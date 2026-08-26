@@ -1,164 +1,210 @@
-# ODL Bridge — Mechanics, Comparisons, and Partner Model
-> On-Demand Liquidity architecture · 2026-08-26
+# VAELIX — ODL Bridge: Mecánica, Comparativa y Modelo de Socios
+> Versión: 2026-06-28 | Complementa TOKENOMICS.md §10 (ODL Bridge)
 
 ---
 
-## What is ODL and Why it Matters
+## 1. QUÉ ES ODL Y POR QUÉ IMPORTA
 
-ODL (On-Demand Liquidity) is the mechanism that allows moving value between currencies/countries in seconds using a digital asset as the bridge, instead of pre-funding nostro accounts at each correspondent bank.
+ODL (On-Demand Liquidity) es la mecánica que permite mover valor entre monedas/países en segundos usando un activo digital como puente, en vez de pre-fondear cuentas nostro en cada banco corresponsal.
 
-The ODL bridge connects **CLP ↔ ckUSDC ↔ destination currencies** using a blockchain layer with ~2 second finality.
+En Vaelix, el bridge ODL conecta **CLP chileno ↔ ckUSDC ↔ monedas de destino** usando ICP como capa de settlement (~2 segundos de finalidad).
 
-The stablecoin vault (Exaltite) **IS the bridge liquidity pool**. It is not a bank account or custodian — it is the ckUSDC inventory available to execute transactions instantly.
-
----
-
-## How an ODL Payment Works
-
-### Remittance flow (Chile → international)
-
-```
-1. User deposits CLP via regulated fiat partner (KYB handled by partner)
-2. The stablecoin vault (ckUSDC pool funded by depositors) releases the
-   equivalent ckUSDC on-chain instantly — this is classic ODL: the pool
-   pays from existing inventory, not waiting for the CLP to "convert"
-3. ckUSDC travels on-chain (~2 seconds finality)
-4. At destination: fiat partner redeems ckUSDC and settles in local
-   currency (USD, MXN, EUR, etc.)
-5. Recipient receives funds
-6. The CLP from step 1 (minus fees) eventually rebalances the ckUSDC pool
-
-Protocol fee: 0.5% + fiat ramp ~1% (total user cost: ~1.5%)
-SWIFT equivalent: ~2.5–3.5%
-```
-
-### The pool does not get "drained"
-
-The ckUSDC in the vault is not consumed per transaction — it serves as **instant liquidity guarantee**. The actual flow:
-
-- ckUSDC enters the pool when there are payments in the reverse direction (into Chile)
-- ckUSDC exits when there are payments outbound
-- If the flow is **bidirectional**: pool self-replenishes, capital permanently intact
-- If the flow is **unidirectional**: pool can become unbalanced → protocol rebalances with accumulated fees (0.5% × volume)
-
-**The depositor's capital never disappears.** If the pool becomes extremely unbalanced, the bridge pauses — but capital remains withdrawable.
-
-### Capacity vs. TVL
-
-```
-$20K ckUSDC in vault → $20K of instant capacity (in simultaneous flight)
-But the chain settles in ~2 seconds:
-→ $20K pool can process $500K–$1M+ monthly volume
-   (if no more than $20K is in flight simultaneously)
-
-Real risk: extreme unidirectional flow, not pool size
-```
+El Vault Exaltite (ckUSDC/ckUSDT) **ES el pool de liquidez del bridge**. No es una cuenta bancaria ni un custodio — es el inventario de ckUSDC disponible para ejecutar transacciones instantáneamente.
 
 ---
 
-## Comparison: Protocol vs. XRP/Ripple vs. SWIFT
+## 2. CÓMO FUNCIONA UN PAGO ODL EN VAELIX
 
-### The Ripple/XRP model
+> ⚠️ **Corrección real (auditoría 2026-08-24, ver `INSTRUCCIONES_FOUNDER.md`
+> §7.1):** el flujo de abajo describe el diseño de la variante "Koywe" —
+> pero `src/koywe_bridge/main.mo` **no existe** (0 código, sin canister
+> deployado, ver §6 más abajo). No usar la palabra "activo" para esta
+> variante en ningún material de founder/marketing hasta que exista
+> código real. La única variante con código real HOY es sCLP nativo
+> (Pegasus SpA + Fintoc, §7) — corre en sandbox, bloqueada para dinero
+> real por aprobación CMF pendiente.
 
-Ripple uses XRP as a bridge asset between market makers (Bitso, SBI Remit, etc.):
+### Flujo de remesa (Chile → exterior) — diseño, Koywe pendiente de construir
 
 ```
-US company → USD → MM buys XRP → XRP travels → MM Mexico sells XRP → MXN → recipient
+1. Usuario deposita CLP en Koywe (custodia y KYB de Koywe — NO toca ningún
+   canister de Vaelix; CLP no tiene representación on-chain sin sCLP)
+2. El Vault Exaltite (pool ckUSDC financiado por depositantes) libera el ckUSDC
+   equivalente on-chain instantáneo — no espera a que el CLP del paso 1 se
+   "convierta"; es ODL clásico: el pool paga con inventario existente
+3. ckUSDC viaja en ICP chain (~2 segundos)
+4. En destino: Koywe redime el ckUSDC (minter oficial de ICP → USDC real, o
+   sus propios rieles) y liquida a moneda local (USD, MXN, EUR, etc.)
+5. Destinatario recibe fondos
+6. El CLP del paso 1 (menos fees) es lo que eventualmente rebalancea el pool
+   ckUSDC de Vaelix — no hay conversión CLP→ckUSDC atómica por transacción
+
+Fee para Vaelix: 0.5% + rampa ~1% (total usuario: ~1.5%)
+Fee SWIFT equivalente: ~2.5–3.5%
 ```
 
-Market makers maintain **XRP inventory on both sides of the corridor**. That inventory IS their ODL liquidity. They earn the spread + fees per transaction.
+### El pool no se "vacía"
 
-**The problem:** XRP is volatile. If XRP drops 40% while the MM holds inventory, it loses on principal. Only large entities with tolerance for that volatility become serious MMs.
+El ckUSDC del vault no es consumido por cada transacción — se usa como **garantía de liquidez instantánea**. El flujo real:
 
-### Comparison table
+- ckUSDC entra al pool cuando hay pagos en dirección inversa (entrada a Chile)
+- ckUSDC sale cuando hay pagos hacia el exterior
+- Si el flujo es **bidireccional**: pool se autorrepone, capital intacto permanentemente
+- Si el flujo es **unidireccional**: pool puede desbalancearse → el protocolo rebalancea con fees acumulados (0.5% × volumen)
 
-| Dimension | SWIFT | XRP/Ripple | This protocol |
-|-----------|-------|-----------|---------------|
-| Bridge asset | None (direct nostro) | XRP (volatile) | ckUSDC (stable $1) |
-| Speed | 1–5 business days | 3–5 seconds | ~2 seconds |
-| Typical user fee | 2.5–3.5% | 0.3–0.5% | ~0.5–0.7% |
-| MM risk | Low (fiat) | High (XRP volatility) | Very low (ckUSDC stable) |
-| New MM entry | Private Ripple agreement | High barrier | Deposit ckUSDC in vault |
-| Governance | Banking / bilateral | Ripple Inc. centralizes | On-chain, transparent |
-| Initial corridor | Global banking | USD↔MXN, USD↔PHP | CLP↔USD (LATAM first) |
-| Yield for MM | None additional | Only spread/fees | Vault APR + Volume Guild |
+**El capital del depositante NUNCA desaparece.** Si el pool se desbalancea extremo, el bridge se pausa — pero el capital sigue accesible para retirar.
 
-### Why this architecture is better positioned than XRP for ODL
+### Capacidad real vs TVL
 
-XRP was born as a speculative asset and adapted as a bridge. This infrastructure was born as distributed computing with:
+```
+$20K ckUSDC en vault → $20K de capacidad instantánea (en vuelo simultáneo)
+Pero ICP liquida en ~2 segundos:
+→ $20K pool puede procesar $500K-$1M+ en volumen mensual
+   (si no hay más de $20K en vuelo en el mismo instante)
 
-1. **~2 second finality** (vs 3–5s for XRP, with no reversals)
-2. **Native HTTP outcalls** — canisters can call banking APIs directly (Koywe, Fintoc, SWIFT MX, etc.) without external middleware
-3. **Stable compute costs** — the cost of processing an ODL transaction does not fluctuate with the native token price
-4. **Native chain-key assets** (ckBTC, ckUSDC, ckETH) — 1:1 representations of real assets, no additional bridging
-5. **Unstoppable protocol** — the ODL code cannot be deactivated by a central bank or regulator acting unilaterally
+Riesgo real: flujo unidireccional extremo, no el tamaño del pool
+```
+
+### 2.1 Variantes de destino diseñadas (post-CMF / Chanfusion Satellite)
+
+Migrado desde `VAELIX_LIVING_SPEC.md` (borrado 2026-08-07). Estos diagramas describen la
+ruta con sCLP vía Chanfusion Satellite — **fuera de alcance mientras sCLP siga bloqueado
+por CMF**, no el flujo Koywe activo de la sección 2. Se conserva como diseño de referencia
+para cuando ese corredor se habilite.
+
+**Chile → Europa**
+```
+1. CLP → Fintoc Webhook → Chanfusion
+2. Canister acuña sCLP 1:1
+3. AMM: sCLP → ckUSDC (oráculo mindicador.cl)
+4. Chain Fusion: USDC nativo en Ethereum
+5. Partner europeo: USDC → EUR → banco
+6. Burn sCLP on-chain — ciclo cerrado en <60s
+```
+
+**Chile → LATAM**
+```
+1. CLP → Khipu → Chanfusion → sCLP
+2. AMM: sCLP → ckUSDC
+3. Koywe API: USDC → COP/PEN/ARS/BRL
+4. Depósito bancario en país destino
+5. Burn sCLP
+```
 
 ---
 
-## Business Partner Model — Partners as Market Makers
+## 3. COMPARATIVA: VAELIX vs XRP/RIPPLE vs SWIFT
 
-The key insight: **business partners are not "investors" — they are market makers of the CLP corridor.**
+### El modelo Ripple/XRP
 
-### What a Ripple market maker does
-
-- Bitso (Mexico) deposits XRP on both sides of the USA↔MX corridor
-- When someone sends $1,000 USA→MX, Bitso executes the conversion instantly
-- Bitso earns the spread (XRP buy/sell difference) + commission
-- The size of their inventory determines their volume capacity
-
-### What a business partner does in this protocol
-
-- Company deposits ckUSDC in the stablecoin vault
-- That ckUSDC is the inventory for the CLP↔USD corridor
-- When someone sends CLP to Mexico/USA, the ckUSDC pool executes instantly
-- The partner earns: vault APR + proportional ODL fees + Volume Guild if >$25K/month
-
-### The dual advantage of a partner who also uses the app for their own payments
-
-A company that deposits ckUSDC AND processes its own international payments through the app gets:
+Ripple usa XRP como activo puente entre market makers (Bitso, SBI Remit, etc.):
 
 ```
-Income 1:  APR on deposited capital (~8–10%/year in ckUSDC + PXRM Base APR)
-Income 2:  Share of the 0.5% fee on each transaction flowing through their liquidity
-Savings:   Their own payments go out at 0.5% instead of 2.5–3.5% SWIFT
-Guild:     If >$25K/month in ODL → 7% of the fee pool from ALL users
+Empresa USA → USD → MM compra XRP → XRP viaja → MM México vende XRP → MXN → destinatario
 ```
 
-**The right pitch:** Not "invest in DeFi" — it's "be the Bitso of Chile. Your inventory in ckUSDC (stable, no price risk) gives you APR + fees from every payment that passes through, and your own payments go out 5× cheaper."
+Los market makers mantienen **inventario de XRP en ambos lados del corredor**. Ese inventario ES su liquidez ODL. Ganan el spread + fees por transacción.
+
+**El problema:** XRP es volátil. Si XRP cae 40% mientras el MM tiene el inventario, pierde en el principal. Solo entidades grandes con tolerancia a esa volatilidad se vuelven MMs serios.
+
+### Tabla comparativa
+
+| Dimensión | SWIFT | XRP/Ripple | Vaelix |
+|-----------|-------|-----------|--------|
+| Activo puente | Nada (nostro directo) | XRP (volátil) | ckUSDC (estable $1) |
+| Velocidad | 1-5 días hábiles | 3-5 segundos | ~2 segundos |
+| Fee típico usuario | 2.5-3.5% | 0.3-0.5% | ~0.5-0.7% |
+| Riesgo del MM | Bajo (fiat) | Alto (XRP volatilidad) | Muy bajo (ckUSDC estable) |
+| Entrada de nuevos MMs | Acuerdo Ripple privado | Barrera alta | Depositar ckUSDC en vault |
+| Gobernanza | Bancaria / bilateral | Ripple Inc. centraliza | On-chain, transparent |
+| Corredor inicial | Global bancario | USD↔MXN, USD↔PHP, etc. | CLP↔USD (LATAM first) |
+| Yield para el MM | Ninguno adicional | Solo spread/fees | APR vault + Volume Guild |
+
+### Por qué ICP está mejor posicionado que XRP para ODL global
+
+XRP nació como activo especulativo y fue adaptado como puente. ICP nació como infraestructura de cómputo distribuido con:
+
+1. **Finalidad en ~2 segundos** (vs 3-5s de XRP, sin reversiones)
+2. **HTTP outcalls nativos** — el canister puede llamar APIs bancarias directamente (Koywe, Fintoc, SWIFT MX, etc.) sin middleware externo
+3. **Ciclos de compute estables** — el costo de procesar una transacción ODL no fluctúa con el precio de ICP
+4. **ckAssets nativos** (ckBTC, ckUSDC, ckETH) — son representaciones 1:1 de activos reales dentro de ICP, sin bridging adicional
+5. **Canisters = código que no puede apagarse** — el protocolo ODL no puede ser desactivado por un banco central o regulador
+
+La analogía: XRP es una autopista privada construida sobre terreno prestado. ICP es una autopista pública que también sirve como capa de internet descentralizado — el ODL es solo uno de sus casos de uso.
 
 ---
 
-## Bootstrap Capital Requirements
+## 4. EL MODELO DE SOCIOS EMPRESARIALES COMO MARKET MAKERS
 
-### Minimum viable (founder only)
+El insight clave de este documento: **los socios empresariales de Vaelix no son "inversores" — son market makers del corredor CLP**.
 
-| Vault | Demo minimum | Credible launch |
-|-------|-------------|----------------|
-| ICP vault (Exaltium) | $15K | $40K |
-| Crypto vault (ckBTC/ckETH) | $5K | $15K |
-| **Stablecoin vault (Exaltite)** ← critical | **$20K** | **$50K** |
-| Total TVL | $40K | $105K |
+### Qué hace un market maker en Ripple
 
-**The stablecoin vault is the bottleneck:** without it there is no ODL capacity and the stablecoin vault APRs remain at `"--"`.
+- Bitso (México) deposita XRP en ambos lados del corredor USA↔MX
+- Cuando alguien envía $1,000 USA→MX, Bitso ejecuta la conversión instantáneamente
+- Bitso gana el spread (diferencia compra/venta de XRP) + comisión
+- El tamaño de su inventario determina su capacidad de volumen
 
-### With business partners (scalable)
+### Qué hace un socio empresarial en Vaelix
 
-| Partner profile | Own payments/month | Suggested vault TVL | SWIFT savings | Guild |
-|----------------|-------------------|--------------------|--------------|----|
-| Small (~$15K payments) | $15K | $10–25K | ~$375/month | No |
-| Medium (~$30K payments) | $30K | $25–75K | ~$750/month | No |
-| Large (~$75K payments) | $75K | $75K–300K | ~$1,875/month | ✓ Yes |
+- Empresa deposita ckUSDC en Vault Crypto
+- Ese ckUSDC es el inventario del corredor CLP↔USD
+- Cuando alguien envía CLP a México/USA, el pool de ckUSDC ejecuta instantáneamente
+- El socio gana: APR del vault + 0.5% de fees ODL proporcional + Volume Guild si >$25K/mes
 
-**Suggested Phase 1 captation structure:**
-- 3 Angel partners ($15K TVL each) → $45K external TVL
-- 1 Seed partner ($40K TVL) → $40K TVL
-- 1 Strategic partner ($100K TVL) → $100K TVL + active Guild
-- Total external: ~$185K TVL → protocol can self-sustain PXRM Base APR
+### La doble ventaja del socio que también usa la app para sus propios pagos
 
-### Revenue projection
+Una empresa que deposita ckUSDC Y procesa sus propios pagos internacionales por la app obtiene:
 
-| Monthly ODL | ODL Fees | NNS Yield | Swap+CDP | Total/month |
-|------------|---------|-----------|---------|------------|
+```
+Ingreso 1: APR sobre el capital depositado (~8-10%/año en ckUSDC + PXRM Base APR)
+Ingreso 2: Parte del 0.5% fee de cada transacción que pasa por su liquidez
+Ahorro:    Sus propios pagos salen al 0.5% en vez de 2.5-3.5% SWIFT
+Guild:     Si >$25K/mes en ODL → 7% del fee pool de TODOS los usuarios
+```
+
+**El pitch correcto:** No es "invierte en DeFi" — es "sé el Bitso de Chile. Tu inventario en ckUSDC (estable, sin riesgo de precio) te da APR + fees de cada pago que pasa, y tus propios pagos salen 5x más baratos."
+
+---
+
+## 5. BOOTSTRAP CAPITAL — CUÁNTO SE NECESITA
+
+### Mínimo viable (solo el fundador)
+
+| Vault | Mínimo demo | Lanzamiento creíble |
+|-------|------------|---------------------|
+| Exaltium (ICP) | $15K | $40K |
+| Crypto (ckBTC/ckETH) | $5K | $15K |
+| **Exaltite (ckUSDC)** ← crítico | **$20K** | **$50K** |
+| Total TVL personal | $40K | $105K |
+
+> Naming corregido 2026-08-03: Puranium es el canister de staking PXRM, separado de estos 3 vaults — no es "el vault ICP". Ver `VAELIX_APR_MODEL.md` §12 para el mapping completo.
+
+**Treasury para PXRM Base APR (6 meses, TVL mínimo):**
+- Costo bruto: ~$2,000 en valor PXRM
+- NNS staking del ICP genera ~$500-700/mes (reduce el costo real)
+- Costo neto efectivo: ~$1,000-1,500 para 6 meses
+
+**El ckUSDC es el cuello de botella:** sin él no hay ODL capacity y los APRs del Vault Exaltite se quedan en `"--"`.
+
+### Con socios empresariales (escalable)
+
+| Perfil socio | Pagos propios/mes | TVL sugerido en vault | Ahorro vs SWIFT | Guild |
+|-------------|------------------|-----------------------|----------------|-------|
+| Pequeño (empresa ~$15K pagos) | $15K | $10-25K | ~$375/mes | No |
+| Mediano (empresa ~$30K pagos) | $30K | $25-75K | ~$750/mes | No |
+| Grande (empresa ~$75K pagos) | $75K | $75K-300K | ~$1,875/mes | ✓ Sí |
+
+**Estructura de captación sugerida fase 1:**
+- 3 socios Ángel ($15K TVL c/u) → $45K TVL externo
+- 1 socio Semilla ($40K TVL) → $40K TVL
+- 1 socio Estratégico ($100K TVL) → $100K TVL + Guild activo
+- Total externo: ~$185K TVL → protocolo puede self-sustain el PXRM Base APR
+
+### Revenue projection (del APR Model V3)
+
+| ODL Mensual | ODL Fees | NNS Yield | Swap+CDP | Total/mes |
+|-------------|---------|-----------|---------|----------|
 | $50K | $250 | $600 | $250 | ~$1,100 |
 | $200K | $1,000 | $1,200 | $500 | ~$2,700 |
 | $500K | $2,500 | $2,000 | $1,200 | ~$5,700 |
@@ -167,95 +213,181 @@ Guild:     If >$25K/month in ODL → 7% of the fee pool from ALL users
 
 ---
 
-## Koywe Bridge — CLP → ckUSDC Technical Architecture
+## 6. KOYWE BRIDGE — Arquitectura técnica del on-ramp CLP → ckUSDC
 
-### Key resolved question: does Koywe need to install any blockchain code?
+> **Sesión 2026-08-02** — documentación completa del modelo de integración con Koywe como partner ODL.
 
-**No.** Koywe is pure web2. It installs nothing, integrates no blockchain SDK. The technical integration lives 100% on the protocol side:
+### Pregunta clave resuelta: ¿Koywe necesita instalar código ICP?
+
+**NO.** Koywe es puro web2. No instala nada, no integra ningún SDK de ICP. La integración técnica vive 100% en el lado de Vaelix:
 
 ```
-Koywe:    web2 REST API (PAYIN / ONRAMP / OFFRAMP / PAYOUT)
-Protocol: koywe_bridge canister that calls Koywe's API via HTTPS Outcall
+Koywe:    REST API web2 (PAYIN / ONRAMP / OFFRAMP / PAYOUT)
+Vaelix:   canister koywe_bridge en ICP que llama la API de Koywe
 ```
 
-Koywe only needs:
-1. A **webhook URL** to notify when a payment confirms
-2. An **EVM address** (Ethereum/Polygon) to send USDC to
+Koywe solo necesita:
+1. Un **webhook URL** donde notificar cuando un pago confirma
+2. Una **EVM address** (Ethereum/Polygon) donde enviar el USDC
 
-Both are provided by the `koywe_bridge` canister.
+Ambas las provee el `koywe_bridge` canister de Vaelix.
 
-### Koywe API — relevant endpoints
+### Koywe API — endpoints relevantes
 
-| Endpoint | Function |
+| Endpoint | Función |
 |----------|---------|
-| `POST /v3/deals` | Create ONRAMP order (CLP → USDC). Params: amount, fromCurrency, toCurrency, network, destinationAddress |
-| `GET /v3/deals/{id}` | Check order status |
-| `POST /v3/payouts` | OFFRAMP — convert USDC to CLP and send to bank account |
-| Webhook `POST [url]/koywe-hook` | Koywe notifies when deal confirms |
+| `POST /v3/deals` | Crear orden ONRAMP (CLP → USDC). Parámetros: amount, fromCurrency, toCurrency, network (POLYGON/ETH/BSC), destinationAddress |
+| `GET /v3/deals/{id}` | Consultar estado de orden |
+| `POST /v3/payouts` | OFFRAMP / PAYOUT — convertir USDC a CLP y enviar a cuenta bancaria |
+| Webhook `POST [tu_url]/koywe-hook` | Koywe notifica cuando el deal confirma |
 
-### The Custody Triangle
+Contacto: `soporte@koywe.com` (BD y acuerdos técnicos)  
+Chains soportadas por Koywe: **Ethereum, Polygon, BSC** — NO ICP directamente.
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│                     CUSTODY TRIANGLE                         │
-│                                                              │
-│  [Koywe]           [EVM custody wallet]    [On-chain Ledger] │
-│  CLP custody       USDC custody            ckUSDC            │
-│  ~500 CLP          ~0.55 USDC              0.55 ckUSDC        │
-│  (stays w/Koywe)   (canister address)      (user_principal)  │
-│                                                              │
-│  Koywe holds CLP → USDC arrives at EVM → Bridge mints ck    │
-│                    custody wallet          1:1 on-chain      │
-└──────────────────────────────────────────────────────────────┘
-
-Invariant: ckUSDC in circulation = USDC locked in EVM custody wallet (1:1)
-```
-
-### Canister architecture
+### El triángulo de custodia (Custody Triangle)
 
 ```
-koywe_bridge canister responsibilities:
-  1. Expose webhook endpoint via api_gateway
-  2. Store: orderId → icp_principal (stable storage)
-  3. Verify USDC on EVM via HTTPS Outcall → EVM RPC
-  4. Call ckusdc_ledger.icrc1_mint(user_principal, amount)
-  5. For off-ramp: call Koywe PAYOUT API via HTTPS Outcall
+┌─────────────────────────────────────────────────────────────────┐
+│                  TRIÁNGULO DE CUSTODIA VAELIX                   │
+│                                                                 │
+│  [Koywe]              [EVM custody wallet]      [ICP Ledger]   │
+│  Custodia CLP         Custodia USDC             ckUSDC         │
+│  ≈500 CLP             ≈0.55 USDC               0.55 ckUSDC     │
+│  (queda con Koywe)    (address del canister)   (en user_principal) │
+│                                                                 │
+│  Koywe HODL CLP   →   USDC llega a EVM    →   Bridge minta ck  │
+│                       custody wallet           1:1 en ICP       │
+└─────────────────────────────────────────────────────────────────┘
 
-EVM key:
-  - The EVM custody wallet uses Threshold ECDSA (tECDSA)
-  - The private key NEVER exists on any server
-  - It is fragmented across subnet nodes
-  - Canister requests signature from runtime → network signs → tx sent to EVM RPC
+Invariante: ckUSDC en circulación = USDC locked en EVM custody wallet (1:1)
 ```
 
-### Complete on-ramp flow
+**Qué custodia qué:**
+- **Koywe** retiene el CLP chileno — es su modelo de negocio (spread entre compra y venta de USDC)
+- **EVM custody wallet** (una address Ethereum/Polygon controlada por `koywe_bridge` via tECDSA) retiene el USDC real
+- **ICP `ckusdc_ledger`** registra el ckUSDC gemelo, acreditado al `user_principal` del usuario
+
+### Arquitectura del canister koywe_bridge
 
 ```
-Step 1:  User connects wallet → user_principal = "abc12-xyz34-..."
-Step 2:  Frontend creates Koywe order with metadata { icp_principal: "abc12-xyz34..." }
-Step 3:  koywe_bridge.registerOrder(koywe_order_id, user_principal) → stable map
-Step 4:  User pays via Khipu → CLP received by Koywe
-Step 5:  Koywe sends USDC to canister's EVM custody wallet
-Step 6:  Koywe sends POST webhook → api_gateway
-Step 7:  koywe_bridge verifies tx via EVM RPC HTTPS Outcall
-Step 8:  koywe_bridge retrieves user_principal from stable map (by koywe_order_id)
-Step 9:  koywe_bridge.icrc1_mint({ to: {owner: user_principal}, amount }) on ckusdc_ledger
-Step 10: Wallet updates balance (icrc1_balance_of queries the ledger)
+src/koywe_bridge/main.mo          ← A CONSTRUIR (pendiente)
+
+Responsabilidades:
+  1. Exponer webhook endpoint via api_gateway (raw.ic0.app)
+  2. Almacenar: orderId → icp_principal (stable storage)
+  3. Verificar USDC en EVM via HTTPS Outcall → EVM RPC
+  4. Llamar ckusdc_ledger.icrc1_mint(user_principal, amount)
+  5. Para off-ramp: llamar Koywe PAYOUT API via HTTPS Outcall
+
+Clave EVM:
+  - La EVM custody wallet usa Threshold ECDSA (tECDSA)
+  - La private key NUNCA existe en ningún servidor
+  - Se fragmenta entre los nodos de la subred ICP
+  - El canister pide firma al runtime → ICP firma → tx enviada a EVM RPC
+
+Ciclos necesarios:
+  - ~1B cycles por HTTPS Outcall (verificación EVM RPC)
+  - ~500M cycles por HTTPS Outcall (Koywe API)
+  - Cargar 1T cycles iniciales → ~100 on-ramps de runway cómodo
 ```
+
+### Flujo completo on-ramp con tracking de Principal
+
+```
+Paso 1: usuario conecta wallet → user_principal = "abc12-xyz34-..."
+Paso 2: frontend crea orden Koywe con metadata { icp_principal: "abc12-xyz34..." }
+Paso 3: koywe_bridge.registerOrder(koywe_order_id, user_principal) → stable map
+Paso 4: usuario paga via Khipu → CLP recibido por Koywe
+Paso 5: Koywe envía USDC a EVM custody wallet del canister
+Paso 6: Koywe hace POST webhook → api_gateway.raw.ic0.app/koywe-hook
+Paso 7: koywe_bridge verifica tx via EVM RPC HTTPS Outcall
+Paso 8: koywe_bridge recupera user_principal del stable map (por koywe_order_id)
+Paso 9: koywe_bridge.icrc1_mint({ to: {owner: user_principal}, amount }) en ckusdc_ledger
+Paso 10: wallet Vaelix actualiza balance (icrc1_balance_of consulta el ledger)
+```
+
+### Estado actual del canister
+
+| Componente | Estado |
+|------------|--------|
+| `src/koywe_bridge/main.mo` | ❌ **A CONSTRUIR** — arquitectura diseñada, código no escrito |
+| EVM custody wallet address | ❌ No calculada — necesita `dfx canister create koywe_bridge` primero |
+| Configuración Koywe | ❌ Acuerdo comercial pendiente (KYB Track B) |
+| Canister ID en mainnet | ❌ Sin deploy |
+
+> Para la implementación técnica de HTTPS Outcalls, tECDSA y ICRC-1: ver `VAELIX_ICP_TECH.md`
 
 ---
 
-## Multi-Currency Expansion Roadmap
+## 7. CUSTODIA MULTI-FIAT — sCLP / ckBRL / ckARS / ckMXN (2026-08-15)
 
-| Currency | Open Banking coverage | What's needed | Viability |
-|----------|----------------------|---------------|-----------|
-| **sCLP** | Fintoc (Chile) | CMF approval under Ley 21.521 | Code complete, regulatory pending |
-| **ckMXN** | Fintoc (Mexico) | Real bank account in Mexico via local entity | Technically straightforward — same pattern as sCLP |
-| **ckBRL** | Belvo/Pluggy (Brazil) | Brazilian Open Banking provider + BACEN registration | Higher regulatory cost |
-| **ckARS** | Not viable | Argentine exchange controls (cepo) block any viable flow | Deferred until regulatory environment changes |
+Pregunta del founder: para escalar el corredor más allá de CLP, ¿se busca partners
+nuevos por país, o se arma custodia propia (Vaelix/founder) en cada fiat? Esta
+sección registra el análisis y la recomendación.
 
-The canister-side code (`mint/burn/reconcile` pattern) is reusable as a template per currency — only the Open Banking provider and the banking custodian behind it need to change.
+### Qué ya existe (sCLP, el único corredor con código real)
+
+`src/sclp_ledger/main.mo` + `src/sclp_treasury/main.mo` implementan el patrón
+completo: depósito CLP en la cuenta bancaria de **Pegasus SpA** (custodia propia,
+empresa chilena del founder) → detectado vía **Fintoc** (Open Banking API chilena,
+polling HTTPS outcall cada 60s) → mint 1:1 de sCLP → reconciliación cada 10 min
+contra el saldo bancario real (circuit breaker: `reconciliationOk`). Requiere
+aprobación CMF (Ley 21.521) antes de manejar dinero real; el código puede existir
+y probarse en sandbox sin esa aprobación (ver §6 de este documento sobre el
+patrón Koywe/CMF, y `VAELIX_CORREDOR_VAELIX_SANDBOX.md` si se documenta aparte).
+
+Esto es viable porque Pegasus SpA **ya es una entidad chilena real** — Fintoc solo
+opera sobre bancos chilenos y mexicanos, así que la pieza que falta para CLP es
+regulatoria (CMF), no bancaria ni de código.
+
+**Hueco real encontrado 2026-08-24 — off-ramp (retiro) sin payout real:**
+`sclp_treasury.requestRedeem()` quema el sCLP del usuario y registra la
+solicitud, pero nunca dispara el TEF de vuelta al banco — el código solo
+tenía el mint (on-ramp) completo. Investigado el endpoint real de Fintoc
+(`POST /v2/transfers`) para completarlo: requiere **firma JWS por
+request** (JSON Web Signature), un mecanismo distinto y más complejo que
+el `Authorization: apiKey` que ya usa el polling de movimientos/balance.
+Necesita que el founder genere las claves de firma en su dashboard de
+Fintoc antes de poder implementar esto — ver `INSTRUCCIONES_FOUNDER.md`
+§7.2 para el detalle completo y el siguiente paso.
+
+### Qué haría falta para BRL / ARS / MXN
+
+| Fiat | Cobertura Fintoc | Qué requiere custodia propia | Viabilidad |
+|------|------------------|-------------------------------|------------|
+| **ckMXN** | Sí (Fintoc cubre México) | Cuenta bancaria real en México a nombre de una entidad — la del founder o de un partner mexicano | Técnicamente el camino más corto de los tres: mismo patrón que sCLP, mismo proveedor (Fintoc), pero exige abrir banco/entidad en México — no es solo desplegar un canister |
+| **ckBRL** | No — Fintoc no cubre Brasil | Proveedor de Open Banking brasileño (ej. Belvo, Pluggy — ambos con soporte Pix) + cuenta bancaria en Brasil + registro ante BACEN si se opera como institución de pago | Custodia propia implica compliance regulatorio brasileño completo — alto costo para operar en solitario |
+| **ckARS** | No hay equivalente viable | Cualquier custodia de USD/ARS choca con los controles de cambio del BCRA (cepo cambiario) | El más difícil de los tres — no recomendado como próximo paso mientras persista el cepo |
+
+### Recomendación
+
+**Custodia 100% propia (founder/Pegasus SpA) solo es realista para CLP** — ya está
+armada y es la extensión natural de una empresa que el founder ya controla. Para
+BRL y MXN, el camino rápido no es reconstruir el mismo triángulo de custodia en
+3 países más (banco propio + licencia + compliance local en cada uno), sino
+**buscar partners locales ya licenciados** — EMIs o PSPs con cuenta bancaria y
+autorización regulatoria propia en su país — que jueguen el mismo rol que Pegasus
+SpA juega para CLP. El canister-side (`sclp_ledger`/`sclp_treasury`) es
+reutilizable como plantilla por fiat (mismo patrón mint/burn/reconcile), cambiando
+solo el proveedor de Open Banking y el custodio bancario detrás.
+
+ARS queda fuera del roadmap cercano hasta que cambien las restricciones
+cambiarias — no es un problema de arquitectura, es un problema regulatorio externo
+que ninguna integración técnica resuelve.
 
 ---
 
-*ODL Bridge Mechanics · 2026-08-26*
+## 8. PREGUNTAS TÉCNICAS PENDIENTES (V1)
+
+1. **NNS Neuron staking en nombre del usuario:** ¿Puede el canister de Vaelix stakear el ICP depositado en NNS en nombre del usuario? ¿O el canister es el "dueño" del neuron y distribuye el yield manualmente? → Investigar custodia.
+
+2. **T1 streaming implementation:** El yield de T1 corre segundo a segundo. En Motoko, esto implica o bien un timer muy frecuente o bien cálculo lazy al momento del harvest. ¿Cuál es más eficiente en ciclos de ICP?
+
+3. **Rebalanceo unidireccional automático:** ¿Puede el protocolo ejecutar un swap automático ckUSDC→ICP→ckUSDC para rebalancear sin intervención manual, usando los fees acumulados?
+
+4. **ckUSDC en ICP vs real USDC:** El ckUSDC en ICP es una representación 1:1 del USDC en Ethereum via Chainfusion. ¿Hay delay o riesgo de depegging en condiciones extremas de mercado?
+
+---
+
+*Documento: VAELIX_ODL_MECHANICS.md | 2026-06-28 · Actualizado: 2026-08-15 (§7 custodia multi-fiat sCLP/BRL/ARS/MXN)*  
+*Relacionado: VAELIX_APR_MODEL.md, TOKENOMICS.md §10, VAELIX_ICP_TECH.md (mecánica Principal/HTTPS Outcalls/tECDSA)*
