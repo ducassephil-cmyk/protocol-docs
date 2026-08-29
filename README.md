@@ -7,7 +7,7 @@ Public technical and commercial documentation for the DeFi payment protocol buil
 ## What is this?
 
 A DeFi protocol that connects Chilean fiat (CLP) to on-chain liquidity, enabling:
-- **International payments** at 0.5% vs 2.5–3.5% SWIFT
+- **International payments** at 0.20% vs 2.5–3.5% SWIFT
 - **Yield on stablecoins** via the ODL liquidity pool
 - **Cross-border ODL corridor** Chile ↔ USD ↔ LatAm destinations
 - **Institutional-grade compliance** under Ley Fintech 21.521 + Ley 21.719
@@ -28,8 +28,7 @@ The core stack: WebAssembly canisters on a distributed blockchain network with ~
 ### Finance
 | Document | What's inside |
 |----------|--------------|
-| [Tokenomics](finance/tokenomics.md) | PXRM supply, distribution, vesting, APR model, epoch tiers, fee split |
-| [APR Model](finance/apr-model.md) | How yield is calculated across 3 vaults, PXRM Base APR, Guild Multiplier |
+| [Tokenomics](finance/tokenomics.md) | PXRM supply, distribution, vesting, APR model (§2), epoch tiers, fee split |
 | [Genesis Round](finance/genesis-round.md) | Co-founder program, tiers, captation scenarios, pool sizing |
 
 ### Legal
@@ -68,4 +67,4 @@ For ODL partnership inquiries, see the [ODL Agreement Template](partnerships/odl
 
 ---
 
-*2026-08-26 · Protocol documentation is updated as the codebase evolves.*
+*2026-08-28 · Fee del corredor corregido a 0.20% (era 0.5% en versiones previas) · Link roto a "APR Model" corregido — ese contenido vive en Tokenomics §2, nunca existió como archivo separado · Protocol documentation is updated as the codebase evolves.*

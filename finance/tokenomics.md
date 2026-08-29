@@ -210,7 +210,7 @@ APR TOTAL = Base Real Yield + (PXRM Base APR × Guild Multiplier) + Epoch Tier B
 ### Vault Exaltium (ICP)
 - **Capital al retirar:** ICP exacto depositado
 - **Base Real Yield:** ~3.5%/año en ICP (via NNS neuron staking / WaterNeuron)
-- **PXRM Base APR:** ~4.5%–10% USD en PXRM desde treasury (según lock period)
+- **PXRM Base APR:** 12%–24% USD en PXRM desde treasury (según lock period; recalibrado 2026-08-15, mismo target para las 3 bóvedas)
 - **Guild Multiplier:** ×1.3 Institucional / ×2.0 Apex sobre el PXRM Base APR
 - **+ Epoch Tier Bonus según §3**
 
@@ -225,7 +225,7 @@ APR TOTAL = Base Real Yield + (PXRM Base APR × Guild Multiplier) + Epoch Tier B
 ### Vault Exaltite (ckUSDC, ckUSDT)
 - **Capital al retirar:** ckUSDC exacto depositado
 - **Base Real Yield:** 0%→2%/año variable en ckUSDC — **solo existe con volumen ODL**. En bootstrap = "--".
-- **PXRM Base APR:** ~8%–17% USD en PXRM desde treasury (el attractor principal en bootstrap)
+- **PXRM Base APR:** 12%–24% USD en PXRM desde treasury (el attractor principal en bootstrap; recalibrado 2026-08-15, mismo target para las 3 bóvedas)
 - **Guild Multiplier:** ×1.3 Institucional / ×2.0 Apex sobre el PXRM Base APR
 - **+ Epoch Tier Bonus**
 - El ckUSDC depositado actúa como inventario ODL bridge (ver VAELIX_ODL_MECHANICS.md)

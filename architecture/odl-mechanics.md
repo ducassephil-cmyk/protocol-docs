@@ -31,7 +31,7 @@ El Vault Exaltite (ckUSDC/ckUSDT) **ES el pool de liquidez del bridge**. No es u
    canister de Vaelix; CLP no tiene representación on-chain sin sCLP)
 2. El Vault Exaltite (pool ckUSDC financiado por depositantes) libera el ckUSDC
    equivalente on-chain instantáneo — no espera a que el CLP del paso 1 se
-   "convierta"; es ODL clásico: el pool paga con inventario existente
+   "convierta"; patrón inventario-primero: el pool paga con inventario existente
 3. ckUSDC viaja en ICP chain (~2 segundos)
 4. En destino: Koywe redime el ckUSDC (minter oficial de ICP → USDC real, o
    sus propios rieles) y liquida a moneda local (USD, MXN, EUR, etc.)
@@ -39,7 +39,7 @@ El Vault Exaltite (ckUSDC/ckUSDT) **ES el pool de liquidez del bridge**. No es u
 6. El CLP del paso 1 (menos fees) es lo que eventualmente rebalancea el pool
    ckUSDC de Vaelix — no hay conversión CLP→ckUSDC atómica por transacción
 
-Fee para Vaelix: 0.5% + rampa ~1% (total usuario: ~1.5%)
+Fee para Vaelix: 0.20% + rampa ~1% (total usuario: ~1.2%)
 Fee SWIFT equivalente: ~2.5–3.5%
 ```
 
@@ -50,7 +50,7 @@ El ckUSDC del vault no es consumido por cada transacción — se usa como **gara
 - ckUSDC entra al pool cuando hay pagos en dirección inversa (entrada a Chile)
 - ckUSDC sale cuando hay pagos hacia el exterior
 - Si el flujo es **bidireccional**: pool se autorrepone, capital intacto permanentemente
-- Si el flujo es **unidireccional**: pool puede desbalancearse → el protocolo rebalancea con fees acumulados (0.5% × volumen)
+- Si el flujo es **unidireccional**: pool puede desbalancearse → el protocolo rebalancea con fees acumulados (0.20% × volumen)
 
 **El capital del depositante NUNCA desaparece.** Si el pool se desbalancea extremo, el bridge se pausa — pero el capital sigue accesible para retirar.
 
@@ -113,7 +113,7 @@ Los market makers mantienen **inventario de XRP en ambos lados del corredor**. E
 |-----------|-------|-----------|--------|
 | Activo puente | Nada (nostro directo) | XRP (volátil) | ckUSDC (estable $1) |
 | Velocidad | 1-5 días hábiles | 3-5 segundos | ~2 segundos |
-| Fee típico usuario | 2.5-3.5% | 0.3-0.5% | ~0.5-0.7% |
+| Fee típico usuario | 2.5-3.5% | 0.3-0.5% | ~0.2-0.4% |
 | Riesgo del MM | Bajo (fiat) | Alto (XRP volatilidad) | Muy bajo (ckUSDC estable) |
 | Entrada de nuevos MMs | Acuerdo Ripple privado | Barrera alta | Depositar ckUSDC en vault |
 | Gobernanza | Bancaria / bilateral | Ripple Inc. centraliza | On-chain, transparent |
@@ -150,7 +150,7 @@ El insight clave de este documento: **los socios empresariales de Vaelix no son 
 - Empresa deposita ckUSDC en Vault Crypto
 - Ese ckUSDC es el inventario del corredor CLP↔USD
 - Cuando alguien envía CLP a México/USA, el pool de ckUSDC ejecuta instantáneamente
-- El socio gana: APR del vault + 0.5% de fees ODL proporcional + Volume Guild si >$25K/mes
+- El socio gana: APR del vault + 0.20% de fees ODL proporcional + Volume Guild si >$25K/mes
 
 ### La doble ventaja del socio que también usa la app para sus propios pagos
 
@@ -158,12 +158,12 @@ Una empresa que deposita ckUSDC Y procesa sus propios pagos internacionales por 
 
 ```
 Ingreso 1: APR sobre el capital depositado (~8-10%/año en ckUSDC + PXRM Base APR)
-Ingreso 2: Parte del 0.5% fee de cada transacción que pasa por su liquidez
-Ahorro:    Sus propios pagos salen al 0.5% en vez de 2.5-3.5% SWIFT
+Ingreso 2: Parte del 0.20% fee de cada transacción que pasa por su liquidez
+Ahorro:    Sus propios pagos salen al 0.20% en vez de 2.5-3.5% SWIFT
 Guild:     Si >$25K/mes en ODL → 7% del fee pool de TODOS los usuarios
 ```
 
-**El pitch correcto:** No es "invierte en DeFi" — es "sé el Bitso de Chile. Tu inventario en ckUSDC (estable, sin riesgo de precio) te da APR + fees de cada pago que pasa, y tus propios pagos salen 5x más baratos."
+**El pitch correcto:** No es "invierte en DeFi" — es "sé el Bitso de Chile. Tu inventario en ckUSDC (estable, sin riesgo de precio) te da APR + fees de cada pago que pasa, y tus propios pagos salen ~12-17x más baratos que SWIFT."
 
 ---
 
@@ -389,5 +389,5 @@ que ninguna integración técnica resuelve.
 
 ---
 
-*Documento: VAELIX_ODL_MECHANICS.md | 2026-06-28 · Actualizado: 2026-08-15 (§7 custodia multi-fiat sCLP/BRL/ARS/MXN)*  
+*Documento: VAELIX_ODL_MECHANICS.md | 2026-06-28 · Actualizado: 2026-08-28 (fee real del corredor corregido a 0.20%, decisión del founder — reemplaza el 0.5% de versiones previas)*  
 *Relacionado: VAELIX_APR_MODEL.md, TOKENOMICS.md §10, VAELIX_ICP_TECH.md (mecánica Principal/HTTPS Outcalls/tECDSA)*
