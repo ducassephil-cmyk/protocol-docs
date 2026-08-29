@@ -11,11 +11,11 @@
 
 ---
 
-## 1. Marco Regulatorio Chile — Lo que aplica a Vaelix
+## 1. Marco Regulatorio Chile — Lo que aplica a GreyValley
 
 ### Ley 21.521 (Ley Fintech, enero 2023)
 La ley más relevante. Regula:
-- **Plataformas de financiamiento colectivo** — no aplica directamente a Vaelix
+- **Plataformas de financiamiento colectivo** — no aplica directamente a GreyValley
 - **Sistemas alternativos de transacción (SAT)** — posiblemente aplica al ODL y swap
 - **Custodia de instrumentos financieros y activos virtuales** — **el riesgo principal**
 - **Servicios de enrutamiento de órdenes** — posiblemente aplica al Corredor
@@ -26,7 +26,7 @@ Regula la actividad. Tiene facultad de:
 - Exigir capital mínimo, manuales de conducta, auditorías
 - Multar hasta 15.000 UF por infracción grave
 
-La Ley 21.521 crea un **sandbox regulatorio** (Art. 90+) que permite operar durante hasta 24 meses bajo supervisión CMF mientras se evalúa el modelo de negocio. **Esta es la vía de entrada recomendada para Vaelix.**
+La Ley 21.521 crea un **sandbox regulatorio** (Art. 90+) que permite operar durante hasta 24 meses bajo supervisión CMF mientras se evalúa el modelo de negocio. **Esta es la vía de entrada recomendada para GreyValley.**
 
 ### UAF (Unidad de Análisis Financiero)
 Regula AML/CFT. Aplica a entidades que manejan activos virtuales como PSAVs (Proveedores de Servicios de Activos Virtuales). Koywe absorbe gran parte de este riesgo al hacer el KYC/KYB del on-ramp.
@@ -36,7 +36,7 @@ Regula sistemas de pago. El sCLP (peso chileno sintético) podría necesitar pro
 
 ---
 
-## 2. La Pregunta de Custodia — ¿Vaelix Administra Fondos de Terceros?
+## 2. La Pregunta de Custodia — ¿GreyValley Administra Fondos de Terceros?
 
 ### El triángulo de custodia del on-ramp CLP → ckUSDC
 
@@ -56,11 +56,11 @@ Regula sistemas de pago. El sCLP (peso chileno sintético) podría necesitar pro
 
 | Punto de la cadena | ¿Quién tiene el activo? | ¿Riesgo de "custodia"? |
 |--------------------|------------------------|------------------------|
-| CLP en Koywe | Koywe (regulado, KYC) | ❌ No es Vaelix |
+| CLP en Koywe | Koywe (regulado, KYC) | ❌ No es GreyValley |
 | USDC en EVM wallet | Contrato/wallet controlado por `bridge_canister` canister | ⚠️ **SÍ — este es el riesgo** |
-| ckUSDC en ledger ICP | Usuario directamente (su Principal) | ✅ No es custodia de Vaelix |
+| ckUSDC en ledger ICP | Usuario directamente (su Principal) | ✅ No es custodia de GreyValley |
 
-**El riesgo concreto:** mientras el `bridge_canister` canister tenga un `controllerPrincipal` que sea el team Vaelix (una wallet que controla el equipo), existe control humano unilateral sobre el USDC. Un regulador puede trazar esa cadena: Vaelix desplegó el canister → el canister controla el EVM wallet → el EVM wallet tiene USDC de usuarios → Vaelix custodia USDC de terceros.
+**El riesgo concreto:** mientras el `bridge_canister` canister tenga un `controllerPrincipal` que sea el team GreyValley (una wallet que controla el equipo), existe control humano unilateral sobre el USDC. Un regulador puede trazar esa cadena: GreyValley desplegó el canister → el canister controla el EVM wallet → el EVM wallet tiene USDC de usuarios → GreyValley custodia USDC de terceros.
 
 ---
 
@@ -68,9 +68,9 @@ Regula sistemas de pago. El sCLP (peso chileno sintético) podría necesitar pro
 
 ### Mitigante 1: tECDSA — sin clave privada humana
 
-La clave privada del EVM wallet **no existe** en ningún servidor de Vaelix. Está distribuida como shares entre 28+ nodos independientes del subnet de ICP (operados por entidades distintas en distintas jurisdicciones). Para firmar una transacción, el protocolo ICP requiere el umbral (threshold) — ningún nodo individual (ni Vaelix) puede hacerlo solo.
+La clave privada del EVM wallet **no existe** en ningún servidor de GreyValley. Está distribuida como shares entre 28+ nodos independientes del subnet de ICP (operados por entidades distintas en distintas jurisdicciones). Para firmar una transacción, el protocolo ICP requiere el umbral (threshold) — ningún nodo individual (ni GreyValley) puede hacerlo solo.
 
-**Argumento legal:** Vaelix no "tiene" la llave del EVM wallet en ningún sentido tradicional — es análogo a cómo un protocolo DeFi como Maker "tiene" el ETH colateral sin que ninguna empresa lo custodie.
+**Argumento legal:** GreyValley no "tiene" la llave del EVM wallet en ningún sentido tradicional — es análogo a cómo un protocolo DeFi como Maker "tiene" el ETH colateral sin que ninguna empresa lo custodie.
 
 **Limitación:** el argumento es nuevo en Chile y no tiene jurisprudencia. Un regulador conservador puede ignorarlo.
 
@@ -91,7 +91,7 @@ function releaseUSDC(address recipient, uint256 amount, bytes calldata icpProof)
 
 **¿El Gnosis Safe "tiene custodia" del USDC?**
 Sí, el USDC vive en la dirección del Safe. Pero la pregunta legal relevante no es quién tiene el activo sino **quién puede moverlo**:
-- Safe con firmantes humanos (equipo Vaelix como signers): custodia humana → **MAL**
+- Safe con firmantes humanos (equipo GreyValley como signers): custodia humana → **MAL**
 - Safe donde el **único signer autorizado es la dirección tECDSA del `bridge_canister`**: ningún humano puede liberar el USDC sin pasar por el algoritmo → **BIEN**
 
 La arquitectura correcta: el Safe (o custom escrow) acepta transacciones **solo** desde la dirección que deriva el tECDSA del canister. Sin firmantes humanos. Esto convierte la custodia de "empresa controla fondos" a "protocolo algorítmico controla fondos".
@@ -104,7 +104,7 @@ El USDC **no debería permanecer** en el EVM wallet más de los segundos que tar
 
 ### Mitigante 4: Governance con timelock (el más poderoso para el regulador)
 
-Ver §5 abajo. Si ningún upgrade del canister puede ejecutarse sin aprobación de governance + espera de 48h, el team Vaelix no tiene control unilateral sobre los fondos. Este argumento es el más comprensible para un regulador no técnico.
+Ver §5 abajo. Si ningún upgrade del canister puede ejecutarse sin aprobación de governance + espera de 48h, el team GreyValley no tiene control unilateral sobre los fondos. Este argumento es el más comprensible para un regulador no técnico.
 
 ---
 
@@ -136,7 +136,7 @@ Ver §5 abajo. Si ningún upgrade del canister puede ejecutarse sin aprobación 
 En V1, el Gnosis Safe es la arquitectura más defensible legalmente porque:
 1. Es un estándar auditado y conocido por reguladores internacionales
 2. Las reglas de quién puede firmar son transparentes on-chain
-3. Se puede presentar a CMF como "Multi-sig institucional donde Vaelix NO puede mover fondos sin el protocolo ICP"
+3. Se puede presentar a CMF como "Multi-sig institucional donde GreyValley NO puede mover fondos sin el protocolo ICP"
 4. Futuro: agregar a CMF o un trustee independiente como 2-of-3 co-signer → abre puerta al sandbox sin perder la arquitectura
 
 ---
@@ -145,7 +145,7 @@ En V1, el Gnosis Safe es la arquitectura más defensible legalmente porque:
 
 ### El argumento central
 
-Si el equipo Vaelix puede upgradear el `bridge_canister` canister sin governance approval, tienen control unilateral de facto sobre el USDC en el EVM wallet. Un regulador sigue ese hilo directamente.
+Si el equipo GreyValley puede upgradear el `bridge_canister` canister sin governance approval, tienen control unilateral de facto sobre el USDC en el EVM wallet. Un regulador sigue ese hilo directamente.
 
 **La solución:** el `governance` canister (`src/governance/main.mo`, 71 líneas, **deployado en mainnet desde 2026-08-13** — `ynmo7-taaaa-aaaah-quzjq-cai`, status `Development`) debe **activarse** (a `#Live`/`#Restricted`) **antes de ir a producción con fondos reales** y debe tener control sobre los upgrades del `bridge_canister`. El deploy ya ocurrió; lo que sigue pendiente es la activación de status y la transferencia de controller descrita en los pasos de abajo.
 
@@ -165,7 +165,7 @@ Después del timelock → el governance canister ejecuta el upgrade
 - El founder propone pero no puede ejecutar unilateralmente
 - El upgrade de `bridge_canister` (el canister que controla el EVM wallet) requiere aprobación de la comunidad
 - El timelock de 48h da tiempo para que cualquier actor detecte propuestas maliciosas
-- Esto rompe la cadena "Vaelix → control unilateral → fondos de usuarios"
+- Esto rompe la cadena "GreyValley → control unilateral → fondos de usuarios"
 
 ### Governance como el founder lo quiere
 
@@ -197,11 +197,11 @@ El founder actúa como **Promotor de Propuestas** (Proposal Promoter), no como c
 
 El Art. 90 y ss. de la Ley 21.521 permite a la CMF autorizar la operación temporal de modelos de negocio innovadores bajo supervisión, por hasta 24 meses, con restricciones de escala (máximos de clientes, volumen, etc.) mientras se determina si necesitan regulación permanente.
 
-**Es la vía más inteligente para Vaelix:** operas legalmente, con cobertura regulatoria real, sin necesitar el proceso completo de autorización que puede tomar años.
+**Es la vía más inteligente para GreyValley:** operas legalmente, con cobertura regulatoria real, sin necesitar el proceso completo de autorización que puede tomar años.
 
 ### Prerrequisitos para aplicar al sandbox
 
-| Requisito | Estado Vaelix | Acción |
+| Requisito | Estado GreyValley | Acción |
 |-----------|--------------|--------|
 | Constitución como entidad legal en Chile | ❓ Verificar | Constituir SpA chilena si no existe |
 | Descripción técnica del modelo de negocio | ✅ VAELIX_ODL_MECHANICS.md | Adaptar a formato CMF |
@@ -224,7 +224,7 @@ Mes 31+: Autorización permanente o cierre regulatorio
 
 ### Argumento central para CMF
 
-> "Vaelix no custodia fondos de usuarios en el sentido tradicional. Los pesos chilenos permanecen siempre en Koywe (PSAV regulado). El USDC es tránsito algorítmico controlado por un protocolo distribuido en ICP con governance on-chain. Los usuarios reciben ckUSDC directamente en su wallet soberana. No hay discrecionalidad humana sobre los fondos en ningún punto del flujo."
+> "GreyValley no custodia fondos de usuarios en el sentido tradicional. Los pesos chilenos permanecen siempre en Koywe (PSAV regulado). El USDC es tránsito algorítmico controlado por un protocolo distribuido en ICP con governance on-chain. Los usuarios reciben ckUSDC directamente en su wallet soberana. No hay discrecionalidad humana sobre los fondos en ningún punto del flujo."
 
 ---
 
@@ -249,34 +249,34 @@ Mes 31+: Autorización permanente o cierre regulatorio
 
 CMF puede ignorar un argumento técnico pero no puede ignorar un patrón de comunicación: si la plataforma se promueve como "un servicio financiero que te da rendimiento", el regulador lo trata como tal aunque técnicamente sea otra cosa. El framing de comunicación es tan importante como la arquitectura.
 
-### Lo que Vaelix ES (y cómo decirlo)
+### Lo que GreyValley ES (y cómo decirlo)
 
-> "Vaelix es una interfaz de código abierto que facilita la interacción con protocolos DeFi desplegados en Internet Computer Protocol. Los contratos inteligentes del protocolo son públicos, auditables y operan sin intervención de Vaelix una vez desplegados. Los servicios de conversión entre pesos chilenos y activos digitales son provistos exclusivamente por Koywe SpA, entidad regulada bajo la Ley 21.521."
+> "GreyValley es una interfaz de código abierto que facilita la interacción con protocolos DeFi desplegados en Internet Computer Protocol. Los contratos inteligentes del protocolo son públicos, auditables y operan sin intervención de GreyValley una vez desplegados. Los servicios de conversión entre pesos chilenos y activos digitales son provistos exclusivamente por Koywe SpA, entidad regulada bajo la Ley 21.521."
 
 ### Copy PROHIBIDO (activa riesgo regulatorio)
 
 | ❌ NO decir | ✅ Decir en cambio |
 |-------------|------------------|
-| "Deposita con Vaelix" | "Interactúa con el protocolo usando Vaelix" |
-| "Vaelix te da un X% de rendimiento" | "El protocolo genera rendimiento de estas fuentes: [...]" |
-| "Tus fondos con Vaelix" | "Tus activos en tu wallet, gestionados on-chain" |
-| "Compra/vende a través de Vaelix" | "Koywe (tercero regulado) provee la conversión CLP↔USDC" |
-| "Vaelix garantiza el valor del ckUSDC" | "ckUSDC está respaldado 1:1 por USDC en Ethereum, verificable por ICP/NNS" |
-| "Tu dinero está seguro con nosotros" | "Los activos on-chain son custodiados por el protocolo ICP, no por Vaelix" |
+| "Deposita con GreyValley" | "Interactúa con el protocolo usando GreyValley" |
+| "GreyValley te da un X% de rendimiento" | "El protocolo genera rendimiento de estas fuentes: [...]" |
+| "Tus fondos con GreyValley" | "Tus activos en tu wallet, gestionados on-chain" |
+| "Compra/vende a través de GreyValley" | "Koywe (tercero regulado) provee la conversión CLP↔USDC" |
+| "GreyValley garantiza el valor del ckUSDC" | "ckUSDC está respaldado 1:1 por USDC en Ethereum, verificable por ICP/NNS" |
+| "Tu dinero está seguro con nosotros" | "Los activos on-chain son custodiados por el protocolo ICP, no por GreyValley" |
 
 ### Los tres pilares del argumento "Software Público"
 
-**Pilar 1 — Open source:** el código de los canisters de Vaelix es público en GitHub. Cualquier desarrollador puede auditarlo, forkear el protocolo o desplegar su propia instancia.
+**Pilar 1 — Open source:** el código de los canisters de GreyValley es público en GitHub. Cualquier desarrollador puede auditarlo, forkear el protocolo o desplegar su propia instancia.
 
 **Pilar 2 — Sin discrecionalidad:** una vez activado el governance canister (§5), ningún humano puede cambiar unilateralmente el comportamiento del protocolo con respecto a los fondos de usuarios. El upgrade requiere voto de la comunidad + timelock 48h.
 
-**Pilar 3 — Tercero regulado para fiat:** Vaelix nunca toca pesos chilenos. El on/off-ramp CLP es exclusivo de Koywe, que opera bajo Ley 21.521. Vaelix es la interfaz; Koywe es el servicio financiero.
+**Pilar 3 — Tercero regulado para fiat:** GreyValley nunca toca pesos chilenos. El on/off-ramp CLP es exclusivo de Koywe, que opera bajo Ley 21.521. GreyValley es la interfaz; Koywe es el servicio financiero.
 
 ---
 
 ## 9. Argumento Técnico Central: ckUSDC 1:1 via ICP/NNS — Explicación Profunda
 
-> Este es el argumento técnico más poderoso disponible para Vaelix ante CMF. Requiere explicarlo bien porque los reguladores no conocen ICP. Esta sección está escrita para ser adaptada a la presentación ante CMF con asesoría legal.
+> Este es el argumento técnico más poderoso disponible para GreyValley ante CMF. Requiere explicarlo bien porque los reguladores no conocen ICP. Esta sección está escrita para ser adaptada a la presentación ante CMF con asesoría legal.
 
 ### El problema que resuelve
 
@@ -284,7 +284,7 @@ Un regulador tiene una pregunta obvia: *"Si el usuario deposita tokens que repre
 
 La respuesta tradicional en DeFi — *"el emisor del wrapped token promete mantener la reserva"* — implica confianza en una empresa. Es exactamente lo que un regulador trata como riesgo de contraparte.
 
-**La respuesta de Vaelix es diferente y verificable:** ckUSDC no lo emite ni lo respalda Vaelix. Lo respalda el **NNS de ICP** mediante un protocolo criptográfico distribuido sin intervención humana de ninguna empresa.
+**La respuesta de GreyValley es diferente y verificable:** ckUSDC no lo emite ni lo respalda GreyValley. Lo respalda el **NNS de ICP** mediante un protocolo criptográfico distribuido sin intervención humana de ninguna empresa.
 
 ---
 
@@ -309,7 +309,7 @@ Propuestas aprobadas → se ejecutan automáticamente on-chain
 - DFINITY Foundation tiene una porción del voto, pero no mayoría absoluta — no puede actuar unilateralmente
 - El NNS controla: upgrades del protocolo ICP, creación de subnets, despliegue y control de system canisters
 
-**El punto clave:** El ckUSDC minter canister es un **system canister controlado por el NNS**. No por DFINITY Foundation. No por Vaelix. Por una DAO on-chain con 500K+ participantes. Ni Vaelix ni nadie puede modificar las reglas de cómo se emite o quema ckUSDC sin aprobación del NNS.
+**El punto clave:** El ckUSDC minter canister es un **system canister controlado por el NNS**. No por DFINITY Foundation. No por GreyValley. Por una DAO on-chain con 500K+ participantes. Ni GreyValley ni nadie puede modificar las reglas de cómo se emite o quema ckUSDC sin aprobación del NNS.
 
 ---
 
@@ -324,7 +324,7 @@ ckUSDC no es un "wrapped" token en el sentido tradicional. La diferencia es téc
 | **Auditoría de reserva** | Attestation o auditoría de la empresa emisora | On-chain en Etherscan — verificable por cualquiera en tiempo real |
 | **Riesgo de contraparte** | Quiebra o hack del emisor | Ninguna empresa — el protocolo ICP |
 | **Quién controla las reglas de mint/burn** | El equipo del proyecto emisor | El NNS (DAO con 500K+ neurons) |
-| **¿Puede Vaelix cambiar esto?** | N/A | **No** — Vaelix solo usa ckUSDC, no lo emite ni controla |
+| **¿Puede GreyValley cambiar esto?** | N/A | **No** — GreyValley solo usa ckUSDC, no lo emite ni controla |
 
 **Para CMF:** La distinción entre "wrapped token emitido por una empresa" y "chain-key token emitido por un protocolo descentralizado" es la diferencia entre riesgo de contraparte y riesgo de protocolo. CMF puede regular el primero; el segundo es análogo a como el riesgo de Ethereum como protocolo escapa a la regulación nacional.
 
@@ -353,7 +353,7 @@ Dirección Ethereum resultante: 0xA17a8883dA1abd57c690DF9Ebf58fD551d76042e
 
 **Lo que esto implica legalmente:**
 - DFINITY Foundation no puede mover ese USDC unilateralmente
-- Vaelix no puede mover ese USDC — ni siquiera tiene acceso al sistema
+- GreyValley no puede mover ese USDC — ni siquiera tiene acceso al sistema
 - Un hack de cualquier empresa involucrada en ICP no compromete los fondos
 - Comprometerlo requeriría comprometer >1/3 de los nodos del subnet simultáneamente — operados en múltiples países y proveedores de cloud
 
@@ -400,7 +400,7 @@ El proceso de verificación (ejecutado por el NNS minter canister):
 | El resultado viene firmado por la empresa oracle | El resultado viene del consenso del protocolo (BLS threshold signatures del subnet) |
 | Requiere confiar en la empresa oracle | Requiere confiar en que >2/3 de los 28 nodos no estén colludidos |
 
-**Argumento para CMF:** La verificación de que existe el USDC real en Ethereum no la hace Vaelix ni ninguna empresa. La hace el consenso distribuido de 28 nodos independientes de ICP — matemáticamente, es la misma garantía que el consenso de la blockchain de Ethereum mismo para sus transacciones.
+**Argumento para CMF:** La verificación de que existe el USDC real en Ethereum no la hace GreyValley ni ninguna empresa. La hace el consenso distribuido de 28 nodos independientes de ICP — matemáticamente, es la misma garantía que el consenso de la blockchain de Ethereum mismo para sus transacciones.
 
 #### Paso 3: El mint de ckUSDC
 
@@ -408,7 +408,7 @@ Una vez verificado el depósito por consenso, el NNS minter canister ejecuta:
 
 ```motoko
 // Código del NNS ckUSDC minter canister (público, auditado por DFINITY)
-// Vaelix no controla ni puede modificar este código
+// GreyValley no controla ni puede modificar este código
 
 ckusdc_ledger.icrc1_mint({
   to     = { owner = user_principal };    // usuario que depositó USDC
@@ -445,14 +445,14 @@ Total Supply ckUSDC en ICP = USDC en dirección 0xA17a8883... en Ethereum
 
 ---
 
-### 9.4 Por qué Vaelix queda fuera de esta cadena de custodia
+### 9.4 Por qué GreyValley queda fuera de esta cadena de custodia
 
-Vaelix usa ckUSDC como token nativo para los vaults. Pero:
+GreyValley usa ckUSDC como token nativo para los vaults. Pero:
 
-1. **No emite ckUSDC** — el minter canister es del NNS, Vaelix no tiene acceso ni control
+1. **No emite ckUSDC** — el minter canister es del NNS, GreyValley no tiene acceso ni control
 2. **No puede modificar las reglas** — el minter canister requiere propuesta NNS aprobada para cualquier cambio
 3. **No puede acceder al USDC subyacente** — la dirección Ethereum está bajo threshold signatures de 28 nodos independientes
-4. **Si Vaelix desaparece mañana**, los usuarios siguen pudiendo:
+4. **Si GreyValley desaparece mañana**, los usuarios siguen pudiendo:
    - Quemar ckUSDC via el minter canister del NNS directamente
    - Recuperar USDC en Ethereum
    - Retirar sus fondos de los vaults on-chain (los canisters de vault siguen funcionando)
@@ -461,11 +461,11 @@ Vaelix usa ckUSDC como token nativo para los vaults. Pero:
 
 ### 9.5 El argumento completo para CMF (versión no técnica, para el abogado)
 
-> "Los usuarios de Vaelix que depositan ckUSDC están interactuando con el protocolo Internet Computer (ICP) —  no con Vaelix como custodio. Cada unidad de ckUSDC representa un USDC real depositado en una dirección de la red Ethereum cuya clave privada no existe completa en ningún servidor: está distribuida matemáticamente entre 28 nodos independientes de ICP operados por distintas entidades en distintas jurisdicciones. Las reglas de emisión y redención de ckUSDC están codificadas en un canister controlado por el NNS de ICP — una DAO con más de 500.000 participantes de votación — que ni Vaelix ni DFINITY Foundation pueden modificar unilateralmente.
+> "Los usuarios de GreyValley que depositan ckUSDC están interactuando con el protocolo Internet Computer (ICP) —  no con GreyValley como custodio. Cada unidad de ckUSDC representa un USDC real depositado en una dirección de la red Ethereum cuya clave privada no existe completa en ningún servidor: está distribuida matemáticamente entre 28 nodos independientes de ICP operados por distintas entidades en distintas jurisdicciones. Las reglas de emisión y redención de ckUSDC están codificadas en un canister controlado por el NNS de ICP — una DAO con más de 500.000 participantes de votación — que ni GreyValley ni DFINITY Foundation pueden modificar unilateralmente.
 >
-> La verificación de que los USDC reales existen en Ethereum la realiza el consenso de esos mismos 28 nodos independientes mediante consultas HTTP paralelas al blockchain de Ethereum — sin ningún oracle centralizado de por medio. El total supply de ckUSDC en ICP siempre iguala el USDC en la dirección de custodia Ethereum, y esta igualdad es verificable on-chain por cualquier persona, en tiempo real, sin confiar en Vaelix ni en ninguna empresa.
+> La verificación de que los USDC reales existen en Ethereum la realiza el consenso de esos mismos 28 nodos independientes mediante consultas HTTP paralelas al blockchain de Ethereum — sin ningún oracle centralizado de por medio. El total supply de ckUSDC en ICP siempre iguala el USDC en la dirección de custodia Ethereum, y esta igualdad es verificable on-chain por cualquier persona, en tiempo real, sin confiar en GreyValley ni en ninguna empresa.
 >
-> Vaelix no custodia ckUSDC en ningún sentido jurídico o técnico. Vaelix es la interfaz; el NNS de ICP es el custodio algorítmico. La distinción es análoga a la diferencia entre quien usa internet y quien opera la infraestructura TCP/IP."
+> GreyValley no custodia ckUSDC en ningún sentido jurídico o técnico. GreyValley es la interfaz; el NNS de ICP es el custodio algorítmico. La distinción es análoga a la diferencia entre quien usa internet y quien opera la infraestructura TCP/IP."
 
 ---
 
@@ -484,7 +484,7 @@ Vaelix usa ckUSDC como token nativo para los vaults. Pero:
 
 ## 10. Governance — Acción Inmediata Requerida
 
-El riesgo más urgente (🔴 CRÍTICO en §7) es que el founder puede modificar canisters unilateralmente hoy. Sin governance activo, los argumentos de §8 y §9 son válidos para el ckUSDC del NNS pero **no para los canisters propios de Vaelix** (vaults, bridge_canister, fee_splitter).
+El riesgo más urgente (🔴 CRÍTICO en §7) es que el founder puede modificar canisters unilateralmente hoy. Sin governance activo, los argumentos de §8 y §9 son válidos para el ckUSDC del NNS pero **no para los canisters propios de GreyValley** (vaults, bridge_canister, fee_splitter).
 
 **Pasos concretos — ver `INSTRUCCIONES_FOUNDER.md §13.1 item F` para comandos dfx exactos.**
 
@@ -500,7 +500,7 @@ Timeline mínimo antes de ir a producción con fondos de terceros:
 
 ## 11. Modelo de Amenazas de Seguridad — Red Team / Blue Team
 
-> Este análisis fue generado como ejercicio de "piensa como un atacante" sobre el código real de Vaelix (2026-08-07). Documentado en VAELIX_REGULATORY.md porque la seguridad técnica del protocolo es parte del argumento regulatorio: CMF evaluará si los fondos de usuarios están protegidos no solo por arquitectura institucional sino por el código mismo.
+> Este análisis fue generado como ejercicio de "piensa como un atacante" sobre el código real de GreyValley (2026-08-07). Documentado en VAELIX_REGULATORY.md porque la seguridad técnica del protocolo es parte del argumento regulatorio: CMF evaluará si los fondos de usuarios están protegidos no solo por arquitectura institucional sino por el código mismo.
 
 ### 11.1 Mapa de vectores por severidad
 
@@ -603,7 +603,7 @@ Todos los fondos en vault salen en una transacción
 
 **Reentrancy en `harvestVault`:** el diseño usa un running total (`total_yield - harvestedYieldPXRM`) en vez de resetear un timestamp. `harvestedYieldPXRM` se escribe en `positions` ANTES del `await icrc1_transfer`. Un segundo harvest concurrente calcula yield=0 y retorna inmediatamente. Este es el patrón correcto para Motoko.
 
-**Frontend tampering:** el frontend de Vaelix es un canister ICP — no se puede reemplazar sin un upgrade firmado por el controller. Plug Wallet muestra el Principal real de destino antes de cada transacción, permitiendo que el usuario verifique. El modelo de certified assets de ICP garantiza integridad del frontend servido.
+**Frontend tampering:** el frontend de GreyValley es un canister ICP — no se puede reemplazar sin un upgrade firmado por el controller. Plug Wallet muestra el Principal real de destino antes de cada transacción, permitiendo que el usuario verifique. El modelo de certified assets de ICP garantiza integridad del frontend servido.
 
 **Rate limiting y spam:** `bridge/main.mo` tiene `RATE_LIMIT_MAX_CALLS = 20` por 60s por caller, y `processedPayments` previene replay en condiciones normales (el bug §11.2 es solo en upgrades). `backend/main.mo` rechaza anónimos en todos los métodos shared.
 
@@ -629,25 +629,25 @@ Para CMF, el threat model tiene valor en dos direcciones:
 
 Es el equivalente técnico de la "sandbox regulatoria" que los operadores de servicios de pago deben superar para obtener acreditación CMF. Cualquier empresa que quiera ser **PISP** (Payment Initiation Service Provider) o **AISP** (Account Information Service Provider) en Chile necesita operar contra estas APIs.
 
-**Relevancia directa para Vaelix:** Koywe ya está acreditado como PISP bajo este ecosistema — lo que significa que cuando Vaelix usa Koywe para el on-ramp/off-ramp fiat, Vaelix hereda el cumplimiento FAPI 2.0 *sin esfuerzo propio*. En Fase 3, Vaelix SpA podría registrarse directamente como PISP+AISP, eliminando la comisión de Koywe en el lado fiat.
+**Relevancia directa para GreyValley:** Koywe ya está acreditado como PISP bajo este ecosistema — lo que significa que cuando GreyValley usa Koywe para el on-ramp/off-ramp fiat, GreyValley hereda el cumplimiento FAPI 2.0 *sin esfuerzo propio*. En Fase 3, GreyValley SpA podría registrarse directamente como PISP+AISP, eliminando la comisión de Koywe en el lado fiat.
 
 ---
 
-### 12.2 APIs disponibles y relevancia para Vaelix
+### 12.2 APIs disponibles y relevancia para GreyValley
 
-| API | Endpoint | Qué hace | Relevancia Vaelix |
+| API | Endpoint | Qué hace | Relevancia GreyValley |
 |-----|----------|----------|-------------------|
 | **Consentimiento OAuth2** | `POST /api.php?action=consents` | Redirect flow para obtener consentimiento usuario | Base del flujo; Koywe lo maneja en Fase 1 |
 | **Token OAuth2** | `POST /api.php?action=token` | Intercambio de código por JWT Bearer | Necesario para AISP y PISP |
-| **CIBA (backchannel)** | `POST /api.php?action=ciba_auth` | Inicia autenticación sin redirect (push to móvil) | Alta relevancia: flujo sin abrir browser → ideal para app móvil Vaelix |
-| **CIBA token poll** | `POST /api.php?action=ciba_token` | Polling hasta que usuario aprueba en su banco | Necesario si Vaelix implementa CIBA directamente |
-| **PISP — iniciar pago** | `POST /api.php?action=payments` | Debita cuenta bancaria → TEF a cuenta destino | El corazón del on-ramp: convierte CLP bancario en flujo Vaelix |
+| **CIBA (backchannel)** | `POST /api.php?action=ciba_auth` | Inicia autenticación sin redirect (push to móvil) | Alta relevancia: flujo sin abrir browser → ideal para app móvil GreyValley |
+| **CIBA token poll** | `POST /api.php?action=ciba_token` | Polling hasta que usuario aprueba en su banco | Necesario si GreyValley implementa CIBA directamente |
+| **PISP — iniciar pago** | `POST /api.php?action=payments` | Debita cuenta bancaria → TEF a cuenta destino | El corazón del on-ramp: convierte CLP bancario en flujo GreyValley |
 | **PISP — estado pago** | `GET /api.php?action=payment_status&id=X` | Polling del estado de la transferencia | Confirmación on-chain solo cuando pago PISP confirmado |
-| **NCG 514 estado** | `GET /api.php?action=channels_status` | Disponibilidad operacional de canales bancarios | Vaelix puede detectar que el sistema bancario está caído antes de iniciar on-ramp |
-| **AISP — balances** | `GET /api.php?action=balances` | Saldo de cuentas del usuario (requiere JWT Bearer) | Dashboard de portfolio completo: saldo banco + saldo Vaelix en una pantalla |
+| **NCG 514 estado** | `GET /api.php?action=channels_status` | Disponibilidad operacional de canales bancarios | GreyValley puede detectar que el sistema bancario está caído antes de iniciar on-ramp |
+| **AISP — balances** | `GET /api.php?action=balances` | Saldo de cuentas del usuario (requiere JWT Bearer) | Dashboard de portfolio completo: saldo banco + saldo GreyValley en una pantalla |
 | **AISP — transacciones** | `GET /api.php?action=transactions` | Historial 5 años del usuario (requiere JWT Bearer) | Análisis de flujos: detectar si usuario es importador recurrente |
 | **Catálogo productos** | `GET /api.php?action=products` | Productos bancarios públicos, sin auth | Comparador de spreads / tasas para pitch comercial |
-| **Sucursales/ATMs** | `GET /api.php?action=branches` | Geolocalización de puntos físicos | Bajo impacto para Vaelix |
+| **Sucursales/ATMs** | `GET /api.php?action=branches` | Geolocalización de puntos físicos | Bajo impacto para GreyValley |
 
 **Headers requeridos en toda llamada:**
 ```
@@ -661,13 +661,13 @@ x-fapi-interaction-id: <UUID-único-por-request>
 
 SFA-Sandbox tiene un motor de caos activable que simula condiciones reales de fallo bancario:
 
-| Modo caos | Efecto | Cómo afecta a Vaelix |
+| Modo caos | Efecto | Cómo afecta a GreyValley |
 |-----------|--------|----------------------|
 | **Latencia +3500ms** | Todo endpoint tarda 3.5s extra | El canister HTTPS Outcall timeout debe cubrir esto |
-| **Colapso HTTP 500** | Endpoints devuelven error 500 aleatorio | Vaelix necesita retry con backoff exponencial |
+| **Colapso HTTP 500** | Endpoints devuelven error 500 aleatorio | GreyValley necesita retry con backoff exponencial |
 | **CIBA pending infinito** | Auth nunca completa | Timeout de espera usuario configurable (ej: 5 min) |
 
-**Uso recomendado:** antes de conectar Koywe en staging, correr los flujos de on-ramp contra el chaos engine. Si Vaelix sobrevive el modo caos sin dejar fondos en estado inconsistente, el sistema es robusto para producción.
+**Uso recomendado:** antes de conectar Koywe en staging, correr los flujos de on-ramp contra el chaos engine. Si GreyValley sobrevive el modo caos sin dejar fondos en estado inconsistente, el sistema es robusto para producción.
 
 También es útil para probar el **circuit breaker** del canister: si el banco está caído según NCG 514, el canister debe rechazar el depósito con mensaje claro antes de intentar el PISP.
 
@@ -704,30 +704,30 @@ public query func transformSFAResponse(raw : Types.TransformArgs) : async Http.H
 
 ---
 
-### 12.5 Roadmap de integración SFA en Vaelix
+### 12.5 Roadmap de integración SFA en GreyValley
 
 | Fase | Actor | Qué se integra | Cómo |
 |------|-------|---------------|------|
-| **Fase 1 (actual)** | Koywe | PISP + OAuth2 + CIBA | Koywe ya acreditado; Vaelix solo llama API Koywe |
-| **Fase 2** | Vaelix SpA | NCG 514 monitoring | Canister consulta `channels_status` antes de iniciar on-ramp |
-| **Fase 2** | Vaelix SpA | AISP (lectura) | App muestra saldo bancario + saldo Vaelix en pantalla unificada |
-| **Fase 3** | Vaelix SpA | PISP directo | Registro CMF como PISP → canister inicia pagos TEF sin Koywe |
-| **Fase 3** | Vaelix SpA | CIBA backchannel | Flujo sin redirect → usuario aprueba desde su banco-app → canister confirma |
+| **Fase 1 (actual)** | Koywe | PISP + OAuth2 + CIBA | Koywe ya acreditado; GreyValley solo llama API Koywe |
+| **Fase 2** | GreyValley SpA | NCG 514 monitoring | Canister consulta `channels_status` antes de iniciar on-ramp |
+| **Fase 2** | GreyValley SpA | AISP (lectura) | App muestra saldo bancario + saldo GreyValley en pantalla unificada |
+| **Fase 3** | GreyValley SpA | PISP directo | Registro CMF como PISP → canister inicia pagos TEF sin Koywe |
+| **Fase 3** | GreyValley SpA | CIBA backchannel | Flujo sin redirect → usuario aprueba desde su banco-app → canister confirma |
 
-**Prerequisito para Fase 3:** Vaelix SpA debe ser entidad regulada (PSAV o similar) y superar el proceso de acreditación SFA con CMF. Requiere: entidad legal activa, AML/KYC implementado, auditoría de seguridad, depósito de garantía.
+**Prerequisito para Fase 3:** GreyValley SpA debe ser entidad regulada (PSAV o similar) y superar el proceso de acreditación SFA con CMF. Requiere: entidad legal activa, AML/KYC implementado, auditoría de seguridad, depósito de garantía.
 
 ---
 
 ### 12.6 Relación con §6 — Argumento ante CMF
 
-La existencia de SFA-Sandbox y el cumplimiento FAPI 2.0 de Koywe **fortalece el argumento regulatorio de Vaelix** ante CMF:
+La existencia de SFA-Sandbox y el cumplimiento FAPI 2.0 de Koywe **fortalece el argumento regulatorio de GreyValley** ante CMF:
 
 1. **No somos un sistema opaco:** todo el flujo fiat entra/sale por APIs bancarias reguladas (NCG 502/514), no por canales informales.
-2. **Koywe como buffer regulado:** Vaelix no necesita acreditación propia en Fase 1/2 porque el PISP está del lado de Koywe (entidad regulada CMF).
+2. **Koywe como buffer regulado:** GreyValley no necesita acreditación propia en Fase 1/2 porque el PISP está del lado de Koywe (entidad regulada CMF).
 3. **Arquitectura auditable:** los HTTPS Outcalls desde el canister a las APIs SFA son registrables en logs de consenso del subnet — cualquier auditor puede verificar qué llamadas se hicieron y cuándo.
-4. **Roadmap de cumplimiento progresivo:** en lugar de "vamos a violar la ley y pedir perdón después", Vaelix presenta un camino Fase 1→3 donde en cada etapa existe un actor regulado responsable del fiat.
+4. **Roadmap de cumplimiento progresivo:** en lugar de "vamos a violar la ley y pedir perdón después", GreyValley presenta un camino Fase 1→3 donde en cada etapa existe un actor regulado responsable del fiat.
 
-**Riesgo a gestionar:** si CMF cambia NCG 502/514 o agrega requisitos FAPI 2.1, Vaelix hereda ese cambio a través de Koywe en Fase 1. El canister solo llama a la API de Koywe — Koywe absorbe los cambios regulatorios. Esto es una ventaja arquitectónica, no una deuda técnica.
+**Riesgo a gestionar:** si CMF cambia NCG 502/514 o agrega requisitos FAPI 2.1, GreyValley hereda ese cambio a través de Koywe en Fase 1. El canister solo llama a la API de Koywe — Koywe absorbe los cambios regulatorios. Esto es una ventaja arquitectónica, no una deuda técnica.
 
 ---
 
@@ -739,8 +739,8 @@ La existencia de SFA-Sandbox y el cumplimiento FAPI 2.0 de Koywe **fortalece el 
 | **Alta** | Documentar en INSTRUCCIONES_FOUNDER.md el flujo de confirmación on-chain solo después de `payment_status = SETTLED` | Founder |
 | **Media** | Evaluar si el canister bridge debe llamar `channels_status` como circuit breaker antes de aceptar depósitos | Arquitectura |
 | **Media** | Analizar si CIBA backchannel es mejor UX que redirect OAuth2 para el flujo mobile de on-ramp | Producto |
-| **Baja** | Iniciar exploración legal para registro Vaelix SpA como AISP (menos restrictivo que PISP) | Legal |
+| **Baja** | Iniciar exploración legal para registro GreyValley SpA como AISP (menos restrictivo que PISP) | Legal |
 
 ---
 
-*Vaelix Regulatory Reference | Actualizado: 2026-08-09 | Próxima revisión: antes de aplicación sandbox CMF*
+*GreyValley Regulatory Reference | Actualizado: 2026-08-09 | Próxima revisión: antes de aplicación sandbox CMF*

@@ -1,4 +1,4 @@
-# Vaelix — Integración SFA-Sandbox (CMF Open Finance Chile)
+# GreyValley — Integración SFA-Sandbox (CMF Open Finance Chile)
 > Documento técnico de referencia para la integración con sfasandbox.cl
 > Generado: 2026-08-13 | Basado en documentación oficial sfasandbox.cl/docs.php
 > Normativa: Ley Fintech 21.521 · NCG 502 · NCG 514 · FAPI 2.0
@@ -14,7 +14,7 @@
 | **SFA-Sandbox** (`sfasandbox.cl`) | Open finance bancario: pagos TEF, lectura de cuentas, PISP/AISP | Equipo SFA-Sandbox (privado, alineado CMF) | NCG 502, NCG 514, FAPI 2.0 |
 | **SII Sandbox** (`maullin2.sii.cl`) | Facturación electrónica (DTE), folios, notas de crédito | Servicio de Impuestos Internos | Resolución SII, formato XML |
 
-Vaelix usa **SFA-Sandbox** para el flujo fiat on/off-ramp (CLP ↔ ckUSDC). El SII es un tema aparte de operación contable de Vaelix SpA.
+GreyValley usa **SFA-Sandbox** para el flujo fiat on/off-ramp (CLP ↔ ckUSDC). El SII es un tema aparte de operación contable de GreyValley SpA.
 
 ---
 
@@ -54,9 +54,9 @@ Base URL: `https://sfasandbox.cl/api.php?action=<endpoint>`
 
 ---
 
-## 4. Flujo PISP — On-Ramp CLP → ckUSDC (Relevancia Directa Vaelix)
+## 4. Flujo PISP — On-Ramp CLP → ckUSDC (Relevancia Directa GreyValley)
 
-Este es el flujo principal para el on-ramp de Vaelix: el usuario paga desde su cuenta bancaria chilena y el protocolo mintea ckUSDC a su Principal.
+Este es el flujo principal para el on-ramp de GreyValley: el usuario paga desde su cuenta bancaria chilena y el protocolo mintea ckUSDC a su Principal.
 
 > **⚠ Corrección real 2026-08-22, corregida también en código 2026-08-24:**
 > este documento (y `src/sfa_treasury/main.mo`) tenían el endpoint como
@@ -103,7 +103,7 @@ Content-Type: application/json
   "amount": 15000,
   "debtor_account": "12345678",
   "creditor_account": "987654321",
-  "creditor_name": "Vaelix SpA",
+  "creditor_name": "GreyValley SpA",
   "creditor_rut": "76.XXX.XXX-X",
   "creditor_bank": "Banco Santander Chile"
 }
@@ -181,7 +181,7 @@ x-fapi-interaction-id: <uuid>
 
 ## 6. Flujo CIBA — Autenticación Backchannel (Sin Redirect)
 
-CIBA es el flujo preferido para la app móvil de Vaelix: el usuario aprueba desde su app bancaria sin salir de la app de Vaelix.
+CIBA es el flujo preferido para la app móvil de GreyValley: el usuario aprueba desde su app bancaria sin salir de la app de GreyValley.
 
 ### Paso 1 — Iniciar sesión CIBA
 
@@ -229,7 +229,7 @@ Content-Type: application/json
 
 ## 7. AISP — Lectura de Cuentas del Usuario
 
-Con el Bearer JWT obtenido del flujo OIDC o CIBA, se pueden leer cuentas bancarias del usuario. Relevante para el dashboard unificado (saldo banco + saldo Vaelix en una pantalla).
+Con el Bearer JWT obtenido del flujo OIDC o CIBA, se pueden leer cuentas bancarias del usuario. Relevante para el dashboard unificado (saldo banco + saldo GreyValley en una pantalla).
 
 ### Saldos
 
@@ -267,7 +267,7 @@ x-fapi-interaction-id: <uuid>
 
 El sandbox tiene un chaos engine activable desde el panel que simula fallas reales de los cores bancarios:
 
-| Anomalía | Efecto | Cómo probar en Vaelix |
+| Anomalía | Efecto | Cómo probar en GreyValley |
 |----------|--------|----------------------|
 | **Latencia +3500ms** | Todas las llamadas tardan 3.5s extra | El HTTPS Outcall del canister debe tener timeout ≥ 8s |
 | **HTTP 500** | Endpoints devuelven error aleatorio | El canister debe hacer retry con backoff exponencial (máx 3 intentos) |
@@ -297,7 +297,7 @@ Esto permite interceptar y sabotear tráfico real hacia un banco. **No usar en p
 
 ## 10. Integración ICP — HTTPS Outcalls desde Canister
 
-En la arquitectura Vaelix, el canister ICP llama directamente a la API SFA sin ningún backend Node.js intermedio. Cada HTTPS Outcall la ejecutan los 28 nodos del subnet independientemente — ≥19/28 deben acordar la respuesta.
+En la arquitectura GreyValley, el canister ICP llama directamente a la API SFA sin ningún backend Node.js intermedio. Cada HTTPS Outcall la ejecutan los 28 nodos del subnet independientemente — ≥19/28 deben acordar la respuesta.
 
 **Problema de determinismo:** SFA incluye headers como `x-fapi-interaction-id` y timestamps que varían entre nodos. El canister debe usar `transform` para eliminar estos campos antes del consenso.
 
@@ -325,17 +325,17 @@ let headers = [
 
 ---
 
-## 11. Roadmap de Integración Vaelix × SFA
+## 11. Roadmap de Integración GreyValley × SFA
 
 | Fase | Qué se integra | Responsable | Estado |
 |------|---------------|-------------|--------|
-| **Fase 1 (actual)** | Koywe maneja PISP — Vaelix solo llama API Koywe | Koywe (acreditado CMF) | ⏳ KYB pendiente |
-| **Fase 2** | `channels_status` como circuit breaker en el canister | Vaelix técnico | ✅ Construido (`sfa_treasury/main.mo:204-230`, corrección auditoría 2026-08-24 — este doc decía "no construido" pero el código ya lo tiene) |
-| **Fase 2** | AISP: saldo bancario + saldo Vaelix en dashboard unificado | Vaelix técnico | ❌ No construido |
-| **Fase 3** | Registro Vaelix SpA como PISP directo (elimina fee Koywe) | Legal + CMF | ❌ Requiere registro CMF |
-| **Fase 3** | CIBA backchannel desde la app móvil | Vaelix técnico | ❌ No construido |
+| **Fase 1 (actual)** | Koywe maneja PISP — GreyValley solo llama API Koywe | Koywe (acreditado CMF) | ⏳ KYB pendiente |
+| **Fase 2** | `channels_status` como circuit breaker en el canister | GreyValley técnico | ✅ Construido (`sfa_treasury/main.mo:204-230`, corrección auditoría 2026-08-24 — este doc decía "no construido" pero el código ya lo tiene) |
+| **Fase 2** | AISP: saldo bancario + saldo GreyValley en dashboard unificado | GreyValley técnico | ❌ No construido |
+| **Fase 3** | Registro GreyValley SpA como PISP directo (elimina fee Koywe) | Legal + CMF | ❌ Requiere registro CMF |
+| **Fase 3** | CIBA backchannel desde la app móvil | GreyValley técnico | ❌ No construido |
 
-**Prerequisito para Fase 3:** Vaelix SpA debe ser entidad regulada (PSAV o PISP) y superar el proceso de acreditación SFA con CMF. Requiere: entidad legal activa, AML/KYC implementado, auditoría de seguridad, depósito de garantía.
+**Prerequisito para Fase 3:** GreyValley SpA debe ser entidad regulada (PSAV o PISP) y superar el proceso de acreditación SFA con CMF. Requiere: entidad legal activa, AML/KYC implementado, auditoría de seguridad, depósito de garantía.
 
 ---
 
@@ -347,8 +347,8 @@ let headers = [
 | 🔴 **Alta** | Probar flujo PISP completo (payments → polling → AUTHORIZED) con chaos engine activo |
 | 🟡 **Media** | Implementar `channels_status` como circuit breaker en el canister bridge |
 | 🟡 **Media** | Evaluar CIBA vs redirect OAuth2 como flujo de auth para el on-ramp móvil |
-| 🟢 **Baja** | Explorar registro Vaelix SpA como AISP (menos restrictivo que PISP, primer paso legal) |
+| 🟢 **Baja** | Explorar registro GreyValley SpA como AISP (menos restrictivo que PISP, primer paso legal) |
 
 ---
 
-*Vaelix SFA Integration Reference | Actualizado: 2026-08-13 | Fuente: sfasandbox.cl/docs.php*
+*GreyValley SFA Integration Reference | Actualizado: 2026-08-13 | Fuente: sfasandbox.cl/docs.php*

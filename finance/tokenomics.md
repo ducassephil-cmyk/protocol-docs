@@ -1,4 +1,4 @@
-# Vaelix Protocol — Tokenomics & Features
+# GreyValley Protocol — Tokenomics & Features
 > Versión: 2026-07-01 | APR Model V3 + Supply formal + vUSD Institutional Track + Guild tiers
 
 ---
@@ -61,7 +61,7 @@ Tokens bloqueados — se liberan linealmente después del cliff. Supply total: 5
 
 ## 1b. Genesis Round — Cofundadores Pre-TGE (2026-08-03)
 
-El Genesis Round es el programa de captación de TVL antes del TGE. Los participantes son **cofundadores externos** — actores que depositan capital real (ckUSDC) en los vaults y a cambio reciben una asignación de PXRM con vesting. **No son el equipo Vaelix** (ese es el bucket Team/Founders).
+El Genesis Round es el programa de captación de TVL antes del TGE. Los participantes son **cofundadores externos** — actores que depositan capital real (ckUSDC) en los vaults y a cambio reciben una asignación de PXRM con vesting. **No son el equipo GreyValley** (ese es el bucket Team/Founders).
 
 ### ¿De dónde sale el PXRM para el Genesis Round?
 
@@ -163,9 +163,9 @@ Si el precio cae a 0.080 ICP → reducir bps de Flexible 20% → menos PXRM emit
 
 ---
 
-### LUNX (Luminox) — Token Multichain Externo de Vaelix
+### LUNX (Luminox) — Token Multichain Externo de GreyValley
 
-**Diseño dual-token canónico:** PXRM es el token interno del protocolo (ICP, staking, epoch tiers). LUNX es la representación externa y multichain del valor de Vaelix — el token de mercado real.
+**Diseño dual-token canónico:** PXRM es el token interno del protocolo (ICP, staking, epoch tiers). LUNX es la representación externa y multichain del valor de GreyValley — el token de mercado real.
 
 | Parámetro | V1 Beta (hoy) | V2 (roadmap) |
 |-----------|--------------|--------------|
@@ -543,4 +543,4 @@ Solo `controllerPrincipal` puede cambiar el estado.
 
 ---
 
-*Tokenomics v2.0 | Vaelix Protocol | 2026-06-28*
+*Tokenomics v2.0 | GreyValley Protocol | 2026-06-28*

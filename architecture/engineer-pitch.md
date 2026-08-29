@@ -14,7 +14,7 @@
 | Redis | Cache en memoria, lecturas rápidas | **Query calls** — no escriben estado, responden al instante | Query calls (no requieren consenso — solo un nodo responde) |
 | AWS S3 | Almacenamiento de archivos/assets | **Asset canister** | Asset canister (hasta 64GB por subnet) |
 | AWS API Gateway | Enruta requests HTTP al backend | **Boundary node + IC Agent** | Boundary nodes (los "puertos de entrada" de la red) |
-| Nginx / Load balancer | Distribuye tráfico | **Boundary nodes** | Boundary nodes (gestionados por la red, no por Vaelix) |
+| Nginx / Load balancer | Distribuye tráfico | **Boundary nodes** | Boundary nodes (gestionados por la red, no por GreyValley) |
 | Auth0 / Firebase Auth | Autenticación de usuarios | **Internet Identity + Principal ID** | Principal (cada wallet/usuario tiene una identidad criptográfica única) |
 | Chainlink / Pyth | Oracle externo de datos | **HTTPS Outcalls con consenso** | HTTPS Outcalls (los 28 nodos hacen la misma petición HTTP y votan por el resultado) |
 | Wormhole / Axelar / LayerZero | Bridge entre blockchains | **Chain Fusion / tECDSA** | Chain Key Technology (no hay bridge — ICP firma nativamente en Ethereum) |
@@ -64,9 +64,9 @@ Dfinity no controla los 28 nodos directamente — son operadores independientes 
 
 Lo segundo es posible en teoría pero requiere mayoría del NNS — que incluye a competidores, inversionistas, y usuarios que no tienen incentivo en cerrar canisters arbitrariamente.
 
-**El caso práctico para Vaelix:** si en algún momento los canisters de Vaelix no tienen un controller humano (sino el governance canister como controller), ni Vaelix SpA ni Dfinity pueden modificarlos unilateralmente. Eso es exactamente lo que hace el argumento CMF: "el protocolo no lo controla nadie, lo controlan las reglas del código."
+**El caso práctico para GreyValley:** si en algún momento los canisters de GreyValley no tienen un controller humano (sino el governance canister como controller), ni GreyValley SpA ni Dfinity pueden modificarlos unilateralmente. Eso es exactamente lo que hace el argumento CMF: "el protocolo no lo controla nadie, lo controlan las reglas del código."
 
-**La honestidad:** hoy, los canisters de Vaelix SÍ tienen un controller humano (el founder). Eso es el punto crítico regulatorio pendiente de resolver — el objetivo es migrar el control al governance canister.
+**La honestidad:** hoy, los canisters de GreyValley SÍ tienen un controller humano (el founder). Eso es el punto crítico regulatorio pendiente de resolver — el objetivo es migrar el control al governance canister.
 
 ---
 
@@ -112,7 +112,7 @@ Lo que SÍ existe: el **controller principal** (el dfx identity del founder). Es
 
 ---
 
-### Todo en un canister — el ledger PXRM en el corazón de Vaelix
+### Todo en un canister — el ledger PXRM en el corazón de GreyValley
 
 > Nota histórica: el ledger PXRM original quedó comprometido (minting key perdida, ~20M supply
 > fantasma) y fue reemplazado el 2026-08-09 por el ID de abajo. Detalle en
@@ -126,7 +126,7 @@ El **PXRM ledger canister** (canister ID: `q7nmw-diaaa-aaaah-quy4a-cai`) es un c
 
 No hay base de datos PostgreSQL detrás. No hay servidor Node.js manejando las transferencias. El ledger IS el banco. Es el mismo modelo que el PXRM ledger de ckUSDC (canister ID: `xevnm-gaaaa-aaaar-qafnq-cai`) — que gestiona TODOS los ckUSDC de todos los usuarios de ICP.
 
-**El backend de Vaelix** (`main.mo`) es el canister principal que orquesta todo:
+**El backend de GreyValley** (`main.mo`) es el canister principal que orquesta todo:
 - Recibe depósitos → llama al ledger ICRC-2 para transferir tokens al canister
 - Calcula yield → lógica puramente matemática in-canister
 - Paga rendimiento → llama al ledger PXRM para transferir al usuario
@@ -139,7 +139,7 @@ Todo esto ocurre en canister-to-canister calls, sin ningún servidor externo coo
 
 ### SWIFT — complicaciones específicas y cómo ICP las resuelve
 
-| Problema SWIFT | Qué pasa exactamente | Solución ICP / Vaelix |
+| Problema SWIFT | Qué pasa exactamente | Solución ICP / GreyValley |
 |---|---|---|
 | **Correspondent banking** | Tu banco chileno no tiene cuenta directa en el banco del beneficiario. Usa 2–4 bancos intermediarios, cada uno cobra $10–30 USD. | ckUSDC va directo: wallet → wallet. Sin intermediarios. |
 | **Tiempo de liquidación** | T+1 a T+5 días hábiles. Fin de semana → hasta el lunes. | Finalidad en segundos, 24/7/365. |
@@ -149,11 +149,11 @@ Todo esto ocurre en canister-to-canister calls, sin ningún servidor externo coo
 | **Mínimos rentables** | Para $500 USD, una SWIFT de $40 USD + 2% spread = 12% del monto en costos. No tiene sentido para montos pequeños. | 0.10% funciona igual para $50 o $500.000. |
 | **Bloqueo de fondos** | En algunos países (Argentina), el regulador puede congelar transferencias SWIFT. | No hay entidad con poder de congelar ckUSDC en tránsito (salvo que ICP entero sea atacado — improbable). |
 
-**¿Por qué Koywe y no solo Vaelix?**
+**¿Por qué Koywe y no solo GreyValley?**
 
 Koywe resuelve el problema del **primer y último kilómetro**: convertir CLP (que vive en el sistema bancario chileno) en ckUSDC (que vive en ICP). Esa conversión **todavía requiere el sistema bancario** — alguien tiene que recibir la transferencia CLP y emitir los ckUSDC.
 
-Vaelix resuelve todo lo que viene **después**: el almacenamiento, el rendimiento, el envío internacional, la integración institucional. El SWIFT se evita en el tramo de mayor costo — el envío internacional — porque ese tramo ocurre 100% on-chain.
+GreyValley resuelve todo lo que viene **después**: el almacenamiento, el rendimiento, el envío internacional, la integración institucional. El SWIFT se evita en el tramo de mayor costo — el envío internacional — porque ese tramo ocurre 100% on-chain.
 
 **Analogía:** Koywe es el puerto de entrada y salida. ICP es el sistema de transporte que opera entre puertos. El barco (ckUSDC) no usa rutas marítimas SWIFT — viaja instantáneamente por la red.
 
@@ -178,7 +178,7 @@ Con ckUSDC:
 
 ### Lógica de negocio "en el canister" — qué significa
 
-**Lógica de negocio** = las reglas específicas de tu aplicación. En Vaelix:
+**Lógica de negocio** = las reglas específicas de tu aplicación. En GreyValley:
 - "Solo puedo depositar si el sistema está en estado Live"
 - "El rendimiento se calcula como `bps/10000 × tiempo_transcurrido × precio_token`"
 - "Solo el controller puede activar el sistema"
@@ -192,7 +192,7 @@ En arquitectura tradicional, estas reglas viven en tu servidor Node.js. Si el se
 - Para cambiar las reglas, hay que hacer un **upgrade del canister** — que queda registrado on-chain, visible para cualquiera.
 - Las reglas aplican igual para cualquier llamada, de cualquier usuario, sin excepción — el código no tiene "modo administrador" oculto que saltee las reglas (salvo funciones admin explícitas en el código).
 
-**Ejemplo real en Vaelix (`main.mo`):**
+**Ejemplo real en GreyValley (`main.mo`):**
 ```motoko
 public shared(msg) func depositVault(...) {
   requireLive();           // regla 1: el sistema debe estar Live
@@ -258,14 +258,14 @@ En ICP: `dfx deploy`. Ciclos (fracciones de centavo). Listo.
 
 ICP puede hacer HTTPS Outcalls a APIs de IA (Claude, OpenAI, Gemini) — eso funciona bien. Las limitaciones vienen del **runtime del canister**:
 
-| Limitación | Por qué existe | Solución en Vaelix |
+| Limitación | Por qué existe | Solución en GreyValley |
 |---|---|---|
 | No puedes correr un LLM dentro del canister | Un modelo de 7B parámetros requiere 14GB+ de RAM. El canister tiene máximo 4GB stable memory. | Los modelos corren en los servidores de Anthropic/OpenAI. El canister hace el call vía HTTPS Outcall. |
 | Los LLMs no son deterministas | GPT o Claude pueden dar respuestas distintas a la misma pregunta. El consenso de 28 nodos requiere que todos lleguen al mismo resultado. | El canister hace el call desde UN nodo (no en consenso total) o acepta la variación con transform functions. |
 | Límite de compute por mensaje | ~50 mil millones de instrucciones WebAssembly por update call. Suficiente para lógica financiera, no para inference de IA. | La inference corre en Anthropic/OpenAI, el canister solo orquesta y almacena resultados. |
-| Latencia de HTTPS Outcall | 2–30 segundos por call a una API externa. | Para Vaelix: acceptable para análisis de portfolio, no para trading en tiempo real. |
+| Latencia de HTTPS Outcall | 2–30 segundos por call a una API externa. | Para GreyValley: acceptable para análisis de portfolio, no para trading en tiempo real. |
 
-**Estado actual en Vaelix:** los agentes IA (Haiku para datos, Opus para estrategia) se llaman desde el frontend directamente. La roadmap es mover la orquestación al backend canister para que los análisis sean on-chain y auditables.
+**Estado actual en GreyValley:** los agentes IA (Haiku para datos, Opus para estrategia) se llaman desde el frontend directamente. La roadmap es mover la orquestación al backend canister para que los análisis sean on-chain y auditables.
 
 ---
 
@@ -273,12 +273,12 @@ ICP puede hacer HTTPS Outcalls a APIs de IA (Claude, OpenAI, Gemini) — eso fun
 
 ICP cubre mucho, pero no todo:
 
-| Lo que NO está en ICP | Quién lo maneja en Vaelix |
+| Lo que NO está en ICP | Quién lo maneja en GreyValley |
 |---|---|
 | DNS / dominio (vaelix.io) | Registro de dominio externo (GoDaddy, Namecheap) + el boundary node de ICP como servidor |
 | Fiat on/off ramp (CLP ↔ ckUSDC) | Koywe — empresa regulada con cuentas bancarias reales |
-| KYC/AML | Koywe lo hace en su lado; Vaelix SpA es responsable en el suyo |
-| Entidad legal (contratos, facturas, SII) | Vaelix SpA — fuera de ICP completamente |
+| KYC/AML | Koywe lo hace en su lado; GreyValley SpA es responsable en el suyo |
+| Entidad legal (contratos, facturas, SII) | GreyValley SpA — fuera de ICP completamente |
 | Email y notificaciones | HTTPS Outcalls a APIs de email (SendGrid, etc.) — no hay servidor de correo nativo |
 | App stores (iOS/Android) para wallet nativa | Google Play / App Store — sus reglas son externas |
 | Secretos de API keys para integraciones | El estado del canister (solo accesible por el controller) — no es un vault dedicado |
@@ -287,13 +287,13 @@ ICP cubre mucho, pero no todo:
 
 ## POSICIONAMIENTO POR ZONA — SWIFT vs VAELIX
 
-| Zona | Cliente natural | Dolor principal | Lo que evita Vaelix | Producto |
+| Zona | Cliente natural | Dolor principal | Lo que evita GreyValley | Producto |
 |---|---|---|---|---|
 | **Santiago** | Importadora/exportadora con pagos al exterior | SWIFT lento + spread 1–3% + corresponsales | El tramo internacional completo | ODL Bridge + Vault Exaltite |
 | **Santiago** | Pyme con tesorería idle en CLP/USD | CLP sin rendimiento, inflación erosiona el capital | Nada que ver con SWIFT — es rendimiento en dólares digitales | Vault Exaltite (ckUSDC) |
 | **Mendoza / ARG** | Empresa con operaciones cross-border Chile-Argentina | Restricciones cambiarias ARS, cepo, riesgo peso | ARS inestable → ckUSDC estable → CLP sin pasar por banca formal | ckUSDC como store of value + corredor CLP↔ARS |
 | **Lima / Bogotá** | Empresa que paga proveedores en Chile o recibe remesas | Costo alto de transferencia internacional (SWIFT + FX) | Todo el tramo internacional | Corredor Guild Track B |
-| **Santiago / Tech** | Startup que quiere pagos sin montar su propia infraestructura bancaria | Stripe no funciona en Chile para todos los casos; integraciones bancarias caras | La infraestructura de pagos internacionales | SDK Vaelix + vUSD Services |
+| **Santiago / Tech** | Startup que quiere pagos sin montar su propia infraestructura bancaria | Stripe no funciona en Chile para todos los casos; integraciones bancarias caras | La infraestructura de pagos internacionales | SDK GreyValley + vUSD Services |
 
 ---
 
@@ -310,7 +310,7 @@ La tesis era que diversificar entre LatAm reduciría volatilidad (correlación b
 
 **Precios "acá y allá" no correlacionados:** la misma acción en dos mercados debería tener el mismo precio (arbitraje). Pero con 2 días de liquidación, tipos de cambio fluctuantes, y liquidez asimétrica, el mismo activo podía diferir 2–5% entre mercados — sin que nadie pudiera arbitrar eficientemente porque el ciclo de liquidación era más lento que la diferencia de precio.
 
-**Cómo Vaelix resuelve esto (roadmap):**
+**Cómo GreyValley resuelve esto (roadmap):**
 
 Si acciones tokenizadas (RWAs) liquidaran en ckUSDC:
 - Un inversor en Lima compra acciones de Falabella tokenizadas → paga en ckUSDC.
@@ -318,7 +318,7 @@ Si acciones tokenizadas (RWAs) liquidaran en ckUSDC:
 - No hay FX entre PEN y CLP — ambos liquidaron en dólares digitales.
 - El spread cross-market se arbitraría instantáneamente porque el ciclo de liquidación es ~2 segundos, no 2 días.
 
-Este es el caso de uso RWA/tokenización que ICP habilita — no disponible en Vaelix V1, pero es parte de la visión de "adopción institucional" que menciona el CLAUDE.md.
+Este es el caso de uso RWA/tokenización que ICP habilita — no disponible en GreyValley V1, pero es parte de la visión de "adopción institucional" que menciona el CLAUDE.md.
 
 ---
 
@@ -356,7 +356,7 @@ ICP tiene logs on-chain (ICRC-3) que generan ese registro automáticamente — e
 
 ## ANDROID — PREVISUALIZACIÓN DE APP EN CELULAR
 
-Para Vaelix en su estado actual (web app en ICP):
+Para GreyValley en su estado actual (web app en ICP):
 - La app ya es accesible desde **Android Chrome** apuntando al URL del frontend canister.
 - No hay APK — es una Progressive Web App (PWA). El usuario puede agregarla al home screen desde Chrome.
 
@@ -369,7 +369,7 @@ Para la **Wallet móvil nativa (Fase 2 del roadmap en `WALLET.md`):**
 | **Sideload directo (APK)** | El usuario instala el APK directamente descargándolo (sin Play Store) | Solo para el equipo de desarrollo — no para usuarios |
 | **Expo Go** | App de React Native que permite previsualizar sin compilar un APK | Si la wallet se hace en React Native — el más rápido para iterar |
 
-**Recomendación para Vaelix:** hasta que haya wallet nativa, el "Android preview" es simplemente abrir el URL del canister en Android Chrome. Funciona — y el diseño mobile está especificado en `WALLET.md §Wallet Móvil`.
+**Recomendación para GreyValley:** hasta que haya wallet nativa, el "Android preview" es simplemente abrir el URL del canister en Android Chrome. Funciona — y el diseño mobile está especificado en `WALLET.md §Wallet Móvil`.
 
 ---
 
@@ -449,24 +449,24 @@ La solución es de **diseño previo**, no de borrado posterior:
 | PII real (nombre, RUT, email) | Estado mutable del canister (stable var) | ✅ Sí — `delete_user_data()` lo elimina | Guardar PII solo en state mutable, nunca en logs |
 | Posiciones vault/stake | Estado mutable del canister | ✅ Sí | Keyed por Principal — borrable en una llamada |
 | Historial transacciones (ICRC-3) | Log append-only | ❌ No borrable | Solo contiene el Principal (pseudónimo criptográfico), NO el RUT — el log queda, la identidad real no |
-| KYC data (Koywe side) | Sistemas de Koywe | ✅ Koywe tiene obligación propia bajo la ley | Koywe gestiona su cumplimiento; Vaelix gestiona el suyo |
+| KYC data (Koywe side) | Sistemas de Koywe | ✅ Koywe tiene obligación propia bajo la ley | Koywe gestiona su cumplimiento; GreyValley gestiona el suyo |
 
 **La clave de diseño:** si el Principal ID (una dirección criptográfica, no un nombre ni RUT) es el único identificador en los logs, el log puede quedar intacto sin violar la ley. El derecho al olvido aplica al **PII vinculado a la persona real**, no al registro de que "alguien hizo una transacción". Si la vinculación Principal ↔ RUT real se borra del state mutable, el log queda como datos anónimos.
 
 ---
 
-### Por qué esto es un argumento comercial para Vaelix
+### Por qué esto es un argumento comercial para GreyValley
 
-Lo que esas empresas chilenas están construyendo para 2027 — el sistema de data subject requests — Vaelix lo tiene por diseño desde el día 1. Eso es argumento comercial real para el segmento corporativo y institucional:
+Lo que esas empresas chilenas están construyendo para 2027 — el sistema de data subject requests — GreyValley lo tiene por diseño desde el día 1. Eso es argumento comercial real para el segmento corporativo y institucional:
 
 > *"Si tu empresa necesita cumplir la Ley 21.719 y manejar datos financieros de usuarios, una arquitectura ICP te da el data subject request nativo. No necesitas construir un catálogo de datos separado, no necesitas coordinar borrados en 11 sistemas, no necesitas contratar una consultoría de data governance. El diseño del canister ya tiene esa respuesta: `query_user_data(principal)` y `delete_user_data(principal)`. Eso es infraestructura de compliance incluida en la arquitectura, no agregada después."*
 
 **Posicionamiento específico por segmento:**
 
-| Segmento | Por qué les importa la Ley 21.719 | Argumento Vaelix |
+| Segmento | Por qué les importa la Ley 21.719 | Argumento GreyValley |
 |---|---|---|
 | Fintech / startup | Tienen datos de usuarios y están construyendo cumplimiento desde cero | ICP como arquitectura compliance-by-design desde el inicio — más barato que retrofitar |
-| Pyme con sistema propio | Tienen sistemas legacy que no saben dónde guardan todo | Migrar la capa financiera a Vaelix/ICP resuelve ese vector de datos |
+| Pyme con sistema propio | Tienen sistemas legacy que no saben dónde guardan todo | Migrar la capa financiera a GreyValley/ICP resuelve ese vector de datos |
 | Empresa con clientes institucionales | Sus clientes corporativos van a exigir evidencia de cumplimiento | Audit trail on-chain + borrado verificable en una transacción |
 | Empresa exportadora | Datos de contrapartes internacionales pueden estar sujetos a GDPR europeo también | Mismo mecanismo cumple GDPR y Ley 21.719 simultáneamente |
 

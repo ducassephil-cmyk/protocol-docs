@@ -7,7 +7,7 @@
 
 ODL (On-Demand Liquidity) es la mecánica que permite mover valor entre monedas/países en segundos usando un activo digital como puente, en vez de pre-fondear cuentas nostro en cada banco corresponsal.
 
-En Vaelix, el bridge ODL conecta **CLP chileno ↔ ckUSDC ↔ monedas de destino** usando ICP como capa de settlement (~2 segundos de finalidad).
+En GreyValley, el bridge ODL conecta **CLP chileno ↔ ckUSDC ↔ monedas de destino** usando ICP como capa de settlement (~2 segundos de finalidad).
 
 El Vault Exaltite (ckUSDC/ckUSDT) **ES el pool de liquidez del bridge**. No es una cuenta bancaria ni un custodio — es el inventario de ckUSDC disponible para ejecutar transacciones instantáneamente.
 
@@ -28,7 +28,7 @@ El Vault Exaltite (ckUSDC/ckUSDT) **ES el pool de liquidez del bridge**. No es u
 
 ```
 1. Usuario deposita CLP en Koywe (custodia y KYB de Koywe — NO toca ningún
-   canister de Vaelix; CLP no tiene representación on-chain sin sCLP)
+   canister de GreyValley; CLP no tiene representación on-chain sin sCLP)
 2. El Vault Exaltite (pool ckUSDC financiado por depositantes) libera el ckUSDC
    equivalente on-chain instantáneo — no espera a que el CLP del paso 1 se
    "convierta"; patrón inventario-primero: el pool paga con inventario existente
@@ -37,9 +37,9 @@ El Vault Exaltite (ckUSDC/ckUSDT) **ES el pool de liquidez del bridge**. No es u
    sus propios rieles) y liquida a moneda local (USD, MXN, EUR, etc.)
 5. Destinatario recibe fondos
 6. El CLP del paso 1 (menos fees) es lo que eventualmente rebalancea el pool
-   ckUSDC de Vaelix — no hay conversión CLP→ckUSDC atómica por transacción
+   ckUSDC de GreyValley — no hay conversión CLP→ckUSDC atómica por transacción
 
-Fee para Vaelix: 0.20% + rampa ~1% (total usuario: ~1.2%)
+Fee para GreyValley: 0.20% + rampa ~1% (total usuario: ~1.2%)
 Fee SWIFT equivalente: ~2.5–3.5%
 ```
 
@@ -109,7 +109,7 @@ Los market makers mantienen **inventario de XRP en ambos lados del corredor**. E
 
 ### Tabla comparativa
 
-| Dimensión | SWIFT | XRP/Ripple | Vaelix |
+| Dimensión | SWIFT | XRP/Ripple | GreyValley |
 |-----------|-------|-----------|--------|
 | Activo puente | Nada (nostro directo) | XRP (volátil) | ckUSDC (estable $1) |
 | Velocidad | 1-5 días hábiles | 3-5 segundos | ~2 segundos |
@@ -136,7 +136,7 @@ La analogía: XRP es una autopista privada construida sobre terreno prestado. IC
 
 ## 4. EL MODELO DE SOCIOS EMPRESARIALES COMO MARKET MAKERS
 
-El insight clave de este documento: **los socios empresariales de Vaelix no son "inversores" — son market makers del corredor CLP**.
+El insight clave de este documento: **los socios empresariales de GreyValley no son "inversores" — son market makers del corredor CLP**.
 
 ### Qué hace un market maker en Ripple
 
@@ -145,7 +145,7 @@ El insight clave de este documento: **los socios empresariales de Vaelix no son 
 - Bitso gana el spread (diferencia compra/venta de XRP) + comisión
 - El tamaño de su inventario determina su capacidad de volumen
 
-### Qué hace un socio empresarial en Vaelix
+### Qué hace un socio empresarial en GreyValley
 
 - Empresa deposita ckUSDC en Vault Crypto
 - Ese ckUSDC es el inventario del corredor CLP↔USD
@@ -219,18 +219,18 @@ Guild:     Si >$25K/mes en ODL → 7% del fee pool de TODOS los usuarios
 
 ### Pregunta clave resuelta: ¿Koywe necesita instalar código ICP?
 
-**NO.** Koywe es puro web2. No instala nada, no integra ningún SDK de ICP. La integración técnica vive 100% en el lado de Vaelix:
+**NO.** Koywe es puro web2. No instala nada, no integra ningún SDK de ICP. La integración técnica vive 100% en el lado de GreyValley:
 
 ```
 Koywe:    REST API web2 (PAYIN / ONRAMP / OFFRAMP / PAYOUT)
-Vaelix:   canister koywe_bridge en ICP que llama la API de Koywe
+GreyValley:   canister koywe_bridge en ICP que llama la API de Koywe
 ```
 
 Koywe solo necesita:
 1. Un **webhook URL** donde notificar cuando un pago confirma
 2. Una **EVM address** (Ethereum/Polygon) donde enviar el USDC
 
-Ambas las provee el `koywe_bridge` canister de Vaelix.
+Ambas las provee el `koywe_bridge` canister de GreyValley.
 
 ### Koywe API — endpoints relevantes
 
@@ -303,7 +303,7 @@ Paso 6: Koywe hace POST webhook → api_gateway.raw.ic0.app/koywe-hook
 Paso 7: koywe_bridge verifica tx via EVM RPC HTTPS Outcall
 Paso 8: koywe_bridge recupera user_principal del stable map (por koywe_order_id)
 Paso 9: koywe_bridge.icrc1_mint({ to: {owner: user_principal}, amount }) en ckusdc_ledger
-Paso 10: wallet Vaelix actualiza balance (icrc1_balance_of consulta el ledger)
+Paso 10: wallet GreyValley actualiza balance (icrc1_balance_of consulta el ledger)
 ```
 
 ### Estado actual del canister
@@ -322,7 +322,7 @@ Paso 10: wallet Vaelix actualiza balance (icrc1_balance_of consulta el ledger)
 ## 7. CUSTODIA MULTI-FIAT — sCLP / ckBRL / ckARS / ckMXN (2026-08-15)
 
 Pregunta del founder: para escalar el corredor más allá de CLP, ¿se busca partners
-nuevos por país, o se arma custodia propia (Vaelix/founder) en cada fiat? Esta
+nuevos por país, o se arma custodia propia (GreyValley/founder) en cada fiat? Esta
 sección registra el análisis y la recomendación.
 
 ### Qué ya existe (sCLP, el único corredor con código real)
@@ -379,7 +379,7 @@ que ninguna integración técnica resuelve.
 
 ## 8. PREGUNTAS TÉCNICAS PENDIENTES (V1)
 
-1. **NNS Neuron staking en nombre del usuario:** ¿Puede el canister de Vaelix stakear el ICP depositado en NNS en nombre del usuario? ¿O el canister es el "dueño" del neuron y distribuye el yield manualmente? → Investigar custodia.
+1. **NNS Neuron staking en nombre del usuario:** ¿Puede el canister de GreyValley stakear el ICP depositado en NNS en nombre del usuario? ¿O el canister es el "dueño" del neuron y distribuye el yield manualmente? → Investigar custodia.
 
 2. **T1 streaming implementation:** El yield de T1 corre segundo a segundo. En Motoko, esto implica o bien un timer muy frecuente o bien cálculo lazy al momento del harvest. ¿Cuál es más eficiente en ciclos de ICP?
 
