@@ -156,7 +156,7 @@ Co-founders: 5–8           →  Distribution + viable pre-TGE coordination
 
 | Parameter | Value |
 |-----------|-------|
-| Total supply | 5,000,000 PXRM (fixed, never increases) |
+| Total supply | 5,000,509.85 PXRM as of 2026-08-30 (`icrc1_total_supply`, not fixed — see note below) |
 | Standard | ICRC-1 + ICRC-2 |
 | Decimals | 8 |
 | Model | **Deflationary** — burned on swap + enterprise boost burn |
@@ -165,7 +165,12 @@ Co-founders: 5–8           →  Distribution + viable pre-TGE coordination
 | LatAm adoption target | $500M FDV |
 | Institutional adoption target | $2.5B FDV |
 
-**Supply distribution:**
+> ⚠️ **Real correction 2026-08-30**: this table previously said "fixed,
+> never increases" — no longer true. Founder minted 500 new PXRM (real,
+> on-chain) as a welcome fund for the closed tester pilot. A deliberate,
+> small exception (0.01% of supply), not a model change.
+
+**Supply distribution (formal vesting — does not include the tester fund above):**
 | Group | PXRM | TGE Unlock | Vesting |
 |-------|------|-----------|---------|
 | Protocol Treasury | 2,000,000 | 5% | Governance-controlled |

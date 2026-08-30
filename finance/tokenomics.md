@@ -3,6 +3,15 @@
 
 ---
 
+> ⚠️⚠️ **CORRECCIÓN REAL 2026-08-30 — Koywe NO es un partner activo.**
+> Todo lo que este documento describe sobre Koywe (integración, KYC/AML
+> delegado, "Fase 1 actual", acreditación PISP, etc.) es el **diseño de
+> estrategia** para cuando exista un partner fiat así — hoy no existe
+> ninguna relación real con Koywe, ni siquiera contacto comercial. El
+> webhook técnico del lado GreyValley está construido y listo, pero no
+> apunta a ningún partner confirmado todavía. Leer las secciones de abajo
+> como plan de referencia, no como estado operativo actual.
+
 ## 1. Tokens del Ecosistema
 
 ### PXRM (Puranium) — Token Principal
@@ -13,16 +22,21 @@
 | Decimales | 8 (1 PXRM = 100_000_000 e8s) |
 | Nombre canister | Puranium / PXRM (símbolo y nombre correctos desde el init) |
 | Modelo | **Deflacionario** — se quema en swap PXRM→ICP + enterprise boost burn |
-| **Supply total** | **5.000.000 PXRM** (fijo, nunca aumenta) — real, verificado on-chain |
+| **Supply total** | **5.000.509,85 PXRM** al 2026-08-30 (`icrc1_total_supply` real, no fijo) |
 | Uso | Yield de vaults (boost), minipack bienvenida, swap, staking rewards, Guild rewards |
 
 > Nota histórica: el ledger original (`5zqoe-hqaaa-aaaaj-qrupa-cai`) quedó comprometido
 > (minting key perdida, ~20M supply fantasma) y fue reemplazado el 2026-08-09 por el ledger
 > de arriba. Detalle completo en `VAELIX_MASTER_STATE.md` §29.
 
+> ⚠️ **Corrección real 2026-08-30**: este doc decía "fijo, nunca aumenta" —
+> ya no es cierto. El founder minteó 500 PXRM nuevos (real, on-chain) como
+> fondo de bienvenida para el piloto cerrado de testers. Es una excepción
+> deliberada y chica (0.01% del supply), no un cambio del modelo.
+
 **Distribución supply — Vesting Schedule (2026-08-01):**
 
-Tokens bloqueados — se liberan linealmente después del cliff. Supply total: 5.000.000 PXRM.
+Tokens bloqueados — se liberan linealmente después del cliff. Supply del vesting formal: 5.000.000 PXRM (no incluye el fondo de testers de arriba).
 
 | Grupo | Tokens (PXRM) | Cliff | Vesting | TGE Unlock |
 |---|---|---|---|---|

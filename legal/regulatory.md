@@ -8,6 +8,13 @@
 > debe presentarse a CMF ni usarse como base de decisión sin que un abogado
 > especializado en Ley 21.521 lo revise primero — mismo criterio que
 > `INSTRUCCIONES_FOUNDER.md` aplica a sus propios puntos legales.
+>
+> ⚠️⚠️ **CORRECCIÓN REAL 2026-08-30 — Koywe NO es un partner activo.**
+> Todo lo que este documento describe sobre Koywe ("Pilar 3", buffer
+> regulado, PISP acreditado, delegación de KYC/AML) es la **estrategia
+> de diseño** para cuando exista un partner fiat así — hoy no hay
+> ninguna relación real con Koywe, ni contacto comercial. Leer como plan
+> de referencia, no como estado operativo actual.
 
 ---
 

@@ -3,6 +3,15 @@
 
 ---
 
+> ⚠️⚠️ **CORRECCIÓN REAL 2026-08-30 — Koywe NO es un partner activo.**
+> Todo lo que este documento describe sobre Koywe (integración, KYC/AML
+> delegado, "Fase 1 actual", acreditación PISP, etc.) es el **diseño de
+> estrategia** para cuando exista un partner fiat así — hoy no existe
+> ninguna relación real con Koywe, ni siquiera contacto comercial. El
+> webhook técnico del lado GreyValley está construido y listo, pero no
+> apunta a ningún partner confirmado todavía. Leer las secciones de abajo
+> como plan de referencia, no como estado operativo actual.
+
 ## 1. QUÉ ES ODL Y POR QUÉ IMPORTA
 
 ODL (On-Demand Liquidity) es la mecánica que permite mover valor entre monedas/países en segundos usando un activo digital como puente, en vez de pre-fondear cuentas nostro en cada banco corresponsal.
