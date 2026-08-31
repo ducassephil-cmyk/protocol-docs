@@ -1,4 +1,4 @@
-# VAELIX — ICP explicado al ingeniero/informático chileno
+# GREYVALLEY — ICP explicado al ingeniero/informático chileno
 > Documento de referencia para conversaciones técnicas con IT professionals, ingenieros de sistemas, y equipos de infraestructura.
 > Generado: 2026-08-08 | No es documentación oficial de DFINITY.
 
@@ -284,7 +284,7 @@ ICP cubre mucho, pero no todo:
 
 | Lo que NO está en ICP | Quién lo maneja en GreyValley |
 |---|---|
-| DNS / dominio (vaelix.io) | Registro de dominio externo (GoDaddy, Namecheap) + el boundary node de ICP como servidor |
+| DNS / dominio (greyvalley.xyz) | Registro de dominio externo (GoDaddy, Namecheap) + el boundary node de ICP como servidor |
 | Fiat on/off ramp (CLP ↔ ckUSDC) | Koywe — empresa regulada con cuentas bancarias reales |
 | KYC/AML | Koywe lo hace en su lado; GreyValley SpA es responsable en el suyo |
 | Entidad legal (contratos, facturas, SII) | GreyValley SpA — fuera de ICP completamente |
@@ -294,7 +294,7 @@ ICP cubre mucho, pero no todo:
 
 ---
 
-## POSICIONAMIENTO POR ZONA — SWIFT vs VAELIX
+## POSICIONAMIENTO POR ZONA — SWIFT vs GREYVALLEY
 
 | Zona | Cliente natural | Dolor principal | Lo que evita GreyValley | Producto |
 |---|---|---|---|---|

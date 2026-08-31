@@ -1,4 +1,4 @@
-# VAELIX — ODL Bridge: Mecánica, Comparativa y Modelo de Socios
+# GREYVALLEY — ODL Bridge: Mecánica, Comparativa y Modelo de Socios
 > Versión: 2026-06-28 | Complementa TOKENOMICS.md §10 (ODL Bridge)
 
 ---
@@ -22,7 +22,7 @@ El Vault Exaltite (ckUSDC/ckUSDT) **ES el pool de liquidez del bridge**. No es u
 
 ---
 
-## 2. CÓMO FUNCIONA UN PAGO ODL EN VAELIX
+## 2. CÓMO FUNCIONA UN PAGO ODL EN GREYVALLEY
 
 > ⚠️ **Corrección real (auditoría 2026-08-24, ver `INSTRUCCIONES_FOUNDER.md`
 > §7.1):** el flujo de abajo describe el diseño de la variante "Koywe" —
@@ -102,7 +102,7 @@ para cuando ese corredor se habilite.
 
 ---
 
-## 3. COMPARATIVA: VAELIX vs XRP/RIPPLE vs SWIFT
+## 3. COMPARATIVA: GREYVALLEY vs XRP/RIPPLE vs SWIFT
 
 ### El modelo Ripple/XRP
 
@@ -257,7 +257,7 @@ Chains soportadas por Koywe: **Ethereum, Polygon, BSC** — NO ICP directamente.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                  TRIÁNGULO DE CUSTODIA VAELIX                   │
+│                 TRIÁNGULO DE CUSTODIA GREYVALLEY                 │
 │                                                                 │
 │  [Koywe]              [EVM custody wallet]      [ICP Ledger]   │
 │  Custodia CLP         Custodia USDC             ckUSDC         │

@@ -1,4 +1,4 @@
-# VAELIX — Marco Regulatorio & Estrategia CMF
+# GREYVALLEY — Marco Regulatorio & Estrategia CMF
 > Análisis legal-técnico bajo Ley 21.521 (Ley Fintech Chile, 2023)
 > Creado: 2026-08-03 | Propósito: guía interna del founder para navegación regulatoria
 >

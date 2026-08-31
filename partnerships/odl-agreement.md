@@ -68,7 +68,7 @@ Una vez cumplidas las condiciones precedentes, el Cliente se compromete a:
 
 ---
 
-## COMPROMISOS DE VAELIX (una vez activado)
+## COMPROMISOS DE GREYVALLEY (una vez activado)
 
 Una vez cumplidas las condiciones precedentes, GreyValley se compromete a:
 
