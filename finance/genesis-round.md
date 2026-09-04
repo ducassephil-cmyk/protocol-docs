@@ -4,6 +4,27 @@
 
 ---
 
+> ⚠️ **This document describes the original large-scale design (2026-08-15).
+> The model actually deployed on mainnet (`genesis_registry`, updated
+> 2026-08-31) is different — see `TOKENOMICS.md` §1b for the current,
+> authoritative model.** Kept here as reference for the eventual larger
+> TGE scale; do not use the numbers below as current state.
+>
+> **Real model live today**: 10 co-founder slots (Angel 4 / Seed 3 /
+> Strategic 3, the 3rd Strategic slot reserved for a co-founder who also
+> provides real liquidity to the Corridor and tests it live once active).
+> Cap: 300,000 PXRM (30% of the Ecosystem/Guilds bucket — within the
+> 20-35% range this same document already approved below). Mechanism:
+> each slot guarantees a % of capital value in PXRM (80/75/70/65% by
+> entry order, same across all three tiers), computed using PXRM's
+> **live oracle price at the exact moment of registration** — not a
+> fixed PXRM/$ rate. Safety floor: never less than 1.0 PXRM per $1.
+> A dedicated `creditGenesisBonus()` admin function reimburses any
+> operational loss on the special Strategic slot's Corridor-liquidity
+> capital, separate from the vesting allocation.
+
+---
+
 ## What is the Genesis Round?
 
 The Genesis Round is the TVL bootstrapping program before the Token Generation Event (TGE). Participants are **external co-founders** — actors who deposit real capital (stablecoins) into the protocol vaults and receive a PXRM allocation with vesting in return.
@@ -156,7 +177,7 @@ Co-founders: 5–8           →  Distribution + viable pre-TGE coordination
 
 | Parameter | Value |
 |-----------|-------|
-| Total supply | 5,000,509.85 PXRM as of 2026-08-30 (`icrc1_total_supply`, not fixed — see note below) |
+| Total supply | 5,000,000 PXRM (fixed, never increases) |
 | Standard | ICRC-1 + ICRC-2 |
 | Decimals | 8 |
 | Model | **Deflationary** — burned on swap + enterprise boost burn |
@@ -165,12 +186,7 @@ Co-founders: 5–8           →  Distribution + viable pre-TGE coordination
 | LatAm adoption target | $500M FDV |
 | Institutional adoption target | $2.5B FDV |
 
-> ⚠️ **Real correction 2026-08-30**: this table previously said "fixed,
-> never increases" — no longer true. Founder minted 500 new PXRM (real,
-> on-chain) as a welcome fund for the closed tester pilot. A deliberate,
-> small exception (0.01% of supply), not a model change.
-
-**Supply distribution (formal vesting — does not include the tester fund above):**
+**Supply distribution:**
 | Group | PXRM | TGE Unlock | Vesting |
 |-------|------|-----------|---------|
 | Protocol Treasury | 2,000,000 | 5% | Governance-controlled |

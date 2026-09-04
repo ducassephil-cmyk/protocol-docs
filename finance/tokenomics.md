@@ -27,7 +27,7 @@
 
 > Nota histórica: el ledger original (`5zqoe-hqaaa-aaaaj-qrupa-cai`) quedó comprometido
 > (minting key perdida, ~20M supply fantasma) y fue reemplazado el 2026-08-09 por el ledger
-> de arriba. Detalle completo en `VAELIX_MASTER_STATE.md` §29.
+> de arriba. Detalle completo en `GREYVALLEY_MASTER_STATE.md` §29.
 
 > ⚠️ **Corrección real 2026-08-30**: este doc decía "fijo, nunca aumenta" —
 > ya no es cierto. El founder minteó 500 PXRM nuevos (real, on-chain) como
@@ -46,7 +46,7 @@ Tokens bloqueados — se liberan linealmente después del cliff. Supply del vest
 | Staking Rewards | 500.000 | — | Por epoch / APR | 0% |
 | DAO Governance | 500.000 | — | Voto de comunidad | 0% |
 
-> Nota sobre Treasury: "Governance-controlled" es el mecanismo general — dentro de eso, la porción destinada al PXRM Base APR (+ Guild Multiplier para Track B) de vaults sigue el calendario de la Sunset Clause semestral (`VAELIX_APR_MODEL.md` §10: Año 1 boost 100%, Año 2 baja a 50% si el yield real supera 5% y el ODL supera $500K/mes, Año 3 puede llegar a 0%). El 5% TGE Unlock es aparte de ese calendario — liquidez inicial disponible desde el día 1. **Los 2.000.000 PXRM no son un gasto garantizado** — es un techo que se contrae si el protocolo genera suficiente fee real antes de tiempo; con un sunset clause activado temprano, gran parte de ese 40% del supply queda sin gastarse.
+> Nota sobre Treasury: "Governance-controlled" es el mecanismo general — dentro de eso, la porción destinada al PXRM Base APR (+ Guild Multiplier para Track B) de vaults sigue el calendario de la Sunset Clause semestral (`GREYVALLEY_APR_MODEL.md` §10: Año 1 boost 100%, Año 2 baja a 50% si el yield real supera 5% y el ODL supera $500K/mes, Año 3 puede llegar a 0%). El 5% TGE Unlock es aparte de ese calendario — liquidez inicial disponible desde el día 1. **Los 2.000.000 PXRM no son un gasto garantizado** — es un techo que se contrae si el protocolo genera suficiente fee real antes de tiempo; con un sunset clause activado temprano, gran parte de ese 40% del supply queda sin gastarse.
 > Nota sobre Staking Rewards (500K PXRM): es un pool de supply separado del 35% de fee split que reciben los stakers en ICP/ckUSDC/ckBTC — este bucket se libera "por epoch/APR" como refuerzo adicional en PXRM, no reemplaza al fee split real.
 >
 > ⚠️ **Huérfano detectado (auditoría 2026-08-07):** este bucket no tiene
@@ -54,7 +54,7 @@ Tokens bloqueados — se liberan linealmente después del cliff. Supply del vest
 > ninguna referencia a un pool separado de 500K PXRM ni a una fórmula de
 > liberación. El único mecanismo de pago real en `staking/main.mo` es
 > `distribute_fees()` (fees reales del bridge, ponderados por stake × lock
-> multiplier) — que además está dormido hoy (ver nota en `VAELIX_APR_MODEL.md`
+> multiplier) — que además está dormido hoy (ver nota en `GREYVALLEY_APR_MODEL.md`
 > §2, Capa 3). Antes de implementar este bucket falta decidir la fórmula de
 > liberación (candidatas discutidas: proporcional al TVL general por epoch,
 > vs. tasa fija de emisión proporcional al PXRM ya stakeado) — pendiente de
@@ -94,6 +94,18 @@ Del bucket **Ecosistema / Guilds (1.000.000 PXRM)** — esa es exactamente su fu
 
 > **Regla invariante:** ningún cofundador Genesis tiene unlock en TGE — todo el PXRM asignado tiene vesting post-TGE. Esto elimina el sell pressure en el día de lanzamiento.
 
+> ⚠️ **La tabla de arriba es el diseño original a escala TGE grande.** El
+> modelo real deployado en mainnet hoy (`genesis_registry`, actualizado
+> 2026-08-31) es distinto: **10 cupos** (Ángel 4 / Semilla 3 / Estratega 3
+> — el 3er cupo Estratega reservado para quien además aporte liquidez
+> real al Corredor y lo pruebe en vivo), **cap de 300.000 PXRM** (30% del
+> bucket, dentro del rango 20-35% ya aprobado arriba), y un mecanismo de
+> **% de garantía de capital al precio de PXRM en vivo del oráculo al
+> momento del registro** (80/75/70/65% por orden de entrada, piso de
+> seguridad 1.0 PXRM/$ mínimo) en vez de la tasa fija PXRM/$ de la tabla
+> de arriba. Cualquier pérdida operacional del cupo especial de liquidez
+> se repone en PXRM vía una función admin dedicada, separada del vesting.
+
 ### Escenarios de captación
 
 | Escenario | Composición | TVL Genesis | PXRM asignado | % supply | TVL/FDV |
@@ -108,7 +120,7 @@ Del bucket **Ecosistema / Guilds (1.000.000 PXRM)** — esa es exactamente su fu
 
 ### Criterios de TGE sano
 
-1. **TVL día 1 ≥ $105K** — mínimo para ODL capacity real (Vault Exaltite necesita $50K ckUSDC). Ver `VAELIX_ODL_MECHANICS.md` §5.
+1. **TVL día 1 ≥ $105K** — mínimo para ODL capacity real (Vault Exaltite necesita $50K ckUSDC). Ver `GREYVALLEY_ODL_MECHANICS.md` §5.
 2. **PXRM Genesis ≤ 8% del supply** — por encima empieza a presionar precio post-vesting.
 3. **Float TGE: ~200K PXRM circulantes** (4% supply) — solo TGE unlock Ecosistema (100K) + Treasury (100K). Market cap inicial ~$41K vs TVL $295K → ratio 7x.
 4. **Vesting obligatorio para todos los Genesis** — sin TGE unlock, sin cliff dump.
@@ -199,7 +211,7 @@ Si el precio cae a 0.080 ICP → reducir bps de Flexible 20% → menos PXRM emit
 **Uso V1 (hoy):** historial de participación, governance vote, boost de APR (+1% por cada 100K LUNX)  
 **Uso V2:** bridge a Ethereum, liquidez Uniswap V3, listing CEX, colateral en protocolos EVM
 
-**Ver arquitectura técnica completa:** `VAELIX_INTEGRATIONS.md` §11
+**Ver arquitectura técnica completa:** `GREYVALLEY_INTEGRATIONS.md` §11
 
 ### Otros tokens del ecosistema
 | Token | Rol |
@@ -242,7 +254,7 @@ APR TOTAL = Base Real Yield + (PXRM Base APR × Guild Multiplier) + Epoch Tier B
 - **PXRM Base APR:** 12%–24% USD en PXRM desde treasury (el attractor principal en bootstrap; recalibrado 2026-08-15, mismo target para las 3 bóvedas)
 - **Guild Multiplier:** ×1.3 Institucional / ×2.0 Apex sobre el PXRM Base APR
 - **+ Epoch Tier Bonus**
-- El ckUSDC depositado actúa como inventario ODL bridge (ver VAELIX_ODL_MECHANICS.md)
+- El ckUSDC depositado actúa como inventario ODL bridge (ver GREYVALLEY_ODL_MECHANICS.md)
 
 ---
 
@@ -259,7 +271,7 @@ No hay lock forzado. El capital siempre es retirable. El tier premia la permanen
 | T4 | Singularidad | 180–464d | epoch 30d | +6% |
 | T5 | El Heraldo | 465d+ | epoch 30d | +9% |
 
-> V3 (2026-07-17): se agregó el período de gracia (0-14d) para eliminar free-riders, T4 se extendió ~100d y T5 pasó de 365d a 465d — el año completo ya no alcanza para T5. Canónico en `VAELIX_APR_MODEL.md` §4.1, implementado en `epoch_pool/main.mo`.
+> V3 (2026-07-17): se agregó el período de gracia (0-14d) para eliminar free-riders, T4 se extendió ~100d y T5 pasó de 365d a 465d — el año completo ya no alcanza para T5. Canónico en `GREYVALLEY_APR_MODEL.md` §4.1, implementado en `epoch_pool/main.mo`.
 
 **Regla del 5%:**
 - Retiro ≤5% del capital actual (incluyendo reinversiones) → tier se preserva
@@ -290,7 +302,7 @@ No hay lock forzado. El capital siempre es retirable. El tier premia la permanen
 > del split (bajar Treasury a 18%) a un "vUSD Institutional Pool" dedicado para reforzar el
 > track institucional de §5b. Es una idea sobre la mesa, no algo que el `fee_splitter`
 > deployado haga hoy — el contrato real sigue en 35/25/23/10/7/0. Progresión completa V1.5/V2
-> por volumen ODL: ver `VAELIX_APR_MODEL.md` §6.
+> por volumen ODL: ver `GREYVALLEY_APR_MODEL.md` §6.
 
 ---
 
@@ -301,7 +313,7 @@ No hay lock forzado. El capital siempre es retirable. El tier premia la permanen
 > yield % explícito, dirigido a "inversores/empresas/bancos") tiene características
 > de valor mobiliario que todavía no se analizaron formalmente. Distinto del vUSD
 > minteado vía CDP para pagar en el Marketplace (individual, sin pooling), que sí
-> está bien encuadrado como medio de pago. Ver `VAELIX_REGULATORY_PLANB.md` §6 antes
+> está bien encuadrado como medio de pago. Ver `GREYVALLEY_REGULATORY_PLANB.md` §6 antes
 > de escalar este track o de presentarlo a inversores institucionales reales.
 
 Track de rendimiento estable para inversores clásicos, empresas y bancos. **No requiere CMF** *(afirmación pendiente de validar — ver nota arriba)*.
@@ -314,7 +326,7 @@ Track de rendimiento estable para inversores clásicos, empresas y bancos. **No 
 | Fuente suplementaria | Boost adicional en PXRM vía Guild Multiplier (Treasury, §2) — existe como clasificación en `staking-vault` desde 2026-08-13, pero sin wiring a ningún payout real todavía |
 | Colateral | ckUSDC del usuario (CDP interno, ratio 110%) |
 | Al salir | vUSD quemado, ckUSDC devuelto íntegro |
-| Activación | ✅ Mint live desde 2026-08-02 (`ENABLE_VUSD_MINT = true`) — pero vUSD no tiene ningún uso real más allá de cerrar el propio CDP: no es enviable, no es swapeable, el Marketplace es solo UI sin canister (ver `VAELIX_MASTER_STATE.md` §32) |
+| Activación | ✅ Mint live desde 2026-08-02 (`ENABLE_VUSD_MINT = true`) — pero vUSD no tiene ningún uso real más allá de cerrar el propio CDP: no es enviable, no es swapeable, el Marketplace es solo UI sin canister (ver `GREYVALLEY_MASTER_STATE.md` §32) |
 
 **Acceso por Guild tier — corregido 2026-08-14, permissionless en los tres:**
 
@@ -501,7 +513,7 @@ El Vault Exaltite (ckUSDC) actúa como inventario de liquidez del bridge:
 - $1 depositado en Vault Exaltite = $1 de capacidad ODL instantánea
 - ICP liquida en ~2 segundos → el mismo pool puede procesar mucho más volumen mensual
 - Capital del depositante siempre intacto — el pool no se "consume"
-- Ver **VAELIX_ODL_MECHANICS.md** para detalle completo
+- Ver **GREYVALLEY_ODL_MECHANICS.md** para detalle completo
 
 ---
 

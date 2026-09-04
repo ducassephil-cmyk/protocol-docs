@@ -4,15 +4,6 @@
 
 ---
 
-> ⚠️⚠️ **CORRECCIÓN REAL 2026-08-30 — Koywe NO es un partner activo.**
-> Todo lo que este documento describe sobre Koywe (integración, KYC/AML
-> delegado, "Fase 1 actual", acreditación PISP, etc.) es el **diseño de
-> estrategia** para cuando exista un partner fiat así — hoy no existe
-> ninguna relación real con Koywe, ni siquiera contacto comercial. El
-> webhook técnico del lado GreyValley está construido y listo, pero no
-> apunta a ningún partner confirmado todavía. Leer las secciones de abajo
-> como plan de referencia, no como estado operativo actual.
-
 ## TABLA COMPARATIVA PRINCIPAL
 ### Node.js / PostgreSQL / AWS vs ICP — qué hace cada cosa y cómo se llama en ICP
 
@@ -125,7 +116,7 @@ Lo que SÍ existe: el **controller principal** (el dfx identity del founder). Es
 
 > Nota histórica: el ledger PXRM original quedó comprometido (minting key perdida, ~20M supply
 > fantasma) y fue reemplazado el 2026-08-09 por el ID de abajo. Detalle en
-> `VAELIX_MASTER_STATE.md` §29.
+> `GREYVALLEY_MASTER_STATE.md` §29.
 
 El **PXRM ledger canister** (canister ID: `q7nmw-diaaa-aaaah-quy4a-cai`) es un canister que implementa el estándar ICRC-1. Contiene:
 - Todos los balances PXRM de todos los holders (en memoria stable)
@@ -352,7 +343,7 @@ La declaración de renta en Chile es en **abril** por el año anterior (enero–
 | Empresa deposita en enero 2026 y retira en diciembre 2026 | Todo el rendimiento cae en el ejercicio 2026 → declaración abril 2027. | Máxima exposición fiscal en un solo ejercicio. |
 | Empresa retira en noviembre 2026 antes de año fiscal | Cierra el ciclo dentro del ejercicio 2026. Si convierte PXRM a CLP antes del 31 dic → ganancias de capital realizadas en 2026. | Ganancia de capital realizada = declarar en abril 2027. |
 
-**Punto gris SII (del `VAELIX_SII_FISCAL.md §4`):** el criterio sobre cuándo tributa el rendimiento en PXRM aún no está consolidado. Posición conservadora: el PXRM no es ingreso hasta que se convierte a CLP. Consultar contador con experiencia en crypto.
+**Punto gris SII (del `GREYVALLEY_SII_FISCAL.md §4`):** el criterio sobre cuándo tributa el rendimiento en PXRM aún no está consolidado. Posición conservadora: el PXRM no es ingreso hasta que se convierte a CLP. Consultar contador con experiencia en crypto.
 
 **Consejo operacional antes de la consulta al contador:** mantener registro exacto de:
 - Fecha de depósito + monto en USD
@@ -481,5 +472,5 @@ Lo que esas empresas chilenas están construyendo para 2027 — el sistema de da
 
 ---
 
-*VAELIX_ICP_PITCH_INGENIERO.md | Creado: 2026-08-08*
-*Cross-reference: `VAELIX_ICP_TECH.md` (profundidad técnica NNS/tECDSA), `VAELIX_REGULATORY.md §9` (argumento CMF), `VAELIX_SII_FISCAL.md` (tesorería e impuestos), `WALLET.md` (roadmap mobile), `VAELIX_REGULATORY.md §1` (UAF/CMF)*
+*GREYVALLEY_ICP_PITCH_INGENIERO.md | Creado: 2026-08-08*
+*Cross-reference: `GREYVALLEY_ICP_TECH.md` (profundidad técnica NNS/tECDSA), `GREYVALLEY_REGULATORY.md §9` (argumento CMF), `GREYVALLEY_SII_FISCAL.md` (tesorería e impuestos), `WALLET.md` (roadmap mobile), `GREYVALLEY_REGULATORY.md §1` (UAF/CMF)*

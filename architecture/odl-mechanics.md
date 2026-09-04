@@ -3,15 +3,6 @@
 
 ---
 
-> ⚠️⚠️ **CORRECCIÓN REAL 2026-08-30 — Koywe NO es un partner activo.**
-> Todo lo que este documento describe sobre Koywe (integración, KYC/AML
-> delegado, "Fase 1 actual", acreditación PISP, etc.) es el **diseño de
-> estrategia** para cuando exista un partner fiat así — hoy no existe
-> ninguna relación real con Koywe, ni siquiera contacto comercial. El
-> webhook técnico del lado GreyValley está construido y listo, pero no
-> apunta a ningún partner confirmado todavía. Leer las secciones de abajo
-> como plan de referencia, no como estado operativo actual.
-
 ## 1. QUÉ ES ODL Y POR QUÉ IMPORTA
 
 ODL (On-Demand Liquidity) es la mecánica que permite mover valor entre monedas/países en segundos usando un activo digital como puente, en vez de pre-fondear cuentas nostro en cada banco corresponsal.
@@ -76,7 +67,7 @@ Riesgo real: flujo unidireccional extremo, no el tamaño del pool
 
 ### 2.1 Variantes de destino diseñadas (post-CMF / Chanfusion Satellite)
 
-Migrado desde `VAELIX_LIVING_SPEC.md` (borrado 2026-08-07). Estos diagramas describen la
+Migrado desde `GREYVALLEY_LIVING_SPEC.md` (borrado 2026-08-07). Estos diagramas describen la
 ruta con sCLP vía Chanfusion Satellite — **fuera de alcance mientras sCLP siga bloqueado
 por CMF**, no el flujo Koywe activo de la sección 2. Se conserva como diseño de referencia
 para cuando ese corredor se habilite.
@@ -187,7 +178,7 @@ Guild:     Si >$25K/mes en ODL → 7% del fee pool de TODOS los usuarios
 | **Exaltite (ckUSDC)** ← crítico | **$20K** | **$50K** |
 | Total TVL personal | $40K | $105K |
 
-> Naming corregido 2026-08-03: Puranium es el canister de staking PXRM, separado de estos 3 vaults — no es "el vault ICP". Ver `VAELIX_APR_MODEL.md` §12 para el mapping completo.
+> Naming corregido 2026-08-03: Puranium es el canister de staking PXRM, separado de estos 3 vaults — no es "el vault ICP". Ver `GREYVALLEY_APR_MODEL.md` §12 para el mapping completo.
 
 **Treasury para PXRM Base APR (6 meses, TVL mínimo):**
 - Costo bruto: ~$2,000 en valor PXRM
@@ -324,7 +315,107 @@ Paso 10: wallet GreyValley actualiza balance (icrc1_balance_of consulta el ledge
 | Configuración Koywe | ❌ Acuerdo comercial pendiente (KYB Track B) |
 | Canister ID en mainnet | ❌ Sin deploy |
 
-> Para la implementación técnica de HTTPS Outcalls, tECDSA y ICRC-1: ver `VAELIX_ICP_TECH.md`
+> Para la implementación técnica de HTTPS Outcalls, tECDSA y ICRC-1: ver `GREYVALLEY_ICP_TECH.md`
+
+### 6b. Tres rutas distintas — no confundirlas (diseñado 2026-09-01)
+
+El `koywe_bridge` sirve a **tres rutas reales, con mecánicas y riesgos
+regulatorios distintos**. Documentado acá para que quede claro cuál se
+está construyendo en cada momento — se conversaron las tres seguidas en
+la misma sesión y era fácil mezclarlas.
+
+**Ruta A — On/off-ramp individual** (ya especificada arriba, §6, sin
+cambios — esta sección solo confirma el orden de operaciones, que ya
+estaba bien en el diseño original):
+
+```
+On-ramp:  usuario paga CLP a Koywe → Koywe manda USDC real a la wallet
+          EVM → koywe_bridge VERIFICA la llegada (HTTPS Outcall a RPC) →
+          RECIÉN AHÍ mintea ckUSDC 1:1 al usuario (Paso 7 antes que
+          Paso 9, nunca al revés)
+
+Off-ramp: usuario quema su ckUSDC → koywe_bridge confirma que el USDC
+          salió real de la wallet EVM (o que el partner confirmó el
+          depósito CLP en el banco destino) → RECIÉN AHÍ se refleja el
+          quemado como definitivo
+```
+
+Es un **mint/burn directo al usuario** — no toca el pool del corredor
+para nada. Nunca se adelanta la contabilidad a la confirmación real
+(mismo criterio de esta sesión aplicado a otros bugs reales: CDP ratio,
+staleness del oráculo — jamás mover el ledger antes de confirmar el
+estado real del otro lado).
+
+**Ruta B — Remesa internacional vía corredor (liquidez pooleada de
+stakers), en el fondo un "Bank to Bank" vía Chain Fusion**:
+
+A diferencia de la Ruta A, acá NO se mintea ckUSDC nuevo — se usa
+ckUSDC que YA existe, pooleado por stakers en Exaltite, y el partner
+repone la liquidez usada un rato después.
+
+```
+1. Staker deposita ckUSDC en Exaltite → se autopoolea al pool del
+   corredor (liquidity-pool, CLP_USD). Ya 1:1 real vía el minter
+   oficial de ckUSDC (DFINITY) — nada que respaldar de más acá.
+
+2. Cliente de remesa paga CLP en Chile, pide que llegue USD a un banco
+   destino en el extranjero.
+
+3. El corredor usa el ckUSDC ya pooleado del staker como el lado "USD"
+   de esta transacción — mismo modelo de inventario + oráculo que ya
+   corre en liquidity_pool.swap() (sin AMM, sin slippage). El pool baja.
+
+4. El partner (Koywe u otro) recibe el CLP del cliente por su lado,
+   fuera de ICP — y es quien entrega el USD real al banco destino
+   (su off-ramp, no el de GreyValley).
+
+5. Un par de minutos después, el partner devuelve el equivalente en
+   USDC real a la wallet EVM de GreyValley.
+
+6. koywe_bridge mintea ckUSDC fresco con ese USDC recién llegado y lo
+   devuelve al pool del corredor → rebalancea el pool a como estaba
+   antes del paso 3. El staker recupera su respaldo real.
+```
+
+**Qué pasa si el partner se demora en reponer (paso 5-6)**: el pool
+puede agotarse antes de que llegue la reposición. Ya existe cola FIFO
+real en `liquidity_pool.swap()` (`#queued`, `drainQueue()`) para esto —
+nunca ejecuta a peor precio ni rechaza, espera. **Gap real identificado
+2026-09-01, sin código todavía**: hoy el pool se drena literal hasta
+`foreignReserve = 0` antes de encolar — no hay ningún piso de reserva
+(a diferencia de los vaults, que sí tienen `checkBufferFloor` al 5% de
+NAV). Pendiente de diseño: agregar un piso configurable (10-15% del
+pool) que empiece a encolar ANTES de llegar a cero real, para que el
+staker que puso el primer ckUSDC nunca vea el pool completamente vacío.
+
+**Fondeo propio como mitigante adicional** (no reemplaza el piso de
+arriba, lo complementa): el mínimo real ya documentado en
+`TOKENOMICS.md` (Vault Exaltite ≥$50K ckUSDC para capacidad ODL día 1)
+hace que agotarse sea raro en la práctica — pero es plata quieta, no
+una garantía de código.
+
+**Variante futura de la Ruta B (v3, con aprobación CMF)**: en vez de
+que el partner maneje el CLP off-chain (como Koywe hoy), la reposición
+del paso 4-6 podría venir de **sCLP → ckUSDC → USDC** — GreyValley
+custodiando el CLP real (vía Pegasus SpA + Fintoc, ver §7 más abajo) en
+lugar de depender de un partner externo para esa pierna. Esto es
+estrictamente posterior a la aprobación CMF del sandbox regulatorio —
+hoy la Ruta B corre 100% con partner externo (Koywe), sin que GreyValley
+toque CLP en ningún punto.
+
+**Por qué la Ruta B es más liviana regulatoriamente que sCLP solo**:
+GreyValley nunca custodia CLP en esta ruta — coincide exacto con el
+"Pilar 3" de la defensa regulatoria actual (`GREYVALLEY_REGULATORY.md`):
+"GreyValley nunca toca pesos chilenos". La variante v3/CMF de arriba sí
+cruzaría esa línea — por eso queda marcada explícitamente como futura y
+condicionada a aprobación, no como parte del diseño actual.
+
+**sCLP standalone** (§7 más abajo) — bloqueado por CMF, fuera de
+alcance de esta sesión, no se toca. Custodia CLP propia sin depender de
+ningún partner — es la pieza que la variante v3 de la Ruta B usaría el
+día que exista, pero es un desarrollo aparte, ya documentado en §7.
+
+---
 
 ---
 
@@ -343,7 +434,7 @@ polling HTTPS outcall cada 60s) → mint 1:1 de sCLP → reconciliación cada 10
 contra el saldo bancario real (circuit breaker: `reconciliationOk`). Requiere
 aprobación CMF (Ley 21.521) antes de manejar dinero real; el código puede existir
 y probarse en sandbox sin esa aprobación (ver §6 de este documento sobre el
-patrón Koywe/CMF, y `VAELIX_CORREDOR_VAELIX_SANDBOX.md` si se documenta aparte).
+patrón Koywe/CMF, y `GREYVALLEY_CORREDOR_GREYVALLEY_SANDBOX.md` si se documenta aparte).
 
 Esto es viable porque Pegasus SpA **ya es una entidad chilena real** — Fintoc solo
 opera sobre bancos chilenos y mexicanos, así que la pieza que falta para CLP es
@@ -398,5 +489,5 @@ que ninguna integración técnica resuelve.
 
 ---
 
-*Documento: VAELIX_ODL_MECHANICS.md | 2026-06-28 · Actualizado: 2026-08-28 (fee real del corredor corregido a 0.20%, decisión del founder — reemplaza el 0.5% de versiones previas)*  
-*Relacionado: VAELIX_APR_MODEL.md, TOKENOMICS.md §10, VAELIX_ICP_TECH.md (mecánica Principal/HTTPS Outcalls/tECDSA)*
+*Documento: GREYVALLEY_ODL_MECHANICS.md | 2026-06-28 · Actualizado: 2026-08-28 (fee real del corredor corregido a 0.20%, decisión del founder — reemplaza el 0.5% de versiones previas)*  
+*Relacionado: GREYVALLEY_APR_MODEL.md, TOKENOMICS.md §10, GREYVALLEY_ICP_TECH.md (mecánica Principal/HTTPS Outcalls/tECDSA)*

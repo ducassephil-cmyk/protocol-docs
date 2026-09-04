@@ -8,13 +8,6 @@
 > debe presentarse a CMF ni usarse como base de decisión sin que un abogado
 > especializado en Ley 21.521 lo revise primero — mismo criterio que
 > `INSTRUCCIONES_FOUNDER.md` aplica a sus propios puntos legales.
->
-> ⚠️⚠️ **CORRECCIÓN REAL 2026-08-30 — Koywe NO es un partner activo.**
-> Todo lo que este documento describe sobre Koywe ("Pilar 3", buffer
-> regulado, PISP acreditado, delegación de KYC/AML) es la **estrategia
-> de diseño** para cuando exista un partner fiat así — hoy no hay
-> ninguna relación real con Koywe, ni contacto comercial. Leer como plan
-> de referencia, no como estado operativo actual.
 
 ---
 
@@ -211,7 +204,7 @@ El Art. 90 y ss. de la Ley 21.521 permite a la CMF autorizar la operación tempo
 | Requisito | Estado GreyValley | Acción |
 |-----------|--------------|--------|
 | Constitución como entidad legal en Chile | ❓ Verificar | Constituir SpA chilena si no existe |
-| Descripción técnica del modelo de negocio | ✅ VAELIX_ODL_MECHANICS.md | Adaptar a formato CMF |
+| Descripción técnica del modelo de negocio | ✅ GREYVALLEY_ODL_MECHANICS.md | Adaptar a formato CMF |
 | Plan AML/CFT | ⚠️ Delegado a Koywe | Documentar el modelo de delegación |
 | Capital mínimo operacional | ❓ Verificar | Determinar monto requerido para el sandbox |
 | Manejo de quejas y SERNAC | ❌ No existe | Diseñar protocolo |
@@ -507,7 +500,7 @@ Timeline mínimo antes de ir a producción con fondos de terceros:
 
 ## 11. Modelo de Amenazas de Seguridad — Red Team / Blue Team
 
-> Este análisis fue generado como ejercicio de "piensa como un atacante" sobre el código real de GreyValley (2026-08-07). Documentado en VAELIX_REGULATORY.md porque la seguridad técnica del protocolo es parte del argumento regulatorio: CMF evaluará si los fondos de usuarios están protegidos no solo por arquitectura institucional sino por el código mismo.
+> Este análisis fue generado como ejercicio de "piensa como un atacante" sobre el código real de GreyValley (2026-08-07). Documentado en GREYVALLEY_REGULATORY.md porque la seguridad técnica del protocolo es parte del argumento regulatorio: CMF evaluará si los fondos de usuarios están protegidos no solo por arquitectura institucional sino por el código mismo.
 
 ### 11.1 Mapa de vectores por severidad
 
@@ -551,7 +544,7 @@ stable var processedPayments : Map.Map<Text, Bool> = Map.empty();
 
 ### 11.3 Gap crítico — Governance código ≠ Governance spec
 
-**Lo que dice la spec** (`VAELIX_REGULATORY.md §5`, `INSTRUCCIONES_FOUNDER.md §13.5`):
+**Lo que dice la spec** (`GREYVALLEY_REGULATORY.md §5`, `INSTRUCCIONES_FOUNDER.md §13.5`):
 > "Propuesta on-chain + quórum de PXRM stakers + timelock 48h"
 
 **Lo que existe en `src/governance/main.mo` hoy:**
