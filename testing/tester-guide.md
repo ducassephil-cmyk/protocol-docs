@@ -26,36 +26,84 @@ founder + asistente, con el método real: trazar cada función a su canister →
 verificar el resultado on-chain → arreglar o decir la verdad → recién ahí
 probar con plata real.
 
+## 1.1 Resumen rápido — qué está activo, qué no
+
+**Activo, con dinero real hoy:**
+- **Vaults** — Exaltium (ICP), Crypto (ckBTC/ckETH/ckLINK), Exaltite
+  (ckUSDC/ckUSDT/ckEURC): depositar, cosechar yield, retirar (total o
+  parcial).
+- **Staking PXRM** (Puranium) — lock real de 0/90/180/365 días.
+- **AMM** — swap real entre los pares existentes, y agregar/retirar
+  liquidez tú mismo. Algunos pares están muy poco profundos todavía (ver
+  §3) — el guard de impacto (~11%, corregido esta semana en ambas
+  direcciones) los protege.
+- **CDP** — mintear vUSD real contra ICP, ckBTC, ckETH o PXRM como
+  colateral (mint habilitado globalmente).
+
+**Apagado o bloqueado hoy (a propósito, no por bug):**
+- **Corredor fiat CLP↔USD / CLP↔EUR** — el código real ya existe y está
+  deployado, pero el feature flag sigue apagado y no hay partner (Koywe)
+  con KYB confirmado todavía. Nada que probar ahí por ahora.
+- **sCLP nativo** — bloqueado por aprobación regulatoria (CMF), corre en
+  sandbox, no con dinero real.
+- **Governance** — deployado, pero su estado sigue en "Development", sin
+  activar.
+- **NFID** — deshabilitada (ver §2).
+
+## 1.2 Por lo que ya tienes — qué probar según tu token
+
+Si no sabes por dónde empezar, mira qué tienes en la wallet:
+
+- **Tienes ckUSDC / ckUSDT / ckEURC (ahorros en stable)** → deposítalos en
+  **Vault Exaltite**. Ganas PXRM Base APR + una parte del fee del AMM
+  (proporcional a tu share del vault).
+- **Tienes ckBTC** → puedes **colateralizarlo en el CDP** (130% de ratio
+  mínimo, el más bajo de los 4 tipos) para mintear vUSD real, o meterlo
+  en **Vault Crypto** para acumular PXRM.
+- **Te interesa tradear** (o "hacer de trader", como quieras llamarlo) →
+  ve a `/trade` y prueba un swap real entre cualquier par — es un buen
+  momento para confirmar que el guard de impacto bloquea parejo en las
+  dos direcciones (recién corregido).
+- **Tienes ckETH** → mismo camino que ckBTC (Vault Crypto o CDP, 150% de
+  ratio), pero además el par `ckETH_ckUSDC` en `/amm` está casi vacío
+  hoy — buena oportunidad real de ser de los primeros en proveerle
+  liquidez y probar cómo se comporta una pool recién fondeada.
+- **Tienes ICP** → **Vault Exaltium** (WaterNeuron real, ~3.5% APR base)
+  o CDP (150% de ratio) o el par `ICP_ckUSDC` en `/amm`.
+- **Tienes PXRM** (incluido tu regalo de bienvenida, ver §2) → **staking
+  Puranium** con lock real, o **CDP** (200% de ratio, el más alto de los
+  4 — ver la sugerencia concreta de montos en §2).
+
 ## 2. Qué necesitás para participar
 
 - **Wallet real, con soporte confirmado por nivel:**
-  - **Plug** — única wallet con soporte completo hoy. Usá esta si podés.
-  - **Oisy** — custodia real de PXRM/ICP, podés tradear o solo mirar la app,
+  - **Plug** — única wallet con soporte completo hoy. Usa esta si puedes.
+  - **Oisy** — custodia real de PXRM/ICP, puedes tradear o solo mirar la app,
     pero **sin stake ni yield todavía**.
-  - **Bitfinity** — solo lectura, no podés operar.
+  - **Bitfinity** — solo lectura, no puedes operar.
   - **NFID** — marcada "Próximamente", deshabilitada. Nunca conectó de
     verdad en producción pese a tener integración real construida —
     bug sin auditar, no lo intentes todavía.
 - **Montos chicos, a propósito**: no metas nada que no puedas perder. Esto
   es un tope real del founder, no solo una sugerencia — la idea es que un
   bug real cueste centavos, no que arruine a nadie.
-- Una wallet que puedas seguir de cerca vos mismo (revisar balances antes/
+- Una wallet que puedas seguir de cerca tú mismo (revisar balances antes/
   después de cada acción, no confiar solo en lo que la UI te muestra).
 - **Regalo de bienvenida**: cada tester recibe **50 PXRM** reales de arranque
   (~$12,6 al precio de hoy) para tener con qué probar sin poner plata propia
   primero. Llega directo a tu wallet conectada — avisanos tu principal para
   que te lo mandemos.
-  - **Sugerencia (no obligatorio)**: probá el CDP/mint de vUSD con una
-    parte — con ~15-20 PXRM de colateral podés mintear ~$2 de vUSD real
+  - **Sugerencia (no obligatorio)**: prueba el CDP/mint de vUSD con una
+    parte — con ~15-20 PXRM de colateral puedes mintear ~$2 de vUSD real
     (el CDP exige 200% de colateralización para PXRM, así que $2 de vUSD
     necesita ~$4 de colateral ≈ 15-20 PXRM al precio actual). El resto
-    (~30-35 PXRM) quedá libre para stakearlo como prefieras — Flexible,
-    o algún lock (90/180/365 días) si querés probar esa parte también.
+    (~30-35 PXRM) queda libre para stakearlo como prefieras — Flexible,
+    o algún lock (90/180/365 días) si quieres probar esa parte también.
 
 ## 3. Foco real de esta ronda — Swaps y Retiros
 
-Priorizado por dónde ya encontramos bugs reales de plata este mes. Si tenés
-tiempo para poco, empezá acá.
+Priorizado por dónde ya encontramos bugs reales de plata este mes. Si tienes
+tiempo para poco, empieza acá.
 
 ### Swaps
 
@@ -74,9 +122,9 @@ tiempo para poco, empezá acá.
 | 1 | Retiro temprano de vault con yield ya devengado (retención) | **Confirmado por el founder** — el safeguard real (~11%) funcionó bien en la prueba. |
 | 2 | Retirar un vault que tiene vUSD pooleado en el AMM (auto-pooling activo) | Sin confirmar todavía — ligado al mismo patrón que causó fondos huérfanos antes en `add_liquidity`. Sigue siendo zona de riesgo real, probarlo a fondo. |
 | 3 | Abrir un CDP real con PXRM (sugerido: ~15-20 PXRM de tu regalo → ~$2 de vUSD, ver §2) y después cerrarlo con colateral cerca del ratio mínimo, forzando zona de liquidación | Confirmado 2026-09-04: PXRM como colateral **no está bloqueado** (mint de vUSD habilitado globalmente) — exige 200% de ratio mínimo, el más alto de los 4 tipos (ICP 150%, ckBTC 130%, ckETH 150%, PXRM 200%). Sin probar todavía con PXRM real específicamente — este es el primer intento sugerido. |
-| 4 | Unstake de PXRM con lock activo (90/180/365 días) | **Confirmado**: no deja retirar antes de tiempo, probado a los 90 días. Nota real: posiciones de antes del fix del ledger de PXRM (bug real, corregido 2 veces esta sesión) tuvieron que sacrificarse — si tenés posiciones viejas, esperá algo raro y avisá. |
+| 4 | Unstake de PXRM con lock activo (90/180/365 días) | **Confirmado**: no deja retirar antes de tiempo, probado a los 90 días. Nota real: posiciones de antes del fix del ledger de PXRM (bug real, corregido 2 veces esta sesión) tuvieron que sacrificarse — si tienes posiciones viejas, espera algo raro y avisa. |
 | 5 | Retirar varias posiciones de golpe (multi-click / un solo click para varias) | **Probado**: 9 posiciones retiradas con un click, 8 salieron bien. 1 posición de Exaltite AMM (~$0.10) no cerró al primer click, necesitó 2 clicks. **Bug real menor a investigar** — huele a condición de carrera o a que el estado de la UI no refleja el resultado real después del primer intento. |
-| 6 | Retiro de Exaltite (ckUSDC/ckUSDT/ckEURC) — comparar lo que devuelve contra lo que depositaste | **No es un bug, pero sorprende**: Exaltite es un pool de shares compartido entre TODAS las posiciones históricas de esta ronda de testing — hoy el NAV real es chico comparado con la suma nominal de lo depositado alguna vez (confirmado 2026-09-04, un retiro de "$0,50" devolvió solo "$0,054" real, matemáticamente correcto dado el NAV/shares actuales). Nueva query pública `backend.getExaltiteShareDebug()` expone `totalShares`/`navUsdcEquiv` en vivo para verificar esto vos mismo antes de asumir que es un bug. |
+| 6 | Retiro de Exaltite (ckUSDC/ckUSDT/ckEURC) — comparar lo que devuelve contra lo que depositaste | **No es un bug, pero sorprende**: Exaltite es un pool de shares compartido entre TODAS las posiciones históricas de esta ronda de testing — hoy el NAV real es chico comparado con la suma nominal de lo depositado alguna vez (confirmado 2026-09-04, un retiro de "$0,50" devolvió solo "$0,054" real, matemáticamente correcto dado el NAV/shares actuales). Nueva query pública `backend.getExaltiteShareDebug()` expone `totalShares`/`navUsdcEquiv` en vivo para verificar esto tú mismo antes de asumir que es un bug. |
 
 ## 4. Cómo reportar un hallazgo
 
@@ -86,10 +134,10 @@ Para cada cosa rara que veas, aunque parezca chica:
 2. **Qué esperabas que pasara.**
 3. **Qué pasó de verdad** — screenshot si se puede.
 4. **Balance antes/después** de tu wallet, si tocaste plata real.
-5. **¿Se repite?** — probá la misma acción 2 veces antes de reportar, para
+5. **¿Se repite?** — prueba la misma acción 2 veces antes de reportar, para
    distinguir un bug real de un glitch de red puntual.
 
-No hace falta que sepas si es "grave" o no — reportá todo, se prioriza
+No hace falta que sepas si es "grave" o no — reporta todo, se prioriza
 después.
 
 ## 5. Qué NO es foco de esta ronda (a propósito)
