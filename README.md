@@ -7,9 +7,9 @@ Public technical and commercial documentation for the DeFi payment protocol buil
 ## What is this?
 
 A DeFi protocol that connects Chilean fiat (CLP) to on-chain liquidity, enabling:
-- **International payments** at 0.20% vs 2.5–3.5% SWIFT
-- **Yield on stablecoins** via the ODL liquidity pool
-- **Cross-border ODL corridor** Chile ↔ USD ↔ LatAm destinations
+- **International payments** at 0.22% vs 2.5–3.5% SWIFT
+- **Yield on stablecoins** via the corredor liquidity pool
+- **Cross-border corredor** Chile ↔ USD ↔ EUR ↔ LatAm destinations
 - **Institutional-grade compliance** under Ley Fintech 21.521 + Ley 21.719
 
 The core stack: WebAssembly canisters on a distributed blockchain network with ~2 second finality, native Ethereum signing (no bridges), and native HTTPS Outcalls (no oracles).
@@ -22,7 +22,7 @@ The core stack: WebAssembly canisters on a distributed blockchain network with ~
 | Document | What's inside |
 |----------|--------------|
 | [Technical Overview](architecture/tech-overview.md) | Full stack comparison, consensus mechanics, tECDSA, HTTPS Outcalls, data privacy (Ley 21.719) |
-| [ODL Mechanics](architecture/odl-mechanics.md) | How the payment corridor works, SWIFT comparison, Koywe bridge architecture, partner model |
+| [Corredor Mechanics](architecture/corredor-mechanics.md) | How the payment corridor works, SWIFT comparison, Koywe bridge architecture, partner model |
 | [Engineer Pitch](architecture/engineer-pitch.md) | Current code state, deployment instructions, LatAm market positioning |
 
 ### Finance

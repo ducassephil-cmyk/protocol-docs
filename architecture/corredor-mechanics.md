@@ -1,19 +1,19 @@
-# GREYVALLEY — ODL Bridge: Mecánica, Comparativa y Modelo de Socios
-> Versión: 2026-06-28 | Complementa TOKENOMICS.md §10 (ODL Bridge)
+# GREYVALLEY — Corredor: Mecánica, Comparativa y Modelo de Socios
+> Versión: 2026-06-28 | Complementa TOKENOMICS.md §10 (Corredor) | Actualizado 2026-09-04
 
 ---
 
-## 1. QUÉ ES ODL Y POR QUÉ IMPORTA
+## 1. QUÉ ES EL CORREDOR Y POR QUÉ IMPORTA
 
-ODL (On-Demand Liquidity) es la mecánica que permite mover valor entre monedas/países en segundos usando un activo digital como puente, en vez de pre-fondear cuentas nostro en cada banco corresponsal.
+El corredor de GreyValley es la mecánica que permite mover valor entre monedas/países en segundos usando un activo digital como puente, en vez de pre-fondear cuentas nostro en cada banco corresponsal — el mismo principio de "liquidez a demanda" que usa la industria de remesas, aplicado con activos chain-key en vez de un partner bancario intermediario.
 
-En GreyValley, el bridge ODL conecta **CLP chileno ↔ ckUSDC ↔ monedas de destino** usando ICP como capa de settlement (~2 segundos de finalidad).
+En GreyValley, el corredor conecta **CLP chileno ↔ ckUSDC/ckEURC ↔ monedas de destino** usando ICP como capa de settlement (~2 segundos de finalidad). Dos corredores tienen custodia real hoy: **CLP↔USD** (ckUSDC) y **CLP↔EUR** (ckEURC, integrado 2026-09-04) — cada uno con pool independiente en `liquidity_pool`, precio real vía `oracle.getClpPerUsd()`/`getClpPerEur()` (mindicador.cl).
 
-El Vault Exaltite (ckUSDC/ckUSDT) **ES el pool de liquidez del bridge**. No es una cuenta bancaria ni un custodio — es el inventario de ckUSDC disponible para ejecutar transacciones instantáneamente.
+El Vault Exaltite (ckUSDC/ckUSDT/ckEURC) **ES el pool de liquidez del corredor**. No es una cuenta bancaria ni un custodio — es el inventario de ckUSDC/ckEURC disponible para ejecutar transacciones instantáneamente, uno por corredor (CLP↔USD y CLP↔EUR no comparten custodia).
 
 ---
 
-## 2. CÓMO FUNCIONA UN PAGO ODL EN GREYVALLEY
+## 2. CÓMO FUNCIONA UN PAGO POR EL CORREDOR EN GREYVALLEY
 
 > ⚠️ **Corrección real (auditoría 2026-08-24, ver `INSTRUCCIONES_FOUNDER.md`
 > §7.1):** el flujo de abajo describe el diseño de la variante "Koywe" —
@@ -39,7 +39,7 @@ El Vault Exaltite (ckUSDC/ckUSDT) **ES el pool de liquidez del bridge**. No es u
 6. El CLP del paso 1 (menos fees) es lo que eventualmente rebalancea el pool
    ckUSDC de GreyValley — no hay conversión CLP→ckUSDC atómica por transacción
 
-Fee para GreyValley: 0.20% + rampa ~1% (total usuario: ~1.2%)
+Fee para GreyValley: 0.22% + rampa ~1% (total usuario: ~1.2%)
 Fee SWIFT equivalente: ~2.5–3.5%
 ```
 
@@ -50,7 +50,7 @@ El ckUSDC del vault no es consumido por cada transacción — se usa como **gara
 - ckUSDC entra al pool cuando hay pagos en dirección inversa (entrada a Chile)
 - ckUSDC sale cuando hay pagos hacia el exterior
 - Si el flujo es **bidireccional**: pool se autorrepone, capital intacto permanentemente
-- Si el flujo es **unidireccional**: pool puede desbalancearse → el protocolo rebalancea con fees acumulados (0.20% × volumen)
+- Si el flujo es **unidireccional**: pool puede desbalancearse → el protocolo rebalancea con fees acumulados (0.22% × volumen)
 
 **El capital del depositante NUNCA desaparece.** Si el pool se desbalancea extremo, el bridge se pausa — pero el capital sigue accesible para retirar.
 
@@ -72,7 +72,17 @@ ruta con sCLP vía Chanfusion Satellite — **fuera de alcance mientras sCLP sig
 por CMF**, no el flujo Koywe activo de la sección 2. Se conserva como diseño de referencia
 para cuando ese corredor se habilite.
 
-**Chile → Europa**
+> **No confundir con el corredor CLP/EUR real (2026-09-04).** El diagrama
+> "Chile → Europa" de abajo describe una ruta FUTURA vía sCLP (bloqueada
+> por CMF, sin código de sCLP↔ckUSDC↔EUR construido). El corredor CLP/EUR
+> que SÍ existe hoy (`liquidity_pool` par CLP_EUR, `bridge_canister`
+> `depositEurcToCkEurc()`) es un camino distinto y más simple: ckEURC
+> real (Circle EUR, ledger DFINITY) entra directo vía tECDSA desde una
+> wallet EVM, sin pasar por sCLP ni por Chanfusion. Ambos caminos pueden
+> coexistir a futuro (sCLP para el lado CLP custodiado, ckEURC para el
+> lado EUR ya resuelto), pero hoy solo el segundo tiene custodia real.
+
+**Chile → Europa (diseño futuro, sCLP — bloqueado por CMF)**
 ```
 1. CLP → Fintoc Webhook → Chanfusion
 2. Canister acuña sCLP 1:1
@@ -103,7 +113,7 @@ Ripple usa XRP como activo puente entre market makers (Bitso, SBI Remit, etc.):
 Empresa USA → USD → MM compra XRP → XRP viaja → MM México vende XRP → MXN → destinatario
 ```
 
-Los market makers mantienen **inventario de XRP en ambos lados del corredor**. Ese inventario ES su liquidez ODL. Ganan el spread + fees por transacción.
+Los market makers mantienen **inventario de XRP en ambos lados del corredor**. Ese inventario ES su liquidez del corredor. Ganan el spread + fees por transacción.
 
 **El problema:** XRP es volátil. Si XRP cae 40% mientras el MM tiene el inventario, pierde en el principal. Solo entidades grandes con tolerancia a esa volatilidad se vuelven MMs serios.
 
@@ -120,17 +130,17 @@ Los market makers mantienen **inventario de XRP en ambos lados del corredor**. E
 | Corredor inicial | Global bancario | USD↔MXN, USD↔PHP, etc. | CLP↔USD (LATAM first) |
 | Yield para el MM | Ninguno adicional | Solo spread/fees | APR vault + Volume Guild |
 
-### Por qué ICP está mejor posicionado que XRP para ODL global
+### Por qué ICP está mejor posicionado que XRP para un corredor global
 
 XRP nació como activo especulativo y fue adaptado como puente. ICP nació como infraestructura de cómputo distribuido con:
 
 1. **Finalidad en ~2 segundos** (vs 3-5s de XRP, sin reversiones)
 2. **HTTP outcalls nativos** — el canister puede llamar APIs bancarias directamente (Koywe, Fintoc, SWIFT MX, etc.) sin middleware externo
-3. **Ciclos de compute estables** — el costo de procesar una transacción ODL no fluctúa con el precio de ICP
+3. **Ciclos de compute estables** — el costo de procesar una transacción del corredor no fluctúa con el precio de ICP
 4. **ckAssets nativos** (ckBTC, ckUSDC, ckETH) — son representaciones 1:1 de activos reales dentro de ICP, sin bridging adicional
-5. **Canisters = código que no puede apagarse** — el protocolo ODL no puede ser desactivado por un banco central o regulador
+5. **Canisters = código que no puede apagarse** — el corredor no puede ser desactivado por un banco central o regulador
 
-La analogía: XRP es una autopista privada construida sobre terreno prestado. ICP es una autopista pública que también sirve como capa de internet descentralizado — el ODL es solo uno de sus casos de uso.
+La analogía: XRP es una autopista privada construida sobre terreno prestado. ICP es una autopista pública que también sirve como capa de internet descentralizado — el corredor es solo uno de sus casos de uso.
 
 ---
 
@@ -150,7 +160,7 @@ El insight clave de este documento: **los socios empresariales de GreyValley no 
 - Empresa deposita ckUSDC en Vault Crypto
 - Ese ckUSDC es el inventario del corredor CLP↔USD
 - Cuando alguien envía CLP a México/USA, el pool de ckUSDC ejecuta instantáneamente
-- El socio gana: APR del vault + 0.20% de fees ODL proporcional + Volume Guild si >$25K/mes
+- El socio gana: APR del vault + 0.22% de fees del corredor proporcional + Volume Guild si >$25K/mes
 
 ### La doble ventaja del socio que también usa la app para sus propios pagos
 
@@ -158,9 +168,9 @@ Una empresa que deposita ckUSDC Y procesa sus propios pagos internacionales por 
 
 ```
 Ingreso 1: APR sobre el capital depositado (~8-10%/año en ckUSDC + PXRM Base APR)
-Ingreso 2: Parte del 0.20% fee de cada transacción que pasa por su liquidez
-Ahorro:    Sus propios pagos salen al 0.20% en vez de 2.5-3.5% SWIFT
-Guild:     Si >$25K/mes en ODL → 7% del fee pool de TODOS los usuarios
+Ingreso 2: Parte del 0.22% fee de cada transacción que pasa por su liquidez
+Ahorro:    Sus propios pagos salen al 0.22% en vez de 2.5-3.5% SWIFT
+Guild:     Si >$25K/mes en el corredor → 7% del fee pool de TODOS los usuarios
 ```
 
 **El pitch correcto:** No es "invierte en DeFi" — es "sé el Bitso de Chile. Tu inventario en ckUSDC (estable, sin riesgo de precio) te da APR + fees de cada pago que pasa, y tus propios pagos salen ~12-17x más baratos que SWIFT."
@@ -175,7 +185,7 @@ Guild:     Si >$25K/mes en ODL → 7% del fee pool de TODOS los usuarios
 |-------|------------|---------------------|
 | Exaltium (ICP) | $15K | $40K |
 | Crypto (ckBTC/ckETH) | $5K | $15K |
-| **Exaltite (ckUSDC)** ← crítico | **$20K** | **$50K** |
+| **Exaltite (ckUSDC/ckEURC)** ← crítico | **$20K** | **$50K** |
 | Total TVL personal | $40K | $105K |
 
 > Naming corregido 2026-08-03: Puranium es el canister de staking PXRM, separado de estos 3 vaults — no es "el vault ICP". Ver `GREYVALLEY_APR_MODEL.md` §12 para el mapping completo.
@@ -185,7 +195,7 @@ Guild:     Si >$25K/mes en ODL → 7% del fee pool de TODOS los usuarios
 - NNS staking del ICP genera ~$500-700/mes (reduce el costo real)
 - Costo neto efectivo: ~$1,000-1,500 para 6 meses
 
-**El ckUSDC es el cuello de botella:** sin él no hay ODL capacity y los APRs del Vault Exaltite se quedan en `"--"`.
+**El ckUSDC/ckEURC es el cuello de botella:** sin ellos no hay capacidad del corredor y los APRs del Vault Exaltite se quedan en `"--"`.
 
 ### Con socios empresariales (escalable)
 
@@ -203,7 +213,7 @@ Guild:     Si >$25K/mes en ODL → 7% del fee pool de TODOS los usuarios
 
 ### Revenue projection (del APR Model V3)
 
-| ODL Mensual | ODL Fees | NNS Yield | Swap+CDP | Total/mes |
+| Corredor Mensual | Fees del Corredor | NNS Yield | Swap+CDP | Total/mes |
 |-------------|---------|-----------|---------|----------|
 | $50K | $250 | $600 | $250 | ~$1,100 |
 | $200K | $1,000 | $1,200 | $500 | ~$2,700 |
@@ -215,7 +225,7 @@ Guild:     Si >$25K/mes en ODL → 7% del fee pool de TODOS los usuarios
 
 ## 6. KOYWE BRIDGE — Arquitectura técnica del on-ramp CLP → ckUSDC
 
-> **Sesión 2026-08-02** — documentación completa del modelo de integración con Koywe como partner ODL.
+> **Sesión 2026-08-02** — documentación completa del modelo de integración con Koywe como partner del corredor.
 
 ### Pregunta clave resuelta: ¿Koywe necesita instalar código ICP?
 
@@ -390,7 +400,7 @@ staker que puso el primer ckUSDC nunca vea el pool completamente vacío.
 
 **Fondeo propio como mitigante adicional** (no reemplaza el piso de
 arriba, lo complementa): el mínimo real ya documentado en
-`TOKENOMICS.md` (Vault Exaltite ≥$50K ckUSDC para capacidad ODL día 1)
+`TOKENOMICS.md` (Vault Exaltite ≥$50K ckUSDC para capacidad del corredor día 1)
 hace que agotarse sea raro en la práctica — pero es plata quieta, no
 una garantía de código.
 
@@ -489,5 +499,5 @@ que ninguna integración técnica resuelve.
 
 ---
 
-*Documento: GREYVALLEY_ODL_MECHANICS.md | 2026-06-28 · Actualizado: 2026-08-28 (fee real del corredor corregido a 0.20%, decisión del founder — reemplaza el 0.5% de versiones previas)*  
+*Documento: corredor-mechanics.md (antes GREYVALLEY_ODL_MECHANICS.md) | 2026-06-28 · Actualizado: 2026-09-04 (renombrado, referencias "ODL" retiradas, fee real 0.22% tras la subida +10% de 2026-08-28, corredor CLP/EUR agregado como real)*  
 *Relacionado: GREYVALLEY_APR_MODEL.md, TOKENOMICS.md §10, GREYVALLEY_ICP_TECH.md (mecánica Principal/HTTPS Outcalls/tECDSA)*
