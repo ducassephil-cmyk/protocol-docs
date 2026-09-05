@@ -160,20 +160,41 @@ El insight clave de este documento: **los socios empresariales de GreyValley no 
 - Empresa deposita ckUSDC en Vault Crypto
 - Ese ckUSDC es el inventario del corredor CLP↔USD
 - Cuando alguien envía CLP a México/USA, el pool de ckUSDC ejecuta instantáneamente
-- El socio gana: APR del vault + 0.22% de fees del corredor proporcional + Volume Guild si >$25K/mes
+- El socio gana: PXRM Base APR del vault (pagado en PXRM, no ckUSDC) + fees del AMM/corredor proporcional a su liquidez (variable, según volumen real) + Volume Guild si >$25K/mes en el corredor
 
 ### La doble ventaja del socio que también usa la app para sus propios pagos
 
-Una empresa que deposita ckUSDC Y procesa sus propios pagos internacionales por la app obtiene:
+Una empresa que deposita ckUSDC Y procesa sus propios pagos internacionales por la app obtiene
+hasta 3 fuentes de ingreso — **ninguna es un monto fijo garantizado, todas menos una dependen
+del volumen real que pase por el corredor**:
 
 ```
-Ingreso 1: APR sobre el capital depositado (~8-10%/año en ckUSDC + PXRM Base APR)
-Ingreso 2: Parte del 0.22% fee de cada transacción que pasa por su liquidez
-Ahorro:    Sus propios pagos salen al 0.22% en vez de 2.5-3.5% SWIFT
-Guild:     Si >$25K/mes en el corredor → 7% del fee pool de TODOS los usuarios
+Ingreso 1 (semi-fijo, subsidiado por treasury):
+  PXRM Base APR — 12-24% según lock, PAGADO EN PXRM, no en ckUSDC.
+  Depende del treasury (bootstrap) hasta que el fee real lo sostenga solo.
+
+Ingreso 2 (variable, depende de volumen real):
+  Fees del AMM sobre el par ckUSDC pooleado (feeBps=33 hoy, ~0.33%/swap)
+  — 0 si no hay volumen pasando por ese pool.
+
+Ingreso 3 (variable, depende de volumen real del corredor):
+  Share proporcional de tu ckUSDC/TVL sobre el 0.22% del corredor
+  (Volume Guilds, 7% del fee pool) — SOLO si el corredor procesa
+  >$25K/mes en volumen real. Hoy el corredor tiene volumen ~0 (ver
+  GREYVALLEY_AUDIT_LIVE.md), este ingreso es ilustrativo de la
+  MECÁNICA, no una proyección de lo que se cobra hoy.
+
+Ahorro: tus propios pagos por el corredor salen al 0.22% en vez de
+  2.5-3.5% SWIFT — este SÍ es real e inmediato, no depende de terceros.
 ```
 
-**El pitch correcto:** No es "invierte en DeFi" — es "sé el Bitso de Chile. Tu inventario en ckUSDC (estable, sin riesgo de precio) te da APR + fees de cada pago que pasa, y tus propios pagos salen ~12-17x más baratos que SWIFT."
+**Ningún número de arriba es "deposita $100, recibe $X/año garantizado".** El único ingreso
+con un piso semi-predecible es el PXRM Base APR (pagado en PXRM, subsidiado por treasury
+mientras el fee real todavía no lo sostiene) — todo lo demás (Ingreso 2, Ingreso 3) es
+estrictamente proporcional al volumen real que pase por el AMM/corredor, que hoy es bajo
+o nulo. El pitch correcto no es "te pagamos X% fijo" — es "sé el Bitso de Chile: tu
+inventario en ckUSDC (estable, sin riesgo de precio) capta valor de CADA transacción real
+que pasa, y crece con el volumen, no con una promesa de rendimiento fijo."
 
 ---
 
