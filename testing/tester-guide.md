@@ -192,6 +192,53 @@ founder + assistant, using the real method: trace every function to its
 canister → verify the result on-chain → fix it or say the truth → only then
 test with real money.
 
+## 1.1 Quick summary — what's active, what's not
+
+**Active, with real money today:**
+- **Vaults** — Exaltium (ICP), Crypto (ckBTC/ckETH/ckLINK), Exaltite
+  (ckUSDC/ckUSDT/ckEURC): deposit, harvest yield, withdraw (full or
+  partial).
+- **PXRM staking** (Puranium) — real lock of 0/90/180/365 days.
+- **AMM** — real swaps between existing pairs, and add/remove liquidity
+  yourself. Some pairs are still very shallow (see §3) — the impact
+  guard (~11%, fixed this week in both directions) protects them.
+- **CDP** — mint real vUSD against ICP, ckBTC, ckETH, or PXRM as
+  collateral (minting enabled globally).
+
+**Switched off or blocked today (on purpose, not a bug):**
+- **Fiat corridor CLP↔USD / CLP↔EUR** — the real code already exists and
+  is deployed, but the feature flag is still off and there's no partner
+  (Koywe) with confirmed KYB yet. Nothing to test there for now.
+- **Native sCLP** — blocked by regulatory approval (CMF), runs in
+  sandbox, not with real money.
+- **Governance** — deployed, but its status is still "Development",
+  not activated.
+- **NFID** — disabled (see §2).
+
+## 1.2 By what you already have — what to test with your token
+
+If you don't know where to start, look at what's in your wallet:
+
+- **You have ckUSDC / ckUSDT / ckEURC (stable savings)** → deposit them
+  into **Vault Exaltite**. You earn PXRM Base APR + a share of the AMM
+  fee (proportional to your share of the vault).
+- **You have ckBTC** → you can **collateralize it in the CDP** (130%
+  minimum ratio, the lowest of the 4 types) to mint real vUSD, or put it
+  in **Vault Crypto** to accumulate PXRM.
+- **You want to trade** (or "be a trader", whatever you want to call it)
+  → go to `/trade` and try a real swap between any pair — it's a good
+  moment to confirm the impact guard blocks evenly in both directions
+  (just fixed).
+- **You have ckETH** → same path as ckBTC (Vault Crypto or CDP, 150%
+  ratio), but also the `ckETH_ckUSDC` pair in `/amm` is nearly empty
+  today — a real opportunity to be among the first to provide it
+  liquidity and see how a freshly funded pool behaves.
+- **You have ICP** → **Vault Exaltium** (real WaterNeuron, ~3.5% base
+  APR) or CDP (150% ratio) or the `ICP_ckUSDC` pair in `/amm`.
+- **You have PXRM** (including your welcome gift, see §2) → **Puranium
+  staking** with a real lock, or **CDP** (200% ratio, the highest of the
+  4 — see the concrete amount suggestion in §2).
+
 ## 2. What you need to participate
 
 - **A real wallet, with confirmed support by tier:**
