@@ -42,6 +42,11 @@ The core stack: WebAssembly canisters on a distributed blockchain network with ~
 |----------|--------------|
 | [ODL Agreement Template](partnerships/odl-agreement.md) | Conditional ODL Service Agreement — for prospective ODL corridor partners |
 
+### Testing
+| Document | What's inside |
+|----------|--------------|
+| [Tester Guide](testing/tester-guide.md) | Real, honest pre-launch testing guide — what's confirmed working, what's a known real bug, how to report findings |
+
 ---
 
 ## Current Status
