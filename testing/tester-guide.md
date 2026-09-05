@@ -41,9 +41,16 @@ probar con plata real.
   bug real cueste centavos, no que arruine a nadie.
 - Una wallet que puedas seguir de cerca vos mismo (revisar balances antes/
   después de cada acción, no confiar solo en lo que la UI te muestra).
-- **Regalo de bienvenida**: cada tester recibe **40 PXRM** reales de arranque
-  para tener con qué probar sin poner plata propia primero. Llega directo a
-  tu wallet conectada — avisanos tu principal para que te lo mandemos.
+- **Regalo de bienvenida**: cada tester recibe **50 PXRM** reales de arranque
+  (~$12,6 al precio de hoy) para tener con qué probar sin poner plata propia
+  primero. Llega directo a tu wallet conectada — avisanos tu principal para
+  que te lo mandemos.
+  - **Sugerencia (no obligatorio)**: probá el CDP/mint de vUSD con una
+    parte — con ~15-20 PXRM de colateral podés mintear ~$2 de vUSD real
+    (el CDP exige 200% de colateralización para PXRM, así que $2 de vUSD
+    necesita ~$4 de colateral ≈ 15-20 PXRM al precio actual). El resto
+    (~30-35 PXRM) quedá libre para stakearlo como prefieras — Flexible,
+    o algún lock (90/180/365 días) si querés probar esa parte también.
 
 ## 3. Foco real de esta ronda — Swaps y Retiros
 
@@ -66,7 +73,7 @@ tiempo para poco, empezá acá.
 |---|---|---|
 | 1 | Retiro temprano de vault con yield ya devengado (retención) | **Confirmado por el founder** — el safeguard real (~11%) funcionó bien en la prueba. |
 | 2 | Retirar un vault que tiene vUSD pooleado en el AMM (auto-pooling activo) | Sin confirmar todavía — ligado al mismo patrón que causó fondos huérfanos antes en `add_liquidity`. Sigue siendo zona de riesgo real, probarlo a fondo. |
-| 3 | Cerrar CDP con colateral cerca del ratio mínimo, forzando zona de liquidación | Sin probar en esta ronda todavía. Confirmado 2026-09-04: PXRM como colateral **no está bloqueado** (mint de vUSD habilitado globalmente) — exige 200% de ratio mínimo, el más alto de los 4 tipos (ICP 150%, ckBTC 130%, ckETH 150%, PXRM 200%). Sin probar todavía con PXRM real específicamente. |
+| 3 | Abrir un CDP real con PXRM (sugerido: ~15-20 PXRM de tu regalo → ~$2 de vUSD, ver §2) y después cerrarlo con colateral cerca del ratio mínimo, forzando zona de liquidación | Confirmado 2026-09-04: PXRM como colateral **no está bloqueado** (mint de vUSD habilitado globalmente) — exige 200% de ratio mínimo, el más alto de los 4 tipos (ICP 150%, ckBTC 130%, ckETH 150%, PXRM 200%). Sin probar todavía con PXRM real específicamente — este es el primer intento sugerido. |
 | 4 | Unstake de PXRM con lock activo (90/180/365 días) | **Confirmado**: no deja retirar antes de tiempo, probado a los 90 días. Nota real: posiciones de antes del fix del ledger de PXRM (bug real, corregido 2 veces esta sesión) tuvieron que sacrificarse — si tenés posiciones viejas, esperá algo raro y avisá. |
 | 5 | Retirar varias posiciones de golpe (multi-click / un solo click para varias) | **Probado**: 9 posiciones retiradas con un click, 8 salieron bien. 1 posición de Exaltite AMM (~$0.10) no cerró al primer click, necesitó 2 clicks. **Bug real menor a investigar** — huele a condición de carrera o a que el estado de la UI no refleja el resultado real después del primer intento. |
 | 6 | Retiro de Exaltite (ckUSDC/ckUSDT/ckEURC) — comparar lo que devuelve contra lo que depositaste | **No es un bug, pero sorprende**: Exaltite es un pool de shares compartido entre TODAS las posiciones históricas de esta ronda de testing — hoy el NAV real es chico comparado con la suma nominal de lo depositado alguna vez (confirmado 2026-09-04, un retiro de "$0,50" devolvió solo "$0,054" real, matemáticamente correcto dado el NAV/shares actuales). Nueva query pública `backend.getExaltiteShareDebug()` expone `totalShares`/`navUsdcEquiv` en vivo para verificar esto vos mismo antes de asumir que es un bug. |
