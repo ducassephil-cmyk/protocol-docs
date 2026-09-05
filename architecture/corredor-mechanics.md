@@ -15,16 +15,21 @@ El Vault Exaltite (ckUSDC/ckUSDT/ckEURC) **ES el pool de liquidez del corredor**
 
 ## 2. CÓMO FUNCIONA UN PAGO POR EL CORREDOR EN GREYVALLEY
 
-> ⚠️ **Corrección real (auditoría 2026-08-24, ver `INSTRUCCIONES_FOUNDER.md`
-> §7.1):** el flujo de abajo describe el diseño de la variante "Koywe" —
-> pero `src/koywe_bridge/main.mo` **no existe** (0 código, sin canister
-> deployado, ver §6 más abajo). No usar la palabra "activo" para esta
-> variante en ningún material de founder/marketing hasta que exista
-> código real. La única variante con código real HOY es sCLP nativo
-> (Pegasus SpA + Fintoc, §7) — corre en sandbox, bloqueada para dinero
-> real por aprobación CMF pendiente.
+> ⚠️ **Corrección real (actualizado 2026-09-04, ver §6 más abajo para el
+> detalle completo):** el diseño ORIGINAL de esta sección (un canister
+> `koywe_bridge` con wallet EVM y minting propio) nunca se construyó y
+> `src/koywe_bridge/main.mo` **no existe**. Pero eso NO significa que no
+> haya código real — el camino que sí existe y está deployado en mainnet
+> (`api_gateway` → `settlement` → `bridge` → `liquidity_pool`) es distinto
+> y más simple, sin wallet EVM ni minting. Hoy está **apagado por feature
+> flag** (`bridge=false`) y sin Koywe registrado todavía como institución
+> — no por falta de código, sino porque el KYB comercial sigue pendiente
+> (`INSTRUCCIONES_FOUNDER.md` §3). No usar la palabra "activo" para el
+> corredor con Koywe hasta que el KYB esté aprobado y el flag prendido.
+> sCLP nativo (Pegasus SpA + Fintoc, §7) sigue siendo la única variante
+> bloqueada por CMF (no por código) — corre en sandbox.
 
-### Flujo de remesa (Chile → exterior) — diseño, Koywe pendiente de construir
+### Flujo de remesa (Chile → exterior) — código real deployado, apagado hasta que Koywe apruebe KYB
 
 ```
 1. Usuario deposita CLP en Koywe (custodia y KYB de Koywe — NO toca ningún
@@ -244,169 +249,132 @@ que pasa, y crece con el volumen, no con una promesa de rendimiento fijo."
 
 ---
 
-## 6. KOYWE BRIDGE — Arquitectura técnica del on-ramp CLP → ckUSDC
+## 6. KOYWE — Arquitectura técnica real de la integración
 
-> **Sesión 2026-08-02** — documentación completa del modelo de integración con Koywe como partner del corredor.
+> **Actualizado 2026-09-04** — el diseño original de esta sección (sesión
+> 2026-08-02) describía un canister `koywe_bridge` con wallet EVM propia
+> y minting de ckUSDC vía tECDSA. **Ese diseño nunca se construyó y ya no
+> es el camino real** — `src/koywe_bridge/main.mo` no existe, 0 líneas de
+> código, sin canister deployado (confirmado en el filesystem del repo).
+> La integración real que SÍ está deployada y funcionando es más simple:
+> Koywe (o cualquier institución registrada) llama un endpoint HTTP
+> genérico ya construido — `api_gateway` → `settlement` → `bridge` →
+> `liquidity_pool` — sin ningún canister dedicado a Koywe, sin wallet EVM,
+> sin minting nuevo. Reescrito para reflejar esto.
 
-### Pregunta clave resuelta: ¿Koywe necesita instalar código ICP?
+### Pregunta clave: ¿Koywe necesita instalar código ICP?
 
-**NO.** Koywe es puro web2. No instala nada, no integra ningún SDK de ICP. La integración técnica vive 100% en el lado de GreyValley:
+**NO.** Koywe es puro web2 (REST API). No instala nada, no integra ningún
+SDK de ICP. Toda la integración vive del lado de GreyValley, en
+canisters **ya deployados en mainnet**:
 
 ```
-Koywe:    REST API web2 (PAYIN / ONRAMP / OFFRAMP / PAYOUT)
-GreyValley:   canister koywe_bridge en ICP que llama la API de Koywe
+Koywe:      REST API web2 propia (PAYIN / ONRAMP / OFFRAMP / PAYOUT)
+GreyValley: api_gateway (webhook + registro de institución)
+              → settlement (tracking del pago)
+              → bridge (execute_bridge — motor real: precio de oráculo + cola FIFO)
+              → liquidity_pool (swap() contra el inventario ckUSDC/ckEURC ya pooleado)
 ```
 
-Koywe solo necesita:
-1. Un **webhook URL** donde notificar cuando un pago confirma
-2. Una **EVM address** (Ethereum/Polygon) donde enviar el USDC
+Los cuatro canisters de arriba **ya están deployados y en producción**
+(ver `GREYVALLEY_MASTER_STATE.md` §1) — no falta construir nada técnico
+para que Koywe empiece a mandar pagos, solo falta:
+1. Que Koywe apruebe el KYB (documentos §3 de `INSTRUCCIONES_FOUNDER.md`).
+2. Registrar a Koywe como `Institution` en `api_gateway` (`registerInstitution()`,
+   admin-only) — API key, corredores autorizados (ej. `CLP_USD`, `CLP_EUR`),
+   límite diario en CLP.
+3. Prender el feature flag `bridge` (hoy `false` — ver `getFeatureFlags()`).
 
-Ambas las provee el `koywe_bridge` canister de GreyValley.
-
-### Koywe API — endpoints relevantes
+### Koywe API — endpoints relevantes (lado Koywe)
 
 | Endpoint | Función |
 |----------|---------|
-| `POST /v3/deals` | Crear orden ONRAMP (CLP → USDC). Parámetros: amount, fromCurrency, toCurrency, network (POLYGON/ETH/BSC), destinationAddress |
+| `POST /v3/deals` | Crear orden ONRAMP (CLP → USD). Parámetros: amount, fromCurrency, toCurrency, network, destinationAddress |
 | `GET /v3/deals/{id}` | Consultar estado de orden |
-| `POST /v3/payouts` | OFFRAMP / PAYOUT — convertir USDC a CLP y enviar a cuenta bancaria |
-| Webhook `POST [tu_url]/koywe-hook` | Koywe notifica cuando el deal confirma |
+| `POST /v3/payouts` | OFFRAMP / PAYOUT — convertir a CLP y enviar a cuenta bancaria destino |
 
-Contacto: `soporte@koywe.com` (BD y acuerdos técnicos)  
-Chains soportadas por Koywe: **Ethereum, Polygon, BSC** — NO ICP directamente.
+Contacto: `business@koywe.com` (BD y acuerdos técnicos) | [koywe.com/partners](https://koywe.com/partners)
 
-### El triángulo de custodia (Custody Triangle)
+### Endpoint real del lado GreyValley (ya construido)
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                 TRIÁNGULO DE CUSTODIA GREYVALLEY                 │
-│                                                                 │
-│  [Koywe]              [EVM custody wallet]      [ICP Ledger]   │
-│  Custodia CLP         Custodia USDC             ckUSDC         │
-│  ≈500 CLP             ≈0.55 USDC               0.55 ckUSDC     │
-│  (queda con Koywe)    (address del canister)   (en user_principal) │
-│                                                                 │
-│  Koywe HODL CLP   →   USDC llega a EVM    →   Bridge minta ck  │
-│                       custody wallet           1:1 en ICP       │
-└─────────────────────────────────────────────────────────────────┘
+POST api_gateway.raw.ic0.app/v1/payments
 
-Invariante: ckUSDC en circulación = USDC locked en EVM custody wallet (1:1)
+Headers: Authorization con la API key de la institución (hash SHA256
+         comparado server-side — la key nunca se guarda en texto plano)
+Body:    { institutionId, sourceAmount, sourceCurrency, destCurrency,
+           destAccount, destInstitution }
+
+Flujo interno real (api_gateway/main.mo, línea ~250 en adelante):
+  1. Valida feature flag `bridge` (backend.getFeatureFlags()) — si está
+     apagado, responde 503 "Corredor deshabilitado".
+  2. Valida API key contra el hash guardado de la institución (401 si falla).
+  3. Valida que la institución esté autorizada para ESE corredor
+     específico (source_dest, ej. "CLP_USD") — 403 si no.
+  4. Valida límite diario en CLP (429 si se excede; reset automático por
+     cambio de día calendario).
+  5. Registra el pago en `settlement.initiate_payment()` (tracking real,
+     no un placeholder).
+  6. Llama `bridge.execute_bridge()` — este SÍ es el motor real: usa el
+     precio del oráculo (mindicador.cl) + el mismo modelo de inventario y
+     cola FIFO (`#Queued`) que ya corre en `liquidity_pool.swap()` para
+     usuarios retail. Responde #Success, #Queued, #InsufficientLiquidity,
+     #UnsupportedCorridor, #SystemNotLive o #Error — nunca inventa un
+     resultado.
 ```
 
-**Qué custodia qué:**
-- **Koywe** retiene el CLP chileno — es su modelo de negocio (spread entre compra y venta de USDC)
-- **EVM custody wallet** (una address Ethereum/Polygon controlada por `koywe_bridge` via tECDSA) retiene el USDC real
-- **ICP `ckusdc_ledger`** registra el ckUSDC gemelo, acreditado al `user_principal` del usuario
+**No hay minting de ckUSDC/ckEURC nuevo en este flujo.** El corredor usa
+el inventario que YA existe — ckUSDC/ckEURC pooleado por los depositantes
+de Vault Exaltite (ver §2 de este documento, "modelo de inventario"). Koywe
+custodia el CLP y entrega la moneda destino por su propio lado (su
+off-ramp, fuera de ICP) — GreyValley nunca toca ese tramo ni el CLP.
 
-### Arquitectura del canister koywe_bridge
-
-```
-src/koywe_bridge/main.mo          ← A CONSTRUIR (pendiente)
-
-Responsabilidades:
-  1. Exponer webhook endpoint via api_gateway (raw.ic0.app)
-  2. Almacenar: orderId → icp_principal (stable storage)
-  3. Verificar USDC en EVM via HTTPS Outcall → EVM RPC
-  4. Llamar ckusdc_ledger.icrc1_mint(user_principal, amount)
-  5. Para off-ramp: llamar Koywe PAYOUT API via HTTPS Outcall
-
-Clave EVM:
-  - La EVM custody wallet usa Threshold ECDSA (tECDSA)
-  - La private key NUNCA existe en ningún servidor
-  - Se fragmenta entre los nodos de la subred ICP
-  - El canister pide firma al runtime → ICP firma → tx enviada a EVM RPC
-
-Ciclos necesarios:
-  - ~1B cycles por HTTPS Outcall (verificación EVM RPC)
-  - ~500M cycles por HTTPS Outcall (Koywe API)
-  - Cargar 1T cycles iniciales → ~100 on-ramps de runway cómodo
-```
-
-### Flujo completo on-ramp con tracking de Principal
-
-```
-Paso 1: usuario conecta wallet → user_principal = "abc12-xyz34-..."
-Paso 2: frontend crea orden Koywe con metadata { icp_principal: "abc12-xyz34..." }
-Paso 3: koywe_bridge.registerOrder(koywe_order_id, user_principal) → stable map
-Paso 4: usuario paga via Khipu → CLP recibido por Koywe
-Paso 5: Koywe envía USDC a EVM custody wallet del canister
-Paso 6: Koywe hace POST webhook → api_gateway.raw.ic0.app/koywe-hook
-Paso 7: koywe_bridge verifica tx via EVM RPC HTTPS Outcall
-Paso 8: koywe_bridge recupera user_principal del stable map (por koywe_order_id)
-Paso 9: koywe_bridge.icrc1_mint({ to: {owner: user_principal}, amount }) en ckusdc_ledger
-Paso 10: wallet GreyValley actualiza balance (icrc1_balance_of consulta el ledger)
-```
-
-### Estado actual del canister
+### Estado real (verificado en el filesystem y el código, 2026-09-04)
 
 | Componente | Estado |
 |------------|--------|
-| `src/koywe_bridge/main.mo` | ❌ **A CONSTRUIR** — arquitectura diseñada, código no escrito |
-| EVM custody wallet address | ❌ No calculada — necesita `dfx canister create koywe_bridge` primero |
-| Configuración Koywe | ❌ Acuerdo comercial pendiente (KYB Track B) |
-| Canister ID en mainnet | ❌ Sin deploy |
+| `api_gateway` (webhook + registro institución) | ✅ **Deployado en mainnet**, `ua27v-4yaaa-aaaah-quyfa-cai` |
+| `settlement` (tracking de pagos) | ✅ **Deployado en mainnet**, `yknil-6yaaa-aaaah-quzja-cai` |
+| `bridge` (motor real del corredor) | ✅ **Deployado en mainnet**, `us4im-qiaaa-aaaah-quyga-cai` — feature flag `bridge=false` hoy |
+| `liquidity_pool` (swap contra inventario real) | ✅ **Deployado en mainnet**, `uv5oy-5qaaa-aaaah-quygq-cai` |
+| `src/koywe_bridge/main.mo` (diseño original de 2026-08-02) | ❌ **No existe — nunca se construyó, ya no es el plan** |
+| Koywe registrado como `Institution` real | ❌ Pendiente — depende del KYB (§3 `INSTRUCCIONES_FOUNDER.md`) |
+| KYB Koywe (documentos, sandbox, producción) | ⏳ Pendiente |
 
-> Para la implementación técnica de HTTPS Outcalls, tECDSA y ICRC-1: ver `GREYVALLEY_ICP_TECH.md`
+> Para la implementación técnica de HTTPS Outcalls, tECDSA y ICRC-1 (usadas
+> en OTROS canisters del protocolo, no en este flujo): ver `GREYVALLEY_ICP_TECH.md`
 
-### 6b. Tres rutas distintas — no confundirlas (diseñado 2026-09-01)
+### 6b. Dos rutas distintas — no confundirlas
 
-El `koywe_bridge` sirve a **tres rutas reales, con mecánicas y riesgos
-regulatorios distintos**. Documentado acá para que quede claro cuál se
-está construyendo en cada momento — se conversaron las tres seguidas en
-la misma sesión y era fácil mezclarlas.
+Se diseñaron dos rutas posibles para partners tipo Koywe. Solo una tiene
+código real hoy.
 
-**Ruta A — On/off-ramp individual** (ya especificada arriba, §6, sin
-cambios — esta sección solo confirma el orden de operaciones, que ya
-estaba bien en el diseño original):
+**Ruta A — On/off-ramp individual con mint/burn directo al usuario**
+(diseño de 2026-08-02, sección §6 original de este documento):
+requeriría una wallet EVM custodiada por tECDSA que reciba USDC real y
+mintee ckUSDC 1:1 al usuario recién tras verificar la llegada por HTTPS
+Outcall. **No tiene código — es un diseño sin construir**, distinto del
+que sí corre hoy.
 
-```
-On-ramp:  usuario paga CLP a Koywe → Koywe manda USDC real a la wallet
-          EVM → koywe_bridge VERIFICA la llegada (HTTPS Outcall a RPC) →
-          RECIÉN AHÍ mintea ckUSDC 1:1 al usuario (Paso 7 antes que
-          Paso 9, nunca al revés)
+**Ruta B — Remesa vía corredor con liquidez ya pooleada (la real, la que
+describe §6 de arriba)**: no mintea nada nuevo — usa el ckUSDC/ckEURC que
+ya está pooleado por los depositantes de Exaltite como el lado "destino"
+de la transacción, mismo modelo de inventario + oráculo que
+`liquidity_pool.swap()`. El partner (Koywe) recibe el CLP del cliente por
+su lado y entrega la moneda destino directamente — no hay una reposición
+de vuelta a un "wallet EVM de GreyValley" porque esa wallet no existe en
+este diseño; el ciclo se cierra simplemente con el CLP que Koywe se
+queda como margen de su propio negocio.
 
-Off-ramp: usuario quema su ckUSDC → koywe_bridge confirma que el USDC
-          salió real de la wallet EVM (o que el partner confirmó el
-          depósito CLP en el banco destino) → RECIÉN AHÍ se refleja el
-          quemado como definitivo
-```
-
-Es un **mint/burn directo al usuario** — no toca el pool del corredor
-para nada. Nunca se adelanta la contabilidad a la confirmación real
-(mismo criterio de esta sesión aplicado a otros bugs reales: CDP ratio,
-staleness del oráculo — jamás mover el ledger antes de confirmar el
-estado real del otro lado).
-
-**Ruta B — Remesa internacional vía corredor (liquidez pooleada de
-stakers), en el fondo un "Bank to Bank" vía Chain Fusion**:
-
-A diferencia de la Ruta A, acá NO se mintea ckUSDC nuevo — se usa
-ckUSDC que YA existe, pooleado por stakers en Exaltite, y el partner
-repone la liquidez usada un rato después.
-
-```
-1. Staker deposita ckUSDC en Exaltite → se autopoolea al pool del
-   corredor (liquidity-pool, CLP_USD). Ya 1:1 real vía el minter
-   oficial de ckUSDC (DFINITY) — nada que respaldar de más acá.
-
-2. Cliente de remesa paga CLP en Chile, pide que llegue USD a un banco
-   destino en el extranjero.
-
-3. El corredor usa el ckUSDC ya pooleado del staker como el lado "USD"
-   de esta transacción — mismo modelo de inventario + oráculo que ya
-   corre en liquidity_pool.swap() (sin AMM, sin slippage). El pool baja.
-
-4. El partner (Koywe u otro) recibe el CLP del cliente por su lado,
-   fuera de ICP — y es quien entrega el USD real al banco destino
-   (su off-ramp, no el de GreyValley).
-
-5. Un par de minutos después, el partner devuelve el equivalente en
-   USDC real a la wallet EVM de GreyValley.
-
-6. koywe_bridge mintea ckUSDC fresco con ese USDC recién llegado y lo
-   devuelve al pool del corredor → rebalancea el pool a como estaba
-   antes del paso 3. El staker recupera su respaldo real.
-```
+**Qué pasa si el pool se queda sin inventario**: ya existe cola FIFO real
+en `liquidity_pool.swap()` (`#queued`, `drainQueue()`) para esto — nunca
+ejecuta a peor precio ni rechaza, espera. **Gap real identificado
+2026-09-01, sin código todavía**: hoy el pool se drena literal hasta
+`foreignReserve = 0` antes de encolar — no hay ningún piso de reserva
+(a diferencia de los vaults, que sí tienen `checkBufferFloor` al 5% de
+NAV). Pendiente de diseño: agregar un piso configurable (10-15% del
+pool) que empiece a encolar ANTES de llegar a cero real, para que el
+staker que puso el primer ckUSDC nunca vea el pool completamente vacío.
 
 **Qué pasa si el partner se demora en reponer (paso 5-6)**: el pool
 puede agotarse antes de que llegue la reposición. Ya existe cola FIFO
@@ -425,14 +393,13 @@ arriba, lo complementa): el mínimo real ya documentado en
 hace que agotarse sea raro en la práctica — pero es plata quieta, no
 una garantía de código.
 
-**Variante futura de la Ruta B (v3, con aprobación CMF)**: en vez de
-que el partner maneje el CLP off-chain (como Koywe hoy), la reposición
-del paso 4-6 podría venir de **sCLP → ckUSDC → USDC** — GreyValley
-custodiando el CLP real (vía Pegasus SpA + Fintoc, ver §7 más abajo) en
-lugar de depender de un partner externo para esa pierna. Esto es
-estrictamente posterior a la aprobación CMF del sandbox regulatorio —
-hoy la Ruta B corre 100% con partner externo (Koywe), sin que GreyValley
-toque CLP en ningún punto.
+**Variante futura de la Ruta B (v3, con aprobación CMF)**: en vez de que
+el partner maneje el CLP off-chain (como Koywe hoy), el lado CLP podría
+venir de **sCLP → ckUSDC/ckEURC**, con GreyValley custodiando el CLP real
+(vía Pegasus SpA + Fintoc, ver §7 más abajo) en lugar de depender de un
+partner externo para esa pierna. Esto es estrictamente posterior a la
+aprobación CMF del sandbox regulatorio — hoy la Ruta B corre 100% con
+partner externo (Koywe), sin que GreyValley toque CLP en ningún punto.
 
 **Por qué la Ruta B es más liviana regulatoriamente que sCLP solo**:
 GreyValley nunca custodia CLP en esta ruta — coincide exacto con el
@@ -441,10 +408,10 @@ GreyValley nunca custodia CLP en esta ruta — coincide exacto con el
 cruzaría esa línea — por eso queda marcada explícitamente como futura y
 condicionada a aprobación, no como parte del diseño actual.
 
-**sCLP standalone** (§7 más abajo) — bloqueado por CMF, fuera de
-alcance de esta sesión, no se toca. Custodia CLP propia sin depender de
-ningún partner — es la pieza que la variante v3 de la Ruta B usaría el
-día que exista, pero es un desarrollo aparte, ya documentado en §7.
+**sCLP standalone** (§7 más abajo) — bloqueado por CMF. Custodia CLP
+propia sin depender de ningún partner — es la pieza que una variante
+futura de la Ruta B usaría el día que exista, pero es un desarrollo
+aparte, ya documentado en §7.
 
 ---
 
