@@ -204,7 +204,7 @@ El Art. 90 y ss. de la Ley 21.521 permite a la CMF autorizar la operación tempo
 | Requisito | Estado GreyValley | Acción |
 |-----------|--------------|--------|
 | Constitución como entidad legal en Chile | ❓ Verificar | Constituir SpA chilena si no existe |
-| Descripción técnica del modelo de negocio | ✅ GREYVALLEY_ODL_MECHANICS.md | Adaptar a formato CMF |
+| Descripción técnica del modelo de negocio | ✅ corredor-mechanics.md | Adaptar a formato CMF |
 | Plan AML/CFT | ⚠️ Delegado a Koywe | Documentar el modelo de delegación |
 | Capital mínimo operacional | ❓ Verificar | Determinar monto requerido para el sandbox |
 | Manejo de quejas y SERNAC | ❌ No existe | Diseñar protocolo |

@@ -120,7 +120,7 @@ Del bucket **Ecosistema / Guilds (1.000.000 PXRM)** — esa es exactamente su fu
 
 ### Criterios de TGE sano
 
-1. **TVL día 1 ≥ $105K** — mínimo para ODL capacity real (Vault Exaltite necesita $50K ckUSDC). Ver `GREYVALLEY_ODL_MECHANICS.md` §5.
+1. **TVL día 1 ≥ $105K** — mínimo para capacidad real del corredor (Vault Exaltite necesita $50K ckUSDC/ckEURC). Ver `corredor-mechanics.md` §5.
 2. **PXRM Genesis ≤ 8% del supply** — por encima empieza a presionar precio post-vesting.
 3. **Float TGE: ~200K PXRM circulantes** (4% supply) — solo TGE unlock Ecosistema (100K) + Treasury (100K). Market cap inicial ~$41K vs TVL $295K → ratio 7x.
 4. **Vesting obligatorio para todos los Genesis** — sin TGE unlock, sin cliff dump.
@@ -248,13 +248,13 @@ APR TOTAL = Base Real Yield + (PXRM Base APR × Guild Multiplier) + Epoch Tier B
 - **+ Epoch Tier Bonus**
 - ⚠️ USD APR mínimo a precios actuales (BTC>>PXRM en precio). Vault de acumulación PXRM, no de rendimiento USD.
 
-### Vault Exaltite (ckUSDC, ckUSDT)
+### Vault Exaltite (ckUSDC, ckUSDT, ckEURC)
 - **Capital al retirar:** ckUSDC exacto depositado
 - **Base Real Yield:** 0%→2%/año variable en ckUSDC — **solo existe con volumen ODL**. En bootstrap = "--".
 - **PXRM Base APR:** 12%–24% USD en PXRM desde treasury (el attractor principal en bootstrap; recalibrado 2026-08-15, mismo target para las 3 bóvedas)
 - **Guild Multiplier:** ×1.3 Institucional / ×2.0 Apex sobre el PXRM Base APR
 - **+ Epoch Tier Bonus**
-- El ckUSDC depositado actúa como inventario ODL bridge (ver GREYVALLEY_ODL_MECHANICS.md)
+- El ckUSDC/ckEURC depositado actúa como inventario del corredor (ver `corredor-mechanics.md`) — ckUSDC para CLP↔USD, ckEURC para CLP↔EUR (integrado 2026-09-04), custodias separadas
 
 ---
 
@@ -509,11 +509,11 @@ cualquier posición de vault o CDP:
 
 ## 10. ODL Bridge
 
-El Vault Exaltite (ckUSDC) actúa como inventario de liquidez del bridge:
+El Vault Exaltite (ckUSDC/ckEURC) actúa como inventario de liquidez del corredor:
 - $1 depositado en Vault Exaltite = $1 de capacidad ODL instantánea
 - ICP liquida en ~2 segundos → el mismo pool puede procesar mucho más volumen mensual
 - Capital del depositante siempre intacto — el pool no se "consume"
-- Ver **GREYVALLEY_ODL_MECHANICS.md** para detalle completo
+- Ver **`corredor-mechanics.md`** para detalle completo
 
 ---
 

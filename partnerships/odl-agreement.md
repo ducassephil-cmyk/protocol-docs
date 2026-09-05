@@ -63,7 +63,7 @@ Una vez cumplidas las condiciones precedentes, el Cliente se compromete a:
 
 Una vez cumplidas las condiciones precedentes, GreyValley se compromete a:
 
-1. **Fee preferencial de lanzamiento:** aplicar un fee de **0.15%** por transacción ODL (en vez del fee estándar de 0.20%) durante los primeros **[6 / 12] meses** de operación activa del Cliente.
+1. **Fee preferencial de lanzamiento:** aplicar un fee de **0.15%** por transacción del corredor (en vez del fee estándar de 0.22%) durante los primeros **[6 / 12] meses** de operación activa del Cliente.
 
 2. **Slot de liquidez garantizado:** reservar capacidad ODL suficiente para el volumen comprometido del Cliente, con prioridad sobre usuarios que se incorporen posteriormente.
 

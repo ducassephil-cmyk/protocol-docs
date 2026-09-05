@@ -67,4 +67,4 @@ For ODL partnership inquiries, see the [ODL Agreement Template](partnerships/odl
 
 ---
 
-*2026-08-28 · Fee del corredor corregido a 0.20% (era 0.5% en versiones previas) · Link roto a "APR Model" corregido — ese contenido vive en Tokenomics §2, nunca existió como archivo separado · Protocol documentation is updated as the codebase evolves.*
+*2026-09-04 · Fee del corredor real: 0.22% (subida +10% de 2026-08-28 sobre el 0.20% original, que a su vez reemplazó el 0.5% de versiones previas) · Link roto a "APR Model" corregido — ese contenido vive en Tokenomics §2, nunca existió como archivo separado · Protocol documentation is updated as the codebase evolves.*
