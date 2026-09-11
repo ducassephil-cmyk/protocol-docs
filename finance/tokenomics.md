@@ -47,18 +47,19 @@ Tokens bloqueados — se liberan linealmente después del cliff. Supply del vest
 | DAO Governance | 500.000 | — | Voto de comunidad | 0% |
 
 > Nota sobre Treasury: "Governance-controlled" es el mecanismo general — dentro de eso, la porción destinada al PXRM Base APR (+ Guild Multiplier para Track B) de vaults sigue el calendario de la Sunset Clause semestral (`GREYVALLEY_APR_MODEL.md` §10: Año 1 boost 100%, Año 2 baja a 50% si el yield real supera 5% y el ODL supera $500K/mes, Año 3 puede llegar a 0%). El 5% TGE Unlock es aparte de ese calendario — liquidez inicial disponible desde el día 1. **Los 2.000.000 PXRM no son un gasto garantizado** — es un techo que se contrae si el protocolo genera suficiente fee real antes de tiempo; con un sunset clause activado temprano, gran parte de ese 40% del supply queda sin gastarse.
-> Nota sobre Staking Rewards (500K PXRM): es un pool de supply separado del 35% de fee split que reciben los stakers en ICP/ckUSDC/ckBTC — este bucket se libera "por epoch/APR" como refuerzo adicional en PXRM, no reemplaza al fee split real.
+> Nota sobre Staking Rewards (500K PXRM): es un pool de supply separado del fee split real que reciben los stakers en ICP/ckUSDC/ckBTC/PXRM (bucket PxrmStakers del `fee_splitter`) — no lo reemplaza, es un refuerzo adicional en PXRM. **Real desde 2026-09-08** ("PXRM Staker Boost", `staking/main.mo`): timer real de 6 días reparte proporcional a `pxrmStaked × tasa según lock` (1% Flex / 4% 90d / 6% 180d / 10% 365d anualizado) entre todos los stakers activos, financiado por la subcuenta `\04`. Sunset Clause manual, disparadores más largos que vaults (120d estable + corredor 6 meses, revisión anual). Fondeado con 10.000 PXRM reales el día del lanzamiento, quedan ~390.000 PXRM sin deployar en la subcuenta.
 >
-> ⚠️ **Huérfano detectado (auditoría 2026-08-07):** este bucket no tiene
-> ninguna implementación en código — `grep` en `staking/main.mo` no encuentra
-> ninguna referencia a un pool separado de 500K PXRM ni a una fórmula de
-> liberación. El único mecanismo de pago real en `staking/main.mo` es
-> `distribute_fees()` (fees reales del bridge, ponderados por stake × lock
-> multiplier) — que además está dormido hoy (ver nota en `GREYVALLEY_APR_MODEL.md`
-> §2, Capa 3). Antes de implementar este bucket falta decidir la fórmula de
-> liberación (candidatas discutidas: proporcional al TVL general por epoch,
-> vs. tasa fija de emisión proporcional al PXRM ya stakeado) — pendiente de
-> definición del founder, no construir sin esa decisión.
+> ⚠️ **Equipo/Fundadores (1M PXRM, 20%) y Ecosistema/Guilds (1M PXRM, 20% —
+> fuera de la Reserva Genesis Round de abajo) siguen sin ningún mecanismo
+> on-chain real**, a diferencia de Treasury y Staking Rewards (subcuentas
+> reales de arriba). Verificado 2026-09-09: no existe subcuenta, lock,
+> cliff ni contrato de vesting para ninguno de los dos — el cliff de 12
+> meses de Equipo/Fundadores y el cronograma de 36 meses de Ecosistema/
+> Guilds son hoy solo la intención documentada acá. La única pieza de
+> Ecosistema/Guilds con código real es la Reserva Genesis Round
+> (`genesis_registry`, vesting lineal real por cofundador, ver abajo) — el
+> resto del bucket y el 100% de Equipo/Fundadores siguen sin asignar a
+> ninguna subcuenta ni contrato todavía.
 
 **Precio de lanzamiento (v2, 2026-07-31):**
 - Paridad fija: **1 PXRM = ICP / 10** — mecanismo real en `swapPXRMtoICP` (backend/main.mo) y espejado en el oráculo (`oracle.getPxrmPegRatio()`, ajustable sin redeploy vía `setPxrmPegRatio`, admin-only). No hay AMM todavía, así que este swap fijo es el único precio real.
@@ -213,6 +214,15 @@ Si el precio cae a 0.080 ICP → reducir bps de Flexible 20% → menos PXRM emit
 
 **Ver arquitectura técnica completa:** `GREYVALLEY_INTEGRATIONS.md` §11
 
+> **Bug real corregido 2026-09-08:** el staking PXRM que usa hoy la app (canister `staking-vault`,
+> separado del sistema legacy que vivía dentro de `backend.mo`) nunca tuvo forma de acreditar
+> LUNX — cualquier usuario real que stakeara PXRM y reclamara rewards ganaba PXRM/hard assets
+> reales pero **cero LUNX**, sin error visible. Fix real: `staking-vault.claimRewards()` ahora
+> llama a `backend.creditLunxFromStakingVault(caller, pxrmYield)` 1:1 con el yield PXRM
+> reclamado — excepto cuando el `caller` es la posición propia del protocolo (`epoch_pool`,
+> Flujo A del flywheel), que se excluye a propósito porque LUNX es una recompensa para
+> personas, no para el capital semilla interno del protocolo.
+
 ### Otros tokens del ecosistema
 | Token | Rol |
 |-------|-----|
@@ -288,21 +298,89 @@ No hay lock forzado. El capital siempre es retirable. El tier premia la permanen
 
 ## 4. Fee Split — Distribución de Fees del Protocolo (V1 — activo en `fee_splitter/main.mo`)
 
+> **Revisión real 2026-09-08**: el split **YA NO es una sola tabla 35/25/23/10/7** — cada fee
+> real trae una `SourceCategory` que decide con qué tabla FIJA se reparte. Las 3 tablas siempre
+> suman 10.000 bps (100%), sin re-escalar en runtime.
+
+### 4.1 — `#PxrmDenominated` (el fee sale de capital PXRM real)
+
+Rutas: swap AMM (cualquier par), canje Marketplace, swap PXRM→ICP legacy.
+
 | Destino | % | Descripción |
 |---------|---|-------------|
 | PXRM Stakers | 35% | Fee pool en activos duros (ICP/ckUSDC/ckBTC) — no en PXRM |
-| LP AMM providers | 25% | Proporcional a liquidez aportada |
+| LP AMM providers | 25% | Proporcional a liquidez aportada en `amm` |
 | Treasury | 23% | Fondea PXRM Base APR + Guild Multiplier |
 | Epoch Retention Pool | 10% | Epoch Tier Bonus T1–T5 — distribuido cada 30 días |
-| Volume Guilds | 7% | >$25K ODL/mes en PXRM. Acumula si nadie activo. |
-| ReFi Chile | 0% | Reservado — desactivado V1, activar V1.5 con voto T3+ |
+| Volume Guilds | 7% | Proporcional al ckUSDC/ckUSDT/ckEURC en Vault Exaltite (Guild Track A) |
 | **Total** | **100%** | |
 
-> **Propuesta no implementada (V1.5, requiere decisión + cambio de código):** reasignar 5 puntos
-> del split (bajar Treasury a 18%) a un "vUSD Institutional Pool" dedicado para reforzar el
-> track institucional de §5b. Es una idea sobre la mesa, no algo que el `fee_splitter`
-> deployado haga hoy — el contrato real sigue en 35/25/23/10/7/0. Progresión completa V1.5/V2
-> por volumen ODL: ver `GREYVALLEY_APR_MODEL.md` §6.
+### 4.2 — `#VaultBacked` (el fee sale de capital de vault, no de PXRM)
+
+Rutas: interés CDP, liquidación CDP (colateral ICP/ckBTC/ckETH), fee del corredor (`bridge_odl`, 0.22%).
+
+| Destino | % | Descripción |
+|---------|---|-------------|
+| PXRM Stakers | 2% | Remanente real de redondear los otros 4 a enteros (antes 0%) |
+| LP AMM providers | 38% | Corredor → LPs reales de `liquidity_pool` · CDP → LPs de `amm` |
+| Treasury | 35% | Fondea PXRM Base APR + Guild Multiplier |
+| Epoch Retention Pool | 15% | Epoch Tier Bonus T1–T5 |
+| Volume Guilds | 10% | Guild Track A / Exaltite |
+| **Total** | **100%** | |
+
+### 4.3 — `#PxrmLiquidation` (nueva, colateral 100% PXRM liquidado)
+
+Ruta: liquidación CDP cuando el colateral era PXRM — pesa más alto que un swap genérico porque
+el colateral perdido ES capital PXRM real del borrower.
+
+| Destino | % | Descripción |
+|---------|---|-------------|
+| PXRM Stakers | 50% | El colateral PXRM real perdido va a quien apostó por PXRM |
+| LP AMM providers | 19% | A los LPs del `amm` |
+| Treasury | 18% | Fondea PXRM Base APR + Guild Multiplier |
+| Epoch Retention Pool | 8% | Epoch Tier Bonus T1–T5 |
+| Volume Guilds | 5% | Guild Track A / Exaltite |
+| **Total** | **100%** | |
+
+### 4.4 — Routing real del bucket LpAmm (fix 2026-09-08)
+
+El bucket LpAmm de fuentes `#VaultBacked` del **corredor** (`bridge_odl:<pair>`) va a
+`liquidity_pool.receiveAllocation()` — el 100% del monto SOLO a los LPs de ese par
+específico (CLP_USD, CLP_EUR, etc.), no repartido 1/N entre los 4 pares del corredor
+(antes se perdía ~mitad en pares sin LPs reales como CLP_BRL/CLP_ARS). `cdp_interest` y
+`cdp_liquidation` (colateral no-PXRM) siguen yendo a `amm.receiveAllocation()` sin cambio.
+
+### 4.5 — Los dos flujos reales del protocolo (naming unificado 2026-09-08)
+
+- **Flujo de la posición PXRM del protocolo** (~100.000 PXRM stakeada, dueño `epoch_pool`):
+  reparto 100%/100% categórico por token, sin %. Hard assets (ICP/ckBTC/ckETH/ckUSDC)
+  rellenan el pool AMM más flaco; el PXRM del reward vuelve entero a Staking Rewards (fix
+  real 2026-09-08 — antes quedaba huérfano). Nunca compra BTC.
+- **Flujo de fees generales del protocolo** (bucket Treasury, 23%/35%/18% según categoría —
+  distinto del Treasury del Protocolo del §1, que es 40% del SUPPLY): reparto proporcional
+  3%/10%/10% sobre el balance real acumulado en la subcuenta `VAELIX_TREASURY_V1` de
+  `neo-protocol-backend` (POL — Protocol-Owned-Liquidity): 3% opex/mantenimiento (líquido,
+  queda ahí), 10% Posiciones (se mueve a `epoch_pool`, que rebalancea pools + compra ckBTC
+  real vía **ICPSwap**), 10% Reserva flexible (se mueve a una subcuenta separada,
+  `TREASURY_FLEX_RESERVE_V1`, "otros activos sin comprometer a BTC"). La razón 3:10:10 es
+  proporcional al balance real mezclado, no un monto fijo — si entra más plata de la
+  categoría 35%, cada tramo escala proporcionalmente más grande.
+
+### 4.6 — Auditoría real 2026-09-08
+
+- LUNX nunca se acreditaba en el staking PXRM real (`staking-vault`, distinto del sistema
+  legacy huérfano dentro de `backend.mo`) — fix real, `claimRewards()` ahora acredita 1:1,
+  excluyendo la posición propia del protocolo.
+- 6 rutas reales bloqueadas contra la quema del principal de minteo del ledger PXRM (que
+  coincide con la identidad Plug del founder) — `unstake`/`claimRewards`/`adminForceUnstake`
+  en `staking-vault`, `claimUnpaidYield`/`claimStakeRewards`/`unstakePXRM` en `backend.mo`.
+- Info desactualizada corregida en `/analytics` y `/vaults` (% de bucket fijo viejo,
+  mislabeling "Treasury 23%" vs. "Treasury 40%").
+
+> **Propuesta no implementada (V1.5, requiere decisión + cambio de código):** reasignar puntos
+> del bucket Treasury a un "vUSD Institutional Pool" dedicado para reforzar el track
+> institucional de §5b. Progresión completa V1.5/V2 por volumen ODL: ver
+> `GREYVALLEY_APR_MODEL.md` §6.
 
 ---
 
@@ -380,7 +458,13 @@ A diferencia de los vaults (que usan solo Epoch Tiers sin lock), el staking PXRM
 - El lock reduce supply circulante de PXRM → estabiliza el token
 - Análogo a NNS neurons: dissolve delay = compromiso
 
-El APR de staking proviene del **35% del fee pool del protocolo** (no del treasury). Pagado en activos duros: ICP, ckUSDC, ckBTC proporcional al volumen de cada fee.
+El APR de staking proviene del bucket PxrmStakers del `fee_splitter` (no del treasury) — el %
+real varía según de dónde vino cada fee (revisado 2026-09-08, ver §4): 35% de swaps/marketplace,
+2% de interés CDP/corredor, 50% de liquidaciones con colateral 100% PXRM. Pagado en ICP, ckUSDC,
+ckBTC o PXRM real, proporcional al volumen de cada fee. Además, desde 2026-09-08 existe un
+"PXRM Staker Boost" propio (bootstrap, financiado por la subcuenta Staking Rewards, timer real
+de 6 días, tasas 1%/4%/6%/10% anual según lock) — separado del yield real, nunca mezclado en el
+mismo número.
 
 ### Lock multiplier (base)
 
@@ -405,6 +489,48 @@ El tiempo continuo en staking (sin retirar >5%) agrega un bonus sobre el APR ya 
 
 **Regla 5%:** Retirar >5% de la posición total (capital + rewards acumulados) resetea el Epoch Tier a T1. El lock period sigue corriendo independientemente — el lock tiene su propia penalización de salida anticipada.
 
+### Auto-dilución de la posición propia del protocolo (NUEVO — 2026-09-09)
+
+**Problema real evaluado esta sesión:** el reparto del bucket PxrmStakers es puramente
+relativo (`weightOf = pxrmStaked × multiplier`) — si hay un solo staker activo, se lleva
+el 100% del bucket sin importar cuán chico sea el monto. Con $10M en fees totales, un
+único staker de $100 se llevaría los $3.5M completos del bucket (35%). La posición propia
+de `epoch_pool` (~100,000 PXRM, Flexible) ya actuaba de ballast para evitar esto, pero al
+ser fija diluye parejo para siempre, sin importar cuánta adopción real haya.
+
+El founder evaluó y rechazó explícitamente un cap por staker ("no lo limitaremos a un %
+del bucket, para eso tenemos nuestra propia posición") — la solución elegida es que la
+posición propia ceda espacio en vez de limitar a terceros:
+
+- Cada `stake()` externo (no `epoch_pool` mismo) resta esa misma cantidad de la posición
+  propia del protocolo, **floor-guarded** — nunca baja de `pxrmSelfDilutionFloor` (default
+  25,000 PXRM, ~US$6K al precio oráculo actual, ajustable vía `setPxrmSelfDilutionFloor`
+  con el mismo criterio de revisión manual que `boostSunsetMultiplier`).
+- El PXRM restado se devuelve real a la subcuenta Staking Rewards (mismo destino que
+  `returnUnusedPxrmToStakingRewards()` de `epoch_pool`) — nunca se quema, nunca se pierde.
+- Una vez que la posición propia llega al piso, deja de bajar — de ahí en adelante el peso
+  total del bucket crece de verdad con cada nuevo staker, en vez de solo reordenarse.
+
+### vUSD Staking Pool — TVL real sin necesitar PXRM (NUEVO — 2026-09-09)
+
+**Problema real**: un staker PXRM no aporta TVL a los pools AMM salvo que además tenga vUSD para emparejar manualmente en `vUSD_PXRM` — casi nadie lo hacía, así que ese par quedaba casi vacío pese a existir desde 2026-08-28 (auto-pooleado solo por fees de Marketplace, 0.12 vUSD por publicación).
+
+**Solución**: `stakeVusd(amount)`/`unstakeVusd(amount)` en `staking-vault` — depósito de vUSD puro, sin necesitar PXRM. Mecánica:
+
+- El vUSD depositado se empareja automático con la posición PXRM del protocolo (`autoPoolPxrm()`, mecanismo ya existente desde 2026-08-24, reusado tal cual) vía `add_liquidity` real al par `vUSD_PXRM`.
+- Recompensa: LP real de ese par — bucket LpAmm del `fee_splitter` cuando haya swaps, **no** el bucket PxrmStakers (35%).
+- **Buffer de retiro rápido (5%)**: una porción del vUSD depositado se mantiene líquida sin poolear, para pagar retiros chicos al instante sin tocar la pool real.
+- **Buffer de PXRM post-retiro (ventana ajustable, default 30 min)**: si un retiro grande necesita sacar liquidez real de la pool (`remove_liquidity`), el PXRM que vuelve de esa operación **no se re-stakea al instante** — queda en espera por si alguien más deposita vUSD pronto (se reusa directo, sin el viaje inútil de restake→unstake). Si nadie deposita en esa ventana, un timer lo re-acredita a la posición propia del protocolo.
+- La posición propia del protocolo (`pxrmStaked` en su entrada de `positions`) **no baja** cuando su PXRM se poolea — ese campo es el derecho/claim para el reparto de fees (`weightOf`), no la ubicación física del token.
+
+**Verificado real en mainnet (2026-09-09)**: depósito de prueba de 0.10 vUSD → `staking-vault` pasó a ser el **segundo proveedor LP real** de `vUSD_PXRM` — reservas subieron de $1.08 vUSD/~4.47 PXRM a $1.18 vUSD/~4.88 PXRM.
+
+### La cadena completa de salida real para PXRM: PXRM → vUSD → ckUSDC (NUEVO — 2026-09-09)
+
+PXRM (token propio, sin mercado externo) no tiene salida real hacia algo estable salvo vendiéndolo contra `vUSD_PXRM` — y de ahí, vUSD tampoco tiene salida real hacia ckUSDC (chain-key USDC, redimible 1:1 contra USDC real) salvo vendiéndolo contra `vUSD_ckUSDC`. Solo el primer eslabón tenía un mecanismo que lo profundizara — se agregó `autoPoolVusdToCkusdc()` (mismo patrón que `autoPoolVusdToPxrm()`) para que el segundo también crezca solo, con la misma fuente real (fees de Marketplace, repartidos ~50/50 entre ambos pools).
+
+Reposición real de ICP para `swapPXRMtoICP` (2026-09-09): tras evaluar ICPSwap (descartado, sin pool PXRM/ICP real) y la cadena PXRM→vUSD→ckUSDC→ICP (descartada por ahora, pools intermedios demasiado chicos), se eligió tomar un 4% ajustable del ICP real ya guardado en la Reserva flexible (segundo 10% del Treasury) — mismo token, sin pasar por ningún pool, cero impacto de precio. Corre en el tick de 8h del backend.
+
 ### Ejemplo combinado (Lock 6 meses · T3 Vórtice)
 
 ```
@@ -412,7 +538,7 @@ APR base fee pool:    8%
 × Lock 6 meses:       ×1.6  → 12.8%
 + T3 Epoch bonus:     +10%  → 22.8% efectivo
 Pagado en:            ICP + ckUSDC + ckBTC (proporcional a fees)
-LUNX acreditado:      1:1 con rewards al hacer claimStakeRewards
+LUNX acreditado:      1:1 con rewards al hacer claimRewards() (staking-vault, real desde 2026-09-08)
 ```
 
 ### APR según volumen de protocolo
@@ -494,16 +620,31 @@ cualquier posición de vault o CDP:
 
 ## 9. Oracle de Precios
 
+**Actualizado 2026-09-09** — intervalos reales:
+
 | Fuente | Datos | Frecuencia |
 |--------|-------|-----------|
-| CoinGecko HTTP | ICP, BTC, ETH en USD | Cada 300s |
-| mindicador.cl HTTP | CLP/USD | Cada 300s |
+| XRC (system canister) | ICP, BTC, ETH en USD | Cada 8h, ajustable |
+| Derivado | PXRM = ICP × peg fijo (1 PXRM = 0.1 ICP) | Mismo tick que ICP |
+| CoinGecko HTTP | ckLINK en USD | Cada 8h |
+| mindicador.cl + fallback | CLP/USD, CLP/EUR | Cada 8h, timer propio separado (referencial) |
 | Fallback | Caché anterior | Si falla el request |
 
 **Reglas:**
 - CLP: **nunca dividir por 100** — viene como entero (ej: 950 = 950 CLP por 1 USD)
 - Si no hay caché: mostrar `"--"` en UI — NUNCA inventar datos
 - Transform function obligatoria en todas las HTTP outcalls
+- Fix real 2026-09-09: el precio de LINK perdía los decimales al parsear
+  (truncaba después del punto) — corregido, ahora preserva 8 decimales.
+
+### Guard de impacto de swap server-side + recalibración de pools (NUEVO 2026-09-09)
+
+`amm.swap()` ahora tiene un guard propio (no solo client-side): compara
+el valor USD real de lo que entra vs. lo que sale, umbral 11% ajustable,
+falla cerrado si el oráculo no responde. Verificado real: rechazó un
+swap con 2.17M% de impacto contra un pool roto. Además, nueva función
+admin `adminRecalibratePool()` para resembrar pools sin LPs reales de
+forma segura (devuelve las reservas rotas antes de sembrar de nuevo).
 
 ---
 
