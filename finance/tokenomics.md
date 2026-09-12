@@ -241,7 +241,7 @@ APR TOTAL = Base Real Yield + (PXRM Base APR × Guild Multiplier) + Epoch Tier B
 
 **Capa 1 — Base Real Yield:** viene del trabajo real del protocolo (NNS staking, ODL fees, AMM). Token de pago varía por vault.
 **Capa 2 — PXRM Base APR (Treasury Incentive):** APR base en PXRM fondeado por el treasury (2M PXRM). No es un "boost sobre" otra base — ES el APR base de PXRM. Revisión semestral (Sunset Clause). Multiplicado por Guild Multiplier para Track B: ×1.3 Institucional, ×2.0 Apex. Fuente: mismo treasury bucket para PXRM Base APR y Guild Multiplier extra.
-**Capa 3 — Epoch Tier Bonus (T1–T5):** recompensa por permanencia continua. Financiado por el Epoch Retention Pool (10% del fee split) — distinto del treasury. Ver §3.
+**Capa 3 — Epoch Tier Bonus (T1–T5):** recompensa por permanencia continua, streaming en cada harvest. **Corregido (2026-09-12):** se paga desde el mismo PXRM Base APR (treasury) de la Capa 2, no desde el Epoch Retention Pool del fee split — ese bucket se mezcla con la reinversión de la posición propia de staking del protocolo (Flujo A) y el rebalanceo de pools/compra de reserva (Flujo B), sin repartirse directo a holders. Ver §3.
 
 ### Vault Exaltium (ICP)
 - **Capital al retirar:** ICP exacto depositado
@@ -290,7 +290,7 @@ No hay lock forzado. El capital siempre es retirable. El tier premia la permanen
 
 **T1 Streaming:** El 1% de T1 corre en tiempo real, visible en el frontend. No hay que esperar un epoch para cobrarlo.
 
-**T2-T5 Epoch:** Los bonus se acumulan y están disponibles para harvest, pero el mejor momento para hacerlo es en las ventanas de epoch (cada 30d) para maximizar el Epoch Pool (10% del fee pool distribuido a T2+ cada epoch).
+**T2-T5 Epoch:** Los bonus se acumulan y están disponibles para harvest en cualquier momento — la ventana de 30d es solo el contador de tier (días activos), no una fecha de pago. El bonus real se paga desde el PXRM Base APR (treasury), no desde un pool que se reparte cada 30 días.
 
 **Harvest:** No resetea el tier ni el depositTimeNanos. Se puede hacer en cualquier momento.
 
@@ -311,7 +311,7 @@ Rutas: swap AMM (cualquier par), canje Marketplace, swap PXRM→ICP legacy.
 | PXRM Stakers | 35% | Fee pool en activos duros (ICP/ckUSDC/ckBTC) — no en PXRM |
 | LP AMM providers | 25% | Proporcional a liquidez aportada en `amm` |
 | Treasury | 23% | Fondea PXRM Base APR + Guild Multiplier |
-| Epoch Retention Pool | 10% | Epoch Tier Bonus T1–T5 — distribuido cada 30 días |
+| Epoch Retention Pool | 10% | Se mezcla con el rebalanceo de posiciones propias del protocolo — no paga el Tier Bonus directo (ver Capa 3 arriba) |
 | Volume Guilds | 7% | Proporcional al ckUSDC/ckUSDT/ckEURC en Vault Exaltite (Guild Track A) |
 | **Total** | **100%** | |
 
@@ -324,7 +324,7 @@ Rutas: interés CDP, liquidación CDP (colateral ICP/ckBTC/ckETH), fee del corre
 | PXRM Stakers | 2% | Remanente real de redondear los otros 4 a enteros (antes 0%) |
 | LP AMM providers | 38% | Corredor → LPs reales de `liquidity_pool` · CDP → LPs de `amm` |
 | Treasury | 35% | Fondea PXRM Base APR + Guild Multiplier |
-| Epoch Retention Pool | 15% | Epoch Tier Bonus T1–T5 |
+| Epoch Retention Pool | 15% | Se mezcla con el rebalanceo de posiciones propias — no paga el Tier Bonus directo |
 | Volume Guilds | 10% | Guild Track A / Exaltite |
 | **Total** | **100%** | |
 
@@ -338,7 +338,7 @@ el colateral perdido ES capital PXRM real del borrower.
 | PXRM Stakers | 50% | El colateral PXRM real perdido va a quien apostó por PXRM |
 | LP AMM providers | 19% | A los LPs del `amm` |
 | Treasury | 18% | Fondea PXRM Base APR + Guild Multiplier |
-| Epoch Retention Pool | 8% | Epoch Tier Bonus T1–T5 |
+| Epoch Retention Pool | 8% | Se mezcla con el rebalanceo de posiciones propias — no paga el Tier Bonus directo |
 | Volume Guilds | 5% | Guild Track A / Exaltite |
 | **Total** | **100%** | |
 
