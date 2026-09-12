@@ -85,6 +85,15 @@ Del bucket **Ecosistema / Guilds (1.000.000 PXRM)** — esa es exactamente su fu
 - **Reserva Genesis Round:** ~200–350K PXRM (20–35% del bucket Ecosistema)
 - **Resta para Guilds / ecosystem post-TGE:** ~650–800K PXRM
 
+> **Segundo track (2026-09-12) — "Investors Guild"**: mecanismo separado
+> (canister propio a futuro, no `genesis_registry`) que también saca del
+> bucket Ecosistema/Guilds — retorno plano 2x (sin tiers), mínimo $500,
+> vesting 9 meses, cap 200K PXRM (regulable). Sumado al cap del primer
+> track (300K), el total reservado real ronda ~500K PXRM, no los ~650-800K
+> que implica el invariante de arriba — ese invariante (≤350K/≥650K) aplica
+> SOLO al primer track (cofundadores). 100% diseño, cero canister
+> construido todavía.
+
 ### Tiers de cofundadores
 
 | Tier | Cantidad ideal | TVL mínimo c/u | PXRM asignado c/u | Vesting | Beneficios adicionales |
@@ -580,13 +589,13 @@ Los multiplicadores de lock y epoch aplican sobre el APR real, no sobre el estim
 
 ## 8. CDP (Collateralized Debt Position)
 
-Ratios de colateralización requeridos:
-| Activo | Ratio mínimo | Liquidation fee |
+Ratios de colateralización requeridos (**corregido 2026-09-12** — la tabla anterior tenía ICP en 175% en vez de 150%, y listaba `ckUSDC` como colateral, que no existe como tipo real en `cdp/main.mo`):
+| Activo | Ratio mínimo | Liquidation penalty |
 |--------|-------------|----------------|
-| ckBTC | 130% | 13% |
-| ckETH | 150% | 13% |
-| ICP | 175% | 13% |
-| ckUSDC | 110% | 13% |
+| ckBTC | 130% | 13.13% (10% bounty + 3% treasury) |
+| ICP | 150% | 13.13% |
+| ckETH | 150% | 13.13% |
+| PXRM | 200% | 13.13% (o 50% del split de fee si el colateral liquidado es 100% PXRM — ver §4.3) |
 
 **Interés (stability fee), deployado 2026-08-16:** 0.3% mensual sobre el vUSD acuñado,
 lineal (no compuesto, mismo criterio "simple interest" que el resto del protocolo —

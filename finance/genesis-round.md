@@ -22,6 +22,13 @@
 > A dedicated `creditGenesisBonus()` admin function reimburses any
 > operational loss on the special Strategic slot's Corridor-liquidity
 > capital, separate from the vesting allocation.
+>
+> **Second track — "Investors Guild"**: a SEPARATE mechanism (own future
+> canister, own tracking, not `genesis_registry`) pulling from the SAME
+> Ecosystem/Guilds bucket — flat 2x return (no tiers), $500 minimum,
+> 9-month vesting, 200K PXRM cap (regulable). 100% design as of now, zero
+> code/canister built. Do not confuse the two — this document describes
+> only the FIRST track (co-founder slots above).
 
 ---
 
