@@ -143,10 +143,10 @@ Todo esto ocurre en canister-to-canister calls, sin ningún servidor externo coo
 |---|---|---|
 | **Correspondent banking** | Tu banco chileno no tiene cuenta directa en el banco del beneficiario. Usa 2–4 bancos intermediarios, cada uno cobra $10–30 USD. | ckUSDC va directo: wallet → wallet. Sin intermediarios. |
 | **Tiempo de liquidación** | T+1 a T+5 días hábiles. Fin de semana → hasta el lunes. | Finalidad en segundos, 24/7/365. |
-| **Spread cambiario** | El banco aplica un spread del 1–3% sobre el tipo de cambio interbancario. En $10.000 USD = $100–300 USD perdidos. | 0.10% flat sobre el monto, sin spread oculto. |
+| **Spread cambiario** | El banco aplica un spread del 1–3% sobre el tipo de cambio interbancario. En $10.000 USD = $100–300 USD perdidos. | 0.22% flat sobre el monto, sin spread oculto (FIX 2026-09-14: decía 0.10%, el fee subió dos veces desde entonces). |
 | **Opacidad en tránsito** | No sabes dónde está tu dinero mientras viaja por los corresponsales. | Todo on-chain: el hash de la transacción es inmediatamente visible. |
 | **Riesgo de rechazo** | Un banco corresponsal puede rechazar la SWIFT por compliance sin explicación. Tu dinero vuelve 3–7 días después menos las comisiones. | Un smart contract acepta o rechaza determinísticamente. Si cumple las reglas del código, pasa. No hay criterio discrecional. |
-| **Mínimos rentables** | Para $500 USD, una SWIFT de $40 USD + 2% spread = 12% del monto en costos. No tiene sentido para montos pequeños. | 0.10% funciona igual para $50 o $500.000. |
+| **Mínimos rentables** | Para $500 USD, una SWIFT de $40 USD + 2% spread = 12% del monto en costos. No tiene sentido para montos pequeños. | 0.22% funciona igual para $50 o $500.000. |
 | **Bloqueo de fondos** | En algunos países (Argentina), el regulador puede congelar transferencias SWIFT. | No hay entidad con poder de congelar ckUSDC en tránsito (salvo que ICP entero sea atacado — improbable). |
 
 **¿Por qué Koywe y no solo GreyValley?**

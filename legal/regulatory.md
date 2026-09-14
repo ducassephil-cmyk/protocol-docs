@@ -641,7 +641,7 @@ Es el equivalente técnico de la "sandbox regulatoria" que los operadores de ser
 | **Token OAuth2** | `POST /api.php?action=token` | Intercambio de código por JWT Bearer | Necesario para AISP y PISP |
 | **CIBA (backchannel)** | `POST /api.php?action=ciba_auth` | Inicia autenticación sin redirect (push to móvil) | Alta relevancia: flujo sin abrir browser → ideal para app móvil GreyValley |
 | **CIBA token poll** | `POST /api.php?action=ciba_token` | Polling hasta que usuario aprueba en su banco | Necesario si GreyValley implementa CIBA directamente |
-| **PISP — iniciar pago** | `POST /api.php?action=payments` | Debita cuenta bancaria → TEF a cuenta destino | El corazón del on-ramp: convierte CLP bancario en flujo GreyValley |
+| **PISP — iniciar pago** | `POST /api.php?action=payments_pisp` (FIX 2026-09-14: era `action=payments`, endpoint incorrecto) | Debita cuenta bancaria → TEF a cuenta destino. Requiere JWT Bearer vía flujo de consentimiento, además de `x-sandbox-key` — solo la key da `401 unauthorized_client` (confirmado real) | El corazón del on-ramp: convierte CLP bancario en flujo GreyValley |
 | **PISP — estado pago** | `GET /api.php?action=payment_status&id=X` | Polling del estado de la transferencia | Confirmación on-chain solo cuando pago PISP confirmado |
 | **NCG 514 estado** | `GET /api.php?action=channels_status` | Disponibilidad operacional de canales bancarios | GreyValley puede detectar que el sistema bancario está caído antes de iniciar on-ramp |
 | **AISP — balances** | `GET /api.php?action=balances` | Saldo de cuentas del usuario (requiere JWT Bearer) | Dashboard de portfolio completo: saldo banco + saldo GreyValley en una pantalla |

@@ -79,7 +79,7 @@ Una vez cumplidas las condiciones precedentes, GreyValley se compromete a:
 
 | Concepto | Banca tradicional (estimado) | Corredor GreyValley |
 |----------|----------------------------|-----------------|
-| Fee por transacción | 1.5% – 2.5% | **0.3%** (preferencial) |
+| Fee por transacción | 1.5% – 2.5% | **0.15%** (preferencial — FIX 2026-09-14: decía "0.3%", no coincidía con el 0.15% comprometido más arriba en este mismo doc) |
 | Tiempo de liquidación | 1–3 días hábiles | ≤ 2 horas |
 | Trazabilidad | Parcial (SWIFT) | 100% on-chain |
 | Ahorro estimado mensual* | — | **CLP $[______]** |
