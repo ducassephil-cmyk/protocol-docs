@@ -44,7 +44,7 @@ El Vault Exaltite (ckUSDC/ckUSDT/ckEURC) **ES el pool de liquidez del corredor**
 6. El CLP del paso 1 (menos fees) es lo que eventualmente rebalancea el pool
    ckUSDC de GreyValley — no hay conversión CLP→ckUSDC atómica por transacción
 
-Fee para GreyValley: 0.22% + rampa ~1% (total usuario: ~1.2%)
+Fee para GreyValley: 0.66% + rampa ~1% (total usuario: ~1.7%)
 Fee SWIFT equivalente: ~2.5–3.5%
 ```
 
@@ -55,7 +55,7 @@ El ckUSDC del vault no es consumido por cada transacción — se usa como **gara
 - ckUSDC entra al pool cuando hay pagos en dirección inversa (entrada a Chile)
 - ckUSDC sale cuando hay pagos hacia el exterior
 - Si el flujo es **bidireccional**: pool se autorrepone, capital intacto permanentemente
-- Si el flujo es **unidireccional**: pool puede desbalancearse → el protocolo rebalancea con fees acumulados (0.22% × volumen)
+- Si el flujo es **unidireccional**: pool puede desbalancearse → el protocolo rebalancea con fees acumulados (0.66% × volumen)
 
 **El capital del depositante NUNCA desaparece.** Si el pool se desbalancea extremo, el bridge se pausa — pero el capital sigue accesible para retirar.
 
@@ -183,13 +183,13 @@ Ingreso 2 (variable, depende de volumen real):
   — 0 si no hay volumen pasando por ese pool.
 
 Ingreso 3 (variable, depende de volumen real del corredor):
-  Share proporcional de tu ckUSDC/TVL sobre el 0.22% del corredor
+  Share proporcional de tu ckUSDC/TVL sobre el 0.66% del corredor
   (Volume Guilds, 7% del fee pool) — SOLO si el corredor procesa
   >$25K/mes en volumen real. Hoy el corredor tiene volumen ~0 (ver
   GREYVALLEY_AUDIT_LIVE.md), este ingreso es ilustrativo de la
   MECÁNICA, no una proyección de lo que se cobra hoy.
 
-Ahorro: tus propios pagos por el corredor salen al 0.22% en vez de
+Ahorro: tus propios pagos por el corredor salen al 0.66% en vez de
   2.5-3.5% SWIFT — este SÍ es real e inmediato, no depende de terceros.
 ```
 
@@ -487,5 +487,5 @@ que ninguna integración técnica resuelve.
 
 ---
 
-*Documento: corredor-mechanics.md (antes GREYVALLEY_ODL_MECHANICS.md) | 2026-06-28 · Actualizado: 2026-09-04 (renombrado, referencias "ODL" retiradas, fee real 0.22% tras la subida +10% de 2026-08-28, corredor CLP/EUR agregado como real)*  
+*Documento: corredor-mechanics.md (antes GREYVALLEY_ODL_MECHANICS.md) | 2026-06-28 · Actualizado: 2026-09-04 (renombrado, referencias "ODL" retiradas, fee real 0.66% (verificado on-chain 2026-09-18), corredor CLP/EUR agregado como real)*  
 *Relacionado: GREYVALLEY_APR_MODEL.md, TOKENOMICS.md §10, GREYVALLEY_ICP_TECH.md (mecánica Principal/HTTPS Outcalls/tECDSA)*

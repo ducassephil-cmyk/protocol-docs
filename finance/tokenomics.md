@@ -326,7 +326,7 @@ Rutas: swap AMM (cualquier par), canje Marketplace, swap PXRM→ICP legacy.
 
 ### 4.2 — `#VaultBacked` (el fee sale de capital de vault, no de PXRM)
 
-Rutas: interés CDP, liquidación CDP (colateral ICP/ckBTC/ckETH), fee del corredor (`bridge_odl`, 0.22%).
+Rutas: interés CDP, liquidación CDP (colateral ICP/ckBTC/ckETH), fee del corredor (`bridge_odl`, 0.66%).
 
 | Destino | % | Descripción |
 |---------|---|-------------|

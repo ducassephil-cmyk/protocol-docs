@@ -7,7 +7,7 @@ Public technical and commercial documentation for the DeFi payment protocol buil
 ## What is this?
 
 A DeFi protocol that connects Chilean fiat (CLP) to on-chain liquidity, enabling:
-- **International payments** at 0.22% vs 2.5–3.5% SWIFT
+- **International payments** at 0.66% vs 2.5–3.5% SWIFT
 - **Yield on stablecoins** via the corredor liquidity pool
 - **Cross-border corredor** Chile ↔ USD ↔ EUR ↔ LatAm destinations
 - **Institutional-grade compliance** under Ley Fintech 21.521 + Ley 21.719
@@ -72,4 +72,4 @@ For ODL partnership inquiries, see the [ODL Agreement Template](partnerships/odl
 
 ---
 
-*2026-09-04 · Fee del corredor real: 0.22% (subida +10% de 2026-08-28 sobre el 0.20% original, que a su vez reemplazó el 0.5% de versiones previas) · Link roto a "APR Model" corregido — ese contenido vive en Tokenomics §2, nunca existió como archivo separado · Protocol documentation is updated as the codebase evolves.*
+*2026-09-18 · Fee del corredor real: 0.66% (66 bps, verificado on-chain con getFeeBps en el canister del corredor; antes 0.22%, 0.20% y 0.5% en versiones previas) · Link roto a "APR Model" corregido — ese contenido vive en Tokenomics §2, nunca existió como archivo separado · Protocol documentation is updated as the codebase evolves.*
