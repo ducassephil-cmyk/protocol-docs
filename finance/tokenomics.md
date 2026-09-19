@@ -356,7 +356,7 @@ el colateral perdido ES capital PXRM real del borrower.
 | Destino | % | Descripción |
 |---------|---|-------------|
 | PXRM Stakers | 63% | El colateral PXRM real perdido va a quien apostó por PXRM |
-| LP AMM providers | 10% | A los LPs del `amm` |
+| LP AMM providers | 10% | A todos los LP de todos los pools, sin importar el par (ponderado por valor): PXRM extra para los LP indirectos de los stakers |
 | Treasury | 20% | Fondea PXRM Base APR + Guild Multiplier |
 | Reward bucket | 7% | Como el fee es 100% PXRM, va directo a la subcuenta Staking Rewards y termina en los stakers vía el PXRM Staker Boost |
 | Volume Guilds | 0% | Sin guilds: el fee es 100% PXRM; Volume Guild es solo Track A con activos duros del corredor/CDP |
