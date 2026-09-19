@@ -412,8 +412,8 @@ PXRM→vUSD. El swap PXRM→ICP del backend no entra acá: su fee queda entero e
 
 | Destino | % | Descripción |
 |---------|---|-------------|
-| PXRM Stakers | 35% | Único caso en que los stakers reciben PXRM de un fee — se recicla, vuelve a integrarse al reward |
-| LP AMM providers | 25% | Solo a los LP del par `vUSD_PXRM`, proporcional a su LP (posiciones con vUSD contra PXRM y vUSD stakers que aportan liquidez) |
+| PXRM Stakers | 30% | Único caso en que los stakers reciben PXRM de un fee — se recicla, vuelve a integrarse al reward |
+| LP AMM providers | 30% | Solo a los LP del par `vUSD_PXRM`, proporcional a su LP (posiciones con vUSD contra PXRM y vUSD stakers que aportan liquidez) |
 | Treasury | 23% | Se acumula en PXRM en el Treasury (destino final por definir) |
 | Reward bucket | 17% | 10% de Epoch Pool + 7% de Volume Guilds reciclados a la subcuenta Staking Rewards, de donde el PXRM Staker Boost lo reparte a los stakers |
 | **Total** | **100%** | |
