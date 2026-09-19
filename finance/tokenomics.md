@@ -250,7 +250,7 @@ APR TOTAL = Base Real Yield + (PXRM Base APR × Guild Multiplier) + Epoch Tier B
 
 **Capa 1 — Base Real Yield:** viene del trabajo real del protocolo (NNS staking, ODL fees, AMM). Token de pago varía por vault.
 **Capa 2 — PXRM Base APR (Treasury Incentive):** APR base en PXRM fondeado por el treasury (2M PXRM). No es un "boost sobre" otra base — ES el APR base de PXRM. Revisión semestral (Sunset Clause). Multiplicado por Guild Multiplier para Track B: ×1.3 Institucional, ×2.0 Apex. Fuente: mismo treasury bucket para PXRM Base APR y Guild Multiplier extra.
-**Capa 3 — Epoch Tier Bonus (T1–T5):** recompensa por permanencia continua, streaming en cada harvest. **Corregido (2026-09-12):** se paga desde el mismo PXRM Base APR (treasury) de la Capa 2, no desde el Epoch Retention Pool del fee split — ese bucket se mezcla con la reinversión de la posición propia de staking del protocolo (Flujo A) y el rebalanceo de pools/compra de reserva (Flujo B), sin repartirse directo a holders. Ver §3.
+**Capa 3 — Epoch Tier Bonus (T1–T5):** recompensa por permanencia continua, streaming en cada harvest. **Actualizado (2026-09-19):** además del streaming sobre el APR en cada harvest, el bucket Epoch Retention Pool del fee split se acumula en una subcuenta dedicada de `epoch_pool` y se reparte en ciclos a los holders con tier (T1+), ponderado por su bonus (desde 2026-09-14). Los Flujos A y B ya no lo ven. Ver §3.
 
 ### Vault Exaltium (ICP)
 - **Capital al retirar:** ICP exacto depositado
@@ -313,15 +313,15 @@ No hay lock forzado. El capital siempre es retirable. El tier premia la permanen
 
 ### 4.1 — `#PxrmDenominated` (el fee sale de capital PXRM real)
 
-Rutas: swap AMM (cualquier par), canje Marketplace, swap PXRM→ICP legacy.
+Rutas: swap AMM (cualquier par), canje Marketplace. (Desde 2026-09-19 el swap PXRM→ICP ya no se reparte: su fee de 0.33% queda entero en el backend, es la recompra de PXRM con ICP propio.)
 
 | Destino | % | Descripción |
 |---------|---|-------------|
 | PXRM Stakers | 35% | Fee pool en activos duros (ICP/ckUSDC/ckBTC) — no en PXRM |
 | LP AMM providers | 25% | Proporcional a liquidez aportada en `amm` |
 | Treasury | 23% | Fondea PXRM Base APR + Guild Multiplier |
-| Epoch Retention Pool | 10% | Se mezcla con el rebalanceo de posiciones propias del protocolo — no paga el Tier Bonus directo (ver Capa 3 arriba) |
-| Volume Guilds | 7% | Proporcional al ckUSDC/ckUSDT/ckEURC en Vault Exaltite (Guild Track A) |
+| Epoch Retention Pool | 10% | Paga el Tier Bonus T1–T5: se acumula en una subcuenta dedicada de `epoch_pool` y se reparte a los holders con tier en ciclos, ponderado por su bonus (desde 2026-09-14) — separado de los Flujos A/B |
+| Volume Guilds | 7% | Solo depositantes Track A calificados (Exaltite), proporcional a su ckUSDC/ckUSDT/ckEURC |
 | **Total** | **100%** | |
 
 ### 4.2 — `#VaultBacked` (el fee sale de capital de vault, no de PXRM)
@@ -331,10 +331,10 @@ Rutas: interés CDP, liquidación CDP (colateral ICP/ckBTC/ckETH), fee del corre
 | Destino | % | Descripción |
 |---------|---|-------------|
 | PXRM Stakers | 2% | Remanente real de redondear los otros 4 a enteros (antes 0%) |
-| LP AMM providers | 38% | Corredor → LPs reales de `liquidity_pool` · CDP → LPs de `amm` |
-| Treasury | 35% | Fondea PXRM Base APR + Guild Multiplier |
-| Epoch Retention Pool | 15% | Se mezcla con el rebalanceo de posiciones propias — no paga el Tier Bonus directo |
-| Volume Guilds | 10% | Guild Track A / Exaltite |
+| LP AMM providers | 40% | Corredor → LPs reales de `liquidity_pool` · CDP → LPs de `amm` |
+| Treasury | 33% | Fondea PXRM Base APR + Guild Multiplier |
+| Epoch Retention Pool | 15% | Paga el Tier Bonus T1–T5: se acumula en una subcuenta dedicada de `epoch_pool` y se reparte a los holders con tier en ciclos, ponderado por su bonus (desde 2026-09-14) — separado de los Flujos A/B |
+| Volume Guilds | 10% | Solo Track A calificados (Exaltite) — activos duros de los fees del corredor y CDP |
 | **Total** | **100%** | |
 
 ### 4.3 — `#PxrmLiquidation` (nueva, colateral 100% PXRM liquidado)
@@ -344,11 +344,11 @@ el colateral perdido ES capital PXRM real del borrower.
 
 | Destino | % | Descripción |
 |---------|---|-------------|
-| PXRM Stakers | 50% | El colateral PXRM real perdido va a quien apostó por PXRM |
-| LP AMM providers | 19% | A los LPs del `amm` |
-| Treasury | 18% | Fondea PXRM Base APR + Guild Multiplier |
-| Epoch Retention Pool | 8% | Se mezcla con el rebalanceo de posiciones propias — no paga el Tier Bonus directo |
-| Volume Guilds | 5% | Guild Track A / Exaltite |
+| PXRM Stakers | 63% | El colateral PXRM real perdido va a quien apostó por PXRM |
+| LP AMM providers | 10% | A los LPs del `amm` |
+| Treasury | 20% | Fondea PXRM Base APR + Guild Multiplier |
+| Reward bucket | 7% | Como el fee es 100% PXRM, va directo a la subcuenta Staking Rewards y termina en los stakers vía el PXRM Staker Boost |
+| Volume Guilds | 0% | Sin guilds: el fee es 100% PXRM; Volume Guild es solo Track A con activos duros del corredor/CDP |
 | **Total** | **100%** | |
 
 ### 4.4 — Routing real del bucket LpAmm (fix 2026-09-08)
