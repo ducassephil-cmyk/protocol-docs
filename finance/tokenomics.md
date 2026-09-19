@@ -393,6 +393,27 @@ específico (CLP_USD, CLP_EUR, etc.), no repartido 1/N entre los 4 pares del cor
 
 ---
 
+### 4.5 — Fees cobrados en PXRM (tarjeta especial, 2026-09-19)
+
+Aplica a cualquier fee cuyo token sea PXRM y no sea una liquidación de CDP (que tiene su
+propia tabla, §4.3): en la práctica, un swap del AMM en el par `vUSD_PXRM` en dirección
+PXRM→vUSD. El swap PXRM→ICP del backend no entra acá: su fee queda entero en el backend.
+
+| Destino | % | Descripción |
+|---------|---|-------------|
+| PXRM Stakers | 35% | Único caso en que los stakers reciben PXRM de un fee — se recicla, vuelve a integrarse al reward |
+| LP AMM providers | 25% | Solo a los LP del par `vUSD_PXRM`, proporcional a su LP (posiciones con vUSD contra PXRM y vUSD stakers que aportan liquidez) |
+| Treasury | 23% | Se acumula en PXRM en el Treasury (destino final por definir) |
+| Reward bucket | 17% | 10% de Epoch Pool + 7% de Volume Guilds reciclados a la subcuenta Staking Rewards, de donde el PXRM Staker Boost lo reparte a los stakers |
+| **Total** | **100%** | |
+
+Motivo: el PXRM hay que reciclarlo y cuidarlo. Ni los tiers ni los guilds se pagan en PXRM.
+
+**Reparto del bucket LP (fix 2026-09-19):** el 25% de un fee de swap va solo a los LP del par
+donde ocurrió (`amm.receiveAllocationForPair`), proporcional a su LP. Los fees generales
+(p. ej. interés CDP) se reparten entre todos los pools ponderados por el valor de cada pool
+(antes 1/n por igual, lo que le daba a un pool con $1 lo mismo que a uno con $1M).
+
 ## 5b. vUSD Institutional Track (NUEVO — 2026-07-01)
 
 > ⚠️ **Nota de riesgo regulatorio (2026-08-07):** "No requiere CMF" abajo es una
