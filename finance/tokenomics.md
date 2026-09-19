@@ -311,7 +311,7 @@ No hay lock forzado. El capital siempre es retirable. El tier premia la permanen
 > real trae una `SourceCategory` que decide con qué tabla FIJA se reparte. Las 3 tablas siempre
 > suman 10.000 bps (100%), sin re-escalar en runtime.
 
-### 4.1 — `#PxrmDenominated` (el fee sale de capital PXRM real)
+### 4.1 — Categoría estándar `#PxrmDenominated` (fees de trading: swaps AMM y marketplace, en cualquier token; el nombre del código es histórico)
 
 Rutas: swap AMM (cualquier par), canje Marketplace. (Desde 2026-09-19 el swap PXRM→ICP ya no se reparte: su fee de 0.33% queda entero en el backend, es la recompra de PXRM con ICP propio.)
 
