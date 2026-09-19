@@ -345,8 +345,8 @@ como dos tarjetas separadas en /tokenomics:
   vUSD/PXRM (ese solo cobra el 2% simbólico como staker de PXRM).
 - **Corredor:** los fees son solo ckUSDC y ckEURC y van solo a los LP que aportaron a los corredores
   (`liquidity_pool`, por par CLP_USD/CLP_EUR) — un LP de BTC/vUSD no cobra del corredor.
-- **Pendiente de diseño:** Volume Guilds juntando activos para comprar ckUSDC/ckEURC, y que Epoch Pool
-  reparta cada tier según el activo de la bóveda del holder (hoy reparte por token a todos los holders con tier).
+- **Pendiente de diseño:** Volume Guilds juntando activos para comprar ckUSDC/ckEURC. Epoch Pool se queda como
+  está (reparte por token a todos los holders con tier): premiar por activo de bóveda se descartó por raro.
 
 ### 4.3 — `#PxrmLiquidation` (nueva, colateral 100% PXRM liquidado)
 
