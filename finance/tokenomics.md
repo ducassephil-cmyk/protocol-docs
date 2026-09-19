@@ -337,6 +337,17 @@ Rutas: interés CDP, liquidación CDP (colateral ICP/ckBTC/ckETH), fee del corre
 | Volume Guilds | 10% | Solo Track A calificados (Exaltite) — activos duros de los fees del corredor y CDP |
 | **Total** | **100%** | |
 
+**Reparto especializado (2026-09-19):** esta tabla sirve a dos especialidades de la app y se muestra
+como dos tarjetas separadas en /tokenomics:
+- **Mint (CDP, liquidaciones y bridge cripto):** el fee sale en el token del colateral. El 40% LP va
+  solo a los LP de los pools que **contienen ese token** (`amm.receiveAllocationForToken`), ponderado
+  por el valor de cada pool y por LP: un fee en ckBTC lo cobran los pools con ckBTC, no un LP de
+  vUSD/PXRM (ese solo cobra el 2% simbólico como staker de PXRM).
+- **Corredor:** los fees son solo ckUSDC y ckEURC y van solo a los LP que aportaron a los corredores
+  (`liquidity_pool`, por par CLP_USD/CLP_EUR) — un LP de BTC/vUSD no cobra del corredor.
+- **Pendiente de diseño:** Volume Guilds juntando activos para comprar ckUSDC/ckEURC, y que Epoch Pool
+  reparta cada tier según el activo de la bóveda del holder (hoy reparte por token a todos los holders con tier).
+
 ### 4.3 — `#PxrmLiquidation` (nueva, colateral 100% PXRM liquidado)
 
 Ruta: liquidación CDP cuando el colateral era PXRM — pesa más alto que un swap genérico porque
