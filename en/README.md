@@ -1,8 +1,8 @@
-# Protocol Documentation
+# Protocol Documentation (English)
 
 Public technical and commercial documentation for the DeFi payment protocol built for Chilean and LatAm markets.
 
-**🇬🇧 Full English translations of every document in this repo are available under [`/en`](en/README.md).** The files below are the original working versions (mixed Spanish/English); `/en` is a clean, fully English mirror of the same content.
+*This is a full English translation of the repo's original documentation. The original working versions (mixed Spanish/English) are available one level up from [the repo root](../README.md).*
 
 ---
 
@@ -67,7 +67,7 @@ In development: Koywe on/off-ramp bridge, sCLP corridor (pending CMF approval), 
 
 ## Contact
 
-Philippe Ducasse La Rivera — Founder  
+Philippe Ducasse La Rivera — Founder
 Contact via GitHub issues on this repository, or through official GreyValley Protocol channels.
 
 For ODL partnership inquiries, see the [ODL Agreement Template](partnerships/odl-agreement.md).
