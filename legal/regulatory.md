@@ -507,7 +507,7 @@ Timeline mínimo antes de ir a producción con fondos de terceros:
 | # | Vector | Severidad | ¿Defendido en código? | Acción |
 |---|--------|-----------|----------------------|--------|
 | 1 | Compromiso de identidad dfx del founder | 🔴 Crítico | ❌ Solo por key management externo | Activar governance canister |
-| 2 | Replay de paymentId tras upgrade de canister | 🔴 Crítico | ❌ **BUG CONFIRMADO** en `bridge/main.mo` | Fix inmediato (1 línea) |
+| 2 | Vector interno investigado, resultó falso positivo (ver §11.2) | 🟢 — | ✅ Descartado tras verificación 2026-09-29 | Ninguna |
 | 3 | Governance takeover con PXRM | 🟡 Alto | ⚠️ Governance.mo no tiene votación real aún | Implementar módulo de votación antes de ceder control |
 | 4 | Inflación artificial de TVL | 🟡 Alto | ⚠️ `maxDepositE8s = null` — sin cap activo | Activar cap + withdrawal cooldown |
 | 5 | Arbitraje del swap fijo PXRM/ICP | 🟡 Medio | ⚠️ Cap 2%/24h implementado — insuficiente si PXRM muy barata | Freeze swap si precio < paridad |
@@ -518,27 +518,32 @@ Timeline mínimo antes de ir a producción con fondos de terceros:
 
 ---
 
-### 11.2 Bug crítico — replay attack en `bridge/main.mo`
+### 11.2 Hallazgo de seguridad interno — investigado y descartado (falso positivo)
 
-**Descripción:** El mapa `processedPayments` que previene replay de `paymentId` es `var` (volátil), no `stable var`. Se borra en cada upgrade del canister.
+> ⚠️ **CORREGIDO 2026-09-29 (auditoría de docs públicos, 2 pasadas).** Una
+> primera pasada de esta auditoría encontró que esta subsección describía,
+> con snippet de código y pasos de explotación concretos, una supuesta
+> vulnerabilidad de replay en `bridge/main.mo` (`processedPayments`
+> asumido no-stable, borrado en cada upgrade) y redactó el contenido de
+> inmediato por el riesgo de publicar un exploit sin parchear.
+>
+> **Verificación directa contra el compilador real (moc 1.4.1 / dfx
+> 0.32.0) mostró que el hallazgo original era un falso positivo:**
+> `bridge/main.mo:12` declara `persistent actor BridgeCanister`, y en este
+> dialecto de Motoko los campos `var` de nivel superior son **stable por
+> defecto** salvo que se marquen `transient` — `processedPayments`
+> (línea 291) ya sobrevive upgrades tal cual está escrito hoy. No hace
+> falta ningún parche. Esto coincide con la corrección ya existente en
+> `INSTRUCCIONES_FOUNDER.md` §13.7 (documento interno mantenido en vivo
+> por el founder), que ya marcaba esto como falso positivo antes de esta
+> auditoría.
+>
+> Se deja esta sección sin el snippet/pasos de explotación originales de
+> todas formas — no aportan nada ahora que se confirmó que no hay bug, y
+> publicar ese nivel de detalle sobre un canister de fondos reales no
+> tiene beneficio aunque sea inofensivo.
 
-```motoko
-// CÓDIGO ACTUAL — VULNERABLE:
-var processedPayments : Map.Map<Text, Bool> = Map.empty();
-
-// FIX REQUERIDO:
-stable var processedPayments : Map.Map<Text, Bool> = Map.empty();
-// + añadir a preupgrade/postupgrade
-```
-
-**Escenario de ataque:**
-1. Atacante completa un pago legítimo → obtiene un `paymentId` procesado
-2. Espera a que el founder haga cualquier upgrade del canister (borra `processedPayments`)
-3. Replantea la misma tx → el canister la acepta como nueva → doble pago
-
-**Impacto:** recibir fondos dos veces por un único pago real. Con ODL activo y volumen significativo, este es el vector de extracción más concreto disponible sin comprometer la identidad del founder.
-
-**Mitigante hasta que se parchee:** no hacer upgrades de `bridge_canister` mientras haya pagos recientes con menos de 48h de antigüedad.
+**Severidad:** 🟢 — descartado. **Estado:** investigado y cerrado 2026-09-29, sin acción pendiente.
 
 ---
 
@@ -605,7 +610,7 @@ Todos los fondos en vault salen en una transacción
 
 **Frontend tampering:** el frontend de GreyValley es un canister ICP — no se puede reemplazar sin un upgrade firmado por el controller. Plug Wallet muestra el Principal real de destino antes de cada transacción, permitiendo que el usuario verifique. El modelo de certified assets de ICP garantiza integridad del frontend servido.
 
-**Rate limiting y spam:** `bridge/main.mo` tiene `RATE_LIMIT_MAX_CALLS = 20` por 60s por caller, y `processedPayments` previene replay en condiciones normales (el bug §11.2 es solo en upgrades). `backend/main.mo` rechaza anónimos en todos los métodos shared.
+**Rate limiting y spam:** `bridge/main.mo` tiene `RATE_LIMIT_MAX_CALLS = 20` por 60s por caller, y `processedPayments` previene replay incluyendo entre upgrades (confirmado 2026-09-29: campo `var` stable por defecto en `persistent actor`, ver §11.2). `backend/main.mo` rechaza anónimos en todos los métodos shared.
 
 ---
 
@@ -615,7 +620,7 @@ Para CMF, el threat model tiene valor en dos direcciones:
 
 **Argumento positivo:** el protocolo fue diseñado con mitigantes explícitos contra los vectores más comunes (reentrancy, spam, replay). Existe documentación interna de análisis de seguridad, lo cual es señal de madurez operacional.
 
-**Riesgo de argumentar lo contrario:** si CMF pide "¿cómo protegen los fondos de usuarios?" y la respuesta honesta es "hay un bug de replay en el bridge no parcheado y el governance no tiene votación real", ese es exactamente el tipo de exposición que activa revisión de operación. Por eso el patch de §11.2 y la implementación de governance real (§11.3) son prerequisitos antes de cualquier contacto formal con CMF.
+**Riesgo de argumentar lo contrario:** si CMF pide "¿cómo protegen los fondos de usuarios?" y la respuesta honesta es "el governance no tiene votación real", eso ya es suficiente exposición para activar revisión de operación (el vector de replay del bridge se investigó y se descartó, ver §11.2). Por eso la implementación de governance real (§11.3) sigue siendo prerequisito antes de cualquier contacto formal con CMF.
 
 ---
 

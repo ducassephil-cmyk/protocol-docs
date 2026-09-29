@@ -6,7 +6,9 @@
 ## PARTES
 
 **El Protocolo:**
-GreyValley SpA (en constitución), RUT en trámite, representada por Philippe Ducasse La Rivera, RUT XX.XXX.XXX-X, correo ducasse.phil@gmail.com.
+GreyValley SpA (en constitución), RUT en trámite, representada por Philippe Ducasse La Rivera, RUT XX.XXX.XXX-X, correo [contacto oficial pendiente de confirmar].
+
+> ⚠️ **Corrección real 2026-09-29 (auditoría de docs) — "en constitución" no está confirmado como cierto hoy.** El founder confirmó el 2026-08-24 que la entidad chilena real detrás del protocolo (Pegasus SpA) **ya está constituida**, como financiera — no es una SpA nueva en trámite. Sigue abierta y sin resolver (al 2026-08-30) la pregunta de si conviene crear una SpA separada de giro puramente tech para firmar este tipo de acuerdos sin exponer a Pegasus SpA (la financiera) al riesgo de custodia de un partner ODL. **No firmar este acuerdo con el nombre/RUT de una entidad sin que el abogado del founder confirme primero cuál entidad real firma** — este bloque de PARTES es un placeholder pendiente de esa decisión, no un dato verificado.
 
 **El Cliente:**
 [Nombre empresa], RUT [XX.XXX.XXX-X], representada por [Nombre], RUT [XX.XXX.XXX-X], correo [email].
@@ -63,7 +65,7 @@ Una vez cumplidas las condiciones precedentes, el Cliente se compromete a:
 
 Una vez cumplidas las condiciones precedentes, GreyValley se compromete a:
 
-1. **Fee preferencial de lanzamiento:** aplicar un fee de **0.15%** por transacción del corredor (en vez del fee estándar de 0.22%) durante los primeros **[6 / 12] meses** de operación activa del Cliente.
+1. **Fee preferencial de lanzamiento:** aplicar un fee de **0.15%** por transacción del corredor (en vez del fee estándar — **corregido 2026-09-29: el fee retail real hoy es 0.66%, no 0.22%**; el founder subió `FEE_BPS` de 22→66 vía `setFeeBps()` el 2026-09-17, verificado on-chain con `getFeeBps()` — este documento seguía con el valor de referencia anterior) durante los primeros **[6 / 12] meses** de operación activa del Cliente.
 
 2. **Slot de liquidez garantizado:** reservar capacidad ODL suficiente para el volumen comprometido del Cliente, con prioridad sobre usuarios que se incorporen posteriormente.
 
@@ -79,7 +81,7 @@ Una vez cumplidas las condiciones precedentes, GreyValley se compromete a:
 
 | Concepto | Banca tradicional (estimado) | Corredor GreyValley |
 |----------|----------------------------|-----------------|
-| Fee por transacción | 1.5% – 2.5% | **0.15%** (preferencial — FIX 2026-09-14: decía "0.3%", no coincidía con el 0.15% comprometido más arriba en este mismo doc) |
+| Fee por transacción | 1.5% – 2.5% | **0.15%** preferencial vs. **0.66%** estándar hoy (FIX 2026-09-14: decía "0.3%", no coincidía con el 0.15% comprometido más arriba; FIX 2026-09-29: el estándar de referencia era 0.22%, desactualizado — el fee retail real subió a 0.66% el 2026-09-17) |
 | Tiempo de liquidación | 1–3 días hábiles | ≤ 2 horas |
 | Trazabilidad | Parcial (SWIFT) | 100% on-chain |
 | Ahorro estimado mensual* | — | **CLP $[______]** |
@@ -122,7 +124,7 @@ Firmado en Santiago de Chile, el [___] de [_______] de 2026.
 _______________________________
 Philippe Ducasse La Rivera
 Fundador · GreyValley Protocol
-ducasse.phil@gmail.com
+[contacto oficial pendiente de confirmar]
 
 &nbsp;
 

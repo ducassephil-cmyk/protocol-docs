@@ -52,7 +52,7 @@ The core stack: WebAssembly canisters on a distributed blockchain network with ~
 ## Current Status
 
 The protocol is **live on mainnet** with the following components operational:
-- PXRM token ledger (ICRC-1/ICRC-2, 5M fixed supply)
+- PXRM token ledger (ICRC-1/ICRC-2, ~5M supply — deflationary model; see Tokenomics for the 2026-08-30 correction: a small welcome-fund mint means supply is no longer strictly fixed)
 - Protocol backend (vaults, yield calculation, staking)
 - Frontend (React PWA, accessible from mobile browser)
 - Oracle (price feeds every 300s)
@@ -66,7 +66,7 @@ In development: Koywe on/off-ramp bridge, sCLP corridor (pending CMF approval), 
 ## Contact
 
 Philippe Ducasse La Rivera — Founder  
-ducasse.phil@gmail.com
+Contact via GitHub issues on this repository, or through official GreyValley Protocol channels.
 
 For ODL partnership inquiries, see the [ODL Agreement Template](partnerships/odl-agreement.md).
 

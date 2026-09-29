@@ -379,7 +379,9 @@ específico (CLP_USD, CLP_EUR, etc.), no repartido 1/N entre los 4 pares del cor
 - **Flujo de fees generales del protocolo** (bucket Treasury, 23%/35%/18% según categoría —
   distinto del Treasury del Protocolo del §1, que es 40% del SUPPLY): reparto proporcional
   3%/10%/10% sobre el balance real acumulado en la subcuenta `VAELIX_TREASURY_V1` de
-  `neo-protocol-backend` (POL — Protocol-Owned-Liquidity): 3% opex/mantenimiento (líquido,
+  `neo-protocol-backend` (naming previo al rebrand a GreyValley, 2026-08-29 — el
+  identificador on-chain real de la subcuenta todavía no se limpió, no es un typo de este
+  documento) (POL — Protocol-Owned-Liquidity): 3% opex/mantenimiento (líquido,
   queda ahí), 10% Posiciones (se mueve a `epoch_pool`, que rebalancea pools + compra ckBTC
   real vía **ICPSwap**), 10% Reserva flexible (se mueve a una subcuenta separada,
   `TREASURY_FLEX_RESERVE_V1`, "otros activos sin comprometer a BTC"). La razón 3:10:10 es

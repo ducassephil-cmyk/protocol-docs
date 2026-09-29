@@ -183,6 +183,16 @@ x-fapi-interaction-id: <uuid>
 
 CIBA es el flujo preferido para la app móvil de GreyValley: el usuario aprueba desde su app bancaria sin salir de la app de GreyValley.
 
+> ⚠️ **Corrección real 2026-09-29 (auditoría de docs) — bloqueante real no documentado antes acá.**
+> El login CIBA en sí completa de punta a punta contra el sandbox (confirmado real), pero el JWT
+> Bearer que devuelve **siempre trae el array `scope` vacío**, tanto para flujos PISP como AISP —
+> confirmado en código (`sfa_treasury/main.mo`, comentarios reales sobre `payments_pisp` devolviendo
+> `403 invalid_consent_state con scopes vacío en el JWT`). Sin scope válido en el JWT, `balances`/
+> `transactions`/`payments_pisp` no se pueden completar aunque el login CIBA haya sido exitoso. El
+> founder está esperando respuesta del equipo de SFA-Sandbox sobre esto — no es un bug del lado
+> GreyValley confirmado todavía, pero significa que **CIBA no está end-to-end operativo hoy** para
+> los flujos que dependen del JWT, pese a que el login mismo funcione.
+
 ### Paso 1 — Iniciar sesión CIBA
 
 ```http
