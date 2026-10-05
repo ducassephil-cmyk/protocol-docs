@@ -549,6 +549,8 @@ Minimum timeline before going to production with third-party funds:
 
 ### 11.3 Critical gap — Governance code ≠ Governance spec
 
+> ⚠️ **CORRECTED 2026-10-05 (state verified on-chain).** What follows describes the state as of 2026-09-29 and is no longer complete. Since 2026-09-30 the `governance` canister has, in code and deployed, a proposal engine with `propose`, `vote`, `finalize` and `execute`, with quorum, an approval threshold and a timelock per category. **It does not yet govern anything real:** its status is `Sandbox`, there are no proposals, the canisters that custody user funds have a single controller (the founder's principal), and the `multisig` canister is deployed with a single signer and a threshold of 1, not activated. As a result, **the founder's unilateral control over code upgrades and fund movements remains in effect today**; what has changed is that the mechanism to remove it now exists. Activating it (moving control of the canisters to governance or to a multisig with more than one signer) is still pending. The original text is kept below as a historical record.
+
 **What the spec says** (`GREYVALLEY_REGULATORY.md §5`, `INSTRUCCIONES_FOUNDER.md §13.5`):
 > "On-chain proposal + PXRM stakers quorum + 48h timelock"
 
