@@ -203,7 +203,7 @@ El Art. 90 y ss. de la Ley 21.521 permite a la CMF autorizar la operación tempo
 
 | Requisito | Estado GreyValley | Acción |
 |-----------|--------------|--------|
-| Constitución como entidad legal en Chile | ❓ Verificar | Constituir SpA chilena si no existe |
+| Constitución como entidad legal en Chile | ⚠️ Parcial (2026-10-05) | Ya existe una entidad constituida como financiera (Pegasus SpA). Sigue abierta, con el abogado del founder, la decisión de si conviene una SpA separada de giro tecnológico para el protocolo y sus acuerdos (ver `partnerships/odl-agreement.md`) |
 | Descripción técnica del modelo de negocio | ✅ corredor-mechanics.md | Adaptar a formato CMF |
 | Plan AML/CFT | ⚠️ Delegado a Koywe | Documentar el modelo de delegación |
 | Capital mínimo operacional | ❓ Verificar | Determinar monto requerido para el sandbox |
@@ -750,4 +750,4 @@ La existencia de SFA-Sandbox y el cumplimiento FAPI 2.0 de Koywe **fortalece el 
 
 ---
 
-*GreyValley Regulatory Reference | Actualizado: 2026-08-09 | Próxima revisión: antes de aplicación sandbox CMF*
+*GreyValley Regulatory Reference | Actualizado: 2026-10-05 (§11.3 y entidad) | Próxima revisión: antes de aplicación sandbox CMF*

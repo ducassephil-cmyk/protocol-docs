@@ -725,6 +725,8 @@ Development → Sandbox → Restricted → Live
 
 Only `controllerPrincipal` can change the status.
 
+> ⚠️ **CORRECTED 2026-10-05.** Today the status is changed only by the canister *owner* (the founder's principal) through `set_status`. The canister also has a proposal and voting engine (`propose`, `vote`, `finalize`, `execute`) that does not yet govern anything real. Current state verified on-chain: `Sandbox`. See `legal/regulatory.md` §11.3.
+
 ---
 
 ## 12. Feature Flags

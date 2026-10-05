@@ -204,7 +204,7 @@ Art. 90 et seq. of Ley 21.521 allows the CMF to authorize the temporary operatio
 
 | Requirement | GreyValley status | Action |
 |-----------|--------------|--------|
-| Incorporation as a legal entity in Chile | ❓ To verify | Incorporate a Chilean SpA (a type of simplified stock corporation) if it doesn't exist |
+| Incorporation as a legal entity in Chile | ⚠️ Partial (2026-10-05) | An entity already exists, incorporated as a financial company (Pegasus SpA). Whether to create a separate technology-focused SpA for the protocol and its agreements remains an open decision with the founder's counsel (see `partnerships/odl-agreement.md`) |
 | Technical description of the business model | ✅ corredor-mechanics.md | Adapt to CMF format |
 | AML/CFT plan | ⚠️ Delegated to Koywe | Document the delegation model |
 | Minimum operational capital | ❓ To verify | Determine the amount required for the sandbox |
@@ -750,4 +750,4 @@ The existence of SFA-Sandbox and Koywe's FAPI 2.0 compliance **strengthens GreyV
 
 ---
 
-*GreyValley Regulatory Reference | Updated: 2026-08-09 | Next review: before CMF sandbox application*
+*GreyValley Regulatory Reference | Updated: 2026-10-05 (§11.3 and entity) | Next review: before CMF sandbox application*

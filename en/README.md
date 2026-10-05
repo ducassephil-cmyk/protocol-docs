@@ -27,6 +27,11 @@ The core stack: WebAssembly canisters on a distributed blockchain network with ~
 | [Corredor Mechanics](architecture/corredor-mechanics.md) | How the payment corridor works, SWIFT comparison, Koywe bridge architecture, partner model |
 | [Engineer Pitch](architecture/engineer-pitch.md) | Current code state, deployment instructions, LatAm market positioning |
 
+### Product
+| Document | What's inside |
+|----------|--------------|
+| [GreyValley in 3 minutes](product/overview.md) | What the simplified app does, who it is for and what it is not |
+
 ### Finance
 | Document | What's inside |
 |----------|--------------|
@@ -42,6 +47,7 @@ The core stack: WebAssembly canisters on a distributed blockchain network with ~
 ### Partnerships
 | Document | What's inside |
 |----------|--------------|
+| [Market-maker guide](partnerships/market-maker-guide.md) | Commercial summary of the corridor partner model, no technical jargon |
 | [ODL Agreement Template](partnerships/odl-agreement.md) | Conditional ODL Service Agreement — for prospective ODL corridor partners |
 
 ### Testing

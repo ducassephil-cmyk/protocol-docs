@@ -43,8 +43,9 @@ test with real money.
   (Koywe) with confirmed KYB yet. Nothing to test there for now.
 - **Native sCLP** — blocked by regulatory approval (CMF), runs in
   sandbox, not with real money.
-- **Governance** — deployed, but its status is still "Development",
-  not activated.
+- **Governance** — deployed; its status is "Sandbox" (verified on-chain on
+  2026-10-05, previously "Development") and it now has a proposal and voting
+  engine, but no proposals and not activated: it does not yet govern anything real.
 - **NFID** — disabled (see §2).
 
 ## 1.2 By what you already have — what to test with your token

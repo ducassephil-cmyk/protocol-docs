@@ -23,6 +23,8 @@
 > operational loss on the special Strategic slot's Corridor-liquidity
 > capital, separate from the vesting allocation.
 >
+> **Verified on-chain 2026-10-05** (`genesis_registry`): maximum co-founders 10, cap 300,000 PXRM, Angel guarantee by entry order 80% / 75% / 70% / 65%, and co-founders registered so far: 0 (0 PXRM allocated).
+>
 > **Second track — "Investors Guild"**: a SEPARATE mechanism (own future
 > canister, own tracking, not `genesis_registry`) pulling from the SAME
 > Ecosystem/Guilds bucket — flat 2x return (no tiers), $500 minimum,
