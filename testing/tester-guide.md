@@ -49,7 +49,7 @@ probar con plata real.
 - **Governance** — deployado; su estado es "Sandbox" (verificado en cadena el
   2026-10-05, antes decía "Development") y ya tiene motor de propuestas y votos,
   pero sin propuestas ni activar: todavía no gobierna nada real.
-- **NFID** — deshabilitada (ver §2).
+- **NFID** — ya no está en la app (se sacó el 2026-09-02, ver §2). **Internet Identity** — agregada el 2026-09-12; sí puede operar (ver §2).
 
 ## 1.2 Por lo que ya tienes — qué probar según tu token
 
@@ -78,13 +78,15 @@ Si no sabes por dónde empezar, mira qué tienes en la wallet:
 ## 2. Qué necesitás para participar
 
 - **Wallet real, con soporte confirmado por nivel:**
-  - **Plug** — única wallet con soporte completo hoy. Usa esta si puedes.
+  - **Plug** — wallet con soporte completo (junto a Internet Identity). Usa esta si puedes.
   - **Oisy** — custodia real de PXRM/ICP, puedes tradear o solo mirar la app,
     pero **sin stake ni yield todavía**.
   - **Bitfinity** — solo lectura, no puedes operar.
-  - **NFID** — marcada "Próximamente", deshabilitada. Nunca conectó de
-    verdad en producción pese a tener integración real construida —
-    bug sin auditar, no lo intentes todavía.
+  - **Internet Identity** — agregada el 2026-09-12; entrega una sesión que
+    puede llamar cualquier canister del protocolo, así que puede operar.
+  - **NFID** — ⚠️ Corrección (2026-10-07): ya no aparece en la app. Se sacó el
+    2026-09-02 porque nunca conectó de verdad en producción. (Texto anterior:
+    "marcada Próximamente, deshabilitada".)
 - **Montos chicos, a propósito**: no metas nada que no puedas perder. Esto
   es un tope real del founder, no solo una sugerencia — la idea es que un
   bug real cueste centavos, no que arruine a nadie.
@@ -156,7 +158,7 @@ conocidas, incompletas, y no aportan señal nueva:
   marcado "pendiente" en toda la UI)
 - Marketplace de servicios (funciona, pero no es el foco de esta ronda —
   se puede probar informalmente)
-- NFID (deshabilitada, ver arriba)
+- NFID (ya no está en la app, ver arriba) · Internet Identity (disponible)
 
 ---
 
@@ -215,7 +217,7 @@ test with real money.
 - **Governance** — deployed; its status is "Sandbox" (verified on-chain on
   2026-10-05, previously "Development") and it now has a proposal and voting
   engine, but no proposals and not activated: it does not yet govern anything real.
-- **NFID** — disabled (see §2).
+- **NFID** — no longer in the app (removed 2026-09-02, see §2). **Internet Identity** — added 2026-09-12; it can operate (see §2).
 
 ## 1.2 By what you already have — what to test with your token
 
@@ -244,13 +246,15 @@ If you don't know where to start, look at what's in your wallet:
 ## 2. What you need to participate
 
 - **A real wallet, with confirmed support by tier:**
-  - **Plug** — the only wallet with full support today. Use this one if you can.
+  - **Plug** — wallet with full support (along with Internet Identity). Use this one if you can.
   - **Oisy** — real custody of PXRM/ICP, you can trade or just browse the app,
     but **no stake or yield yet**.
   - **Bitfinity** — read-only, you can't operate.
-  - **NFID** — marked "Coming soon", disabled. Never actually connected in
-    production despite having real integration built — unaudited bug,
-    don't try it yet.
+  - **Internet Identity** — added 2026-09-12; it provides a session that can call
+    any protocol canister, so it can operate.
+  - **NFID** — ⚠️ Correction (2026-10-07): no longer shown in the app. It was
+    removed on 2026-09-02 because it never actually connected in production.
+    (Previous text: "marked Coming soon, disabled".)
 - **Small amounts, on purpose**: don't put in anything you can't afford to
   lose. This is a real cap set by the founder, not just a suggestion — the
   idea is that a real bug costs cents, not that it ruins anyone.
@@ -321,7 +325,7 @@ known, incomplete, and don't add new signal:
   "pending" throughout the UI)
 - Services marketplace (it works, but it's not this round's focus — can be
   tested informally)
-- NFID (disabled, see above)
+- NFID (no longer in the app, see above) · Internet Identity (available)
 
 ---
 

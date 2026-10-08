@@ -550,6 +550,8 @@ Minimum timeline before going to production with third-party funds:
 ### 11.3 Critical gap — Governance code ≠ Governance spec
 
 > ⚠️ **CORRECTED 2026-10-05 (state verified on-chain).** What follows describes the state as of 2026-09-29 and is no longer complete. Since 2026-09-30 the `governance` canister has, in code and deployed, a proposal engine with `propose`, `vote`, `finalize` and `execute`, with quorum, an approval threshold and a timelock per category. **It does not yet govern anything real:** its status is `Sandbox`, there are no proposals, the canisters that custody user funds have a single controller (the founder's principal), and the `multisig` canister is deployed with a single signer and a threshold of 1, not activated. As a result, **the founder's unilateral control over code upgrades and fund movements remains in effect today**; what has changed is that the mechanism to remove it now exists. Activating it (moving control of the canisters to governance or to a multisig with more than one signer) is still pending. The original text is kept below as a historical record.
+>
+> ⚠️ **Correction (2026-10-08, verified with `dfx canister info`).** The sentence above, "a single controller (the founder's principal)", was not exact: 16 canisters (including `amm`, `fee_splitter`, `bridge`, `bridge_canister`, `cdp`, `staking-vault`, `liquidity-pool`, `vusd_ledger` and the PXRM ledger) also had the old dfx cycles wallet (`vdwwt-iaaaa-aaaah-quydq-cai`), also the founder's, as a controller. On 2026-10-08 it was removed from all of them: today every canister has **a single controller**, the founder's principal. The underlying risk does not change: unilateral control remains until the multisig with more than one signer, or governance, is activated.
 
 **What the spec says** (`GREYVALLEY_REGULATORY.md §5`, `INSTRUCCIONES_FOUNDER.md §13.5`):
 > "On-chain proposal + PXRM stakers quorum + 48h timelock"
@@ -750,4 +752,4 @@ The existence of SFA-Sandbox and Koywe's FAPI 2.0 compliance **strengthens GreyV
 
 ---
 
-*GreyValley Regulatory Reference | Updated: 2026-10-05 (§11.3 and entity) | Next review: before CMF sandbox application*
+*GreyValley Regulatory Reference | Updated: 2026-10-08 (§11.3: controllers) · 2026-10-05 (§11.3 and entity) | Next review: before CMF sandbox application*
