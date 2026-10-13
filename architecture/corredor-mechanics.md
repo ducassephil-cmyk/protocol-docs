@@ -149,6 +149,32 @@ La analogía: XRP es una autopista privada construida sobre terreno prestado. IC
 
 ---
 
+### Transparencia verificable en cadena (2026-10-12)
+
+> Agregado 2026-10-12. Comparación hecha con lo que sabemos públicamente de cada red a esa fecha; no es una auditoría de terceros.
+
+**Qué puede consultar cualquiera, sin permiso, en el corredor de GreyValley** (consultas públicas del canister `liquidity-pool` y de `settlement`):
+- El **inventario de cada corredor** (CLP con USD, EUR, BRL y ARS): reservas, número de proveedores, comisión y volumen de 24 h (`getAllPools`, `getPool`).
+- El **precio** que se usa: el del oráculo, no uno que empeora con el tamaño del pago.
+- La **cola de pagos en espera**, en orden de llegada (`getQueueForPair`, `getQueuedPayment`): si falta inventario, el pago no se ejecuta a peor precio, espera a la vista de todos.
+- El **estado de cada pago** y el **reparto de las comisiones** (35/25/23/10/7).
+
+**Cómo se compara**
+| Red | Qué es público | Qué no se ve |
+|---|---|---|
+| XRP / Ripple (pagos con liquidez a demanda) | El libro de órdenes y el AMM de XRPL | La liquidez real de cada corredor está en los libros de los exchanges asociados, fuera de la cadena: no se ve cuánta hay ni si un pago queda esperando |
+| Stellar | El DEX y los pools de la red | El lado en moneda local lo manejan los *anchors* fuera de la cadena; sus reservas no se publican en tiempo real |
+| Celo (Mento) | Reservas y pools de stablecoins de varias monedas, en cadena | No es un corredor empresarial con cola de pagos ni lado bancario |
+| Uniswap / Curve (pares de stablecoins) | Liquidez en cadena | Solo cripto contra cripto: sin lado fiat ni cola |
+| SWIFT / banca corresponsal | — | Nada es público |
+
+Hasta donde sabemos, no hay otro corredor de pagos internacionales que publique en cadena, en tiempo real, su inventario por corredor y su cola de pagos.
+
+**Lo que hay que decir con honestidad**
+- **Hoy el corredor está vacío y apagado:** inventario 0 en los cuatro corredores y la bandera del corredor desactivada hasta tener la autorización correspondiente. La transparencia está construida; todavía no mueve pagos.
+- **El lado en pesos** (la cuenta bancaria del custodio) no está en la cadena. Para cerrar la verificación hace falta publicar la conciliación del saldo bancario contra lo emitido; el contrato de tesorería ya tiene prevista esa conciliación.
+- **Transparencia total también expone a las empresas:** montos y contrapartes quedan a la vista. Para datos comerciales sensibles está en estudio el cifrado con vetKeys (Internet Computer).
+
 ## 4. EL MODELO DE SOCIOS EMPRESARIALES COMO MARKET MAKERS
 
 El insight clave de este documento: **los socios empresariales de GreyValley no son "inversores" — son market makers del corredor CLP**.
@@ -487,5 +513,5 @@ que ninguna integración técnica resuelve.
 
 ---
 
-*Documento: corredor-mechanics.md (antes GREYVALLEY_ODL_MECHANICS.md) | 2026-06-28 · Actualizado: 2026-09-04 (renombrado, referencias "ODL" retiradas, fee real 0.66% (verificado on-chain 2026-09-18), corredor CLP/EUR agregado como real)*  
+*Documento: corredor-mechanics.md (antes GREYVALLEY_ODL_MECHANICS.md) | 2026-06-28 · Actualizado: 2026-10-12 (§3: transparencia verificable en cadena) · 2026-09-04 (renombrado, referencias "ODL" retiradas, fee real 0.66% (verificado on-chain 2026-09-18), corredor CLP/EUR agregado como real)*  
 *Relacionado: GREYVALLEY_APR_MODEL.md, TOKENOMICS.md §10, GREYVALLEY_ICP_TECH.md (mecánica Principal/HTTPS Outcalls/tECDSA)*

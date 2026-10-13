@@ -154,6 +154,32 @@ The analogy: XRP is a private highway built on borrowed land. ICP is a public hi
 
 ---
 
+### On-chain verifiable transparency (2026-10-12)
+
+> Added 2026-10-12. Comparison based on what is publicly known about each network at that date; not a third-party audit.
+
+**What anyone can query, without permission, in GreyValley's corridor** (public queries on the `liquidity-pool` and `settlement` canisters):
+- The **inventory of each corridor** (CLP with USD, EUR, BRL and ARS): reserves, number of providers, fee and 24h volume (`getAllPools`, `getPool`).
+- The **price** used: the oracle's, not one that worsens with payment size.
+- The **queue of waiting payments**, first come first served (`getQueueForPair`, `getQueuedPayment`): if inventory is short, the payment is not executed at a worse price; it waits in plain sight.
+- The **status of each payment** and the **fee split** (35/25/23/10/7).
+
+**How it compares**
+| Network | What is public | What you can't see |
+|---|---|---|
+| XRP / Ripple (on-demand liquidity payments) | The XRPL order book and AMM | Each corridor's real liquidity sits in partner exchanges' order books, off-chain: you can't see how much there is or whether a payment is waiting |
+| Stellar | The network's DEX and pools | The local-currency leg is handled by anchors off-chain; their reserves are not published in real time |
+| Celo (Mento) | Reserves and stablecoin pools for several currencies, on-chain | Not a business corridor with a payment queue or a banking leg |
+| Uniswap / Curve (stablecoin pairs) | On-chain liquidity | Crypto-to-crypto only: no fiat leg, no queue |
+| SWIFT / correspondent banking | — | Nothing is public |
+
+As far as we know, no other international payments corridor publishes its per-corridor inventory and payment queue on-chain, in real time.
+
+**What must be said honestly**
+- **Today the corridor is empty and switched off:** inventory 0 in all four corridors and the corridor flag disabled until the corresponding authorization is in place. The transparency is built; it doesn't move payments yet.
+- **The peso leg** (the custodian's bank account) is not on-chain. Closing the loop requires publishing the reconciliation of the bank balance against what was issued; the treasury contract already provides for that reconciliation.
+- **Full transparency also exposes businesses:** amounts and counterparties are visible. For sensitive commercial data, encryption with vetKeys (Internet Computer) is under study.
+
 ## 4. THE BUSINESS-PARTNER-AS-MARKET-MAKER MODEL
 
 The key insight of this document: **GreyValley's business partners are not "investors" — they are market makers of the CLP corridor**.
@@ -497,5 +523,5 @@ that no technical integration solves.
 
 ---
 
-*Document: corredor-mechanics.md (formerly GREYVALLEY_ODL_MECHANICS.md) | 2026-06-28 · Updated: 2026-09-04 (renamed, "ODL" references removed, real fee 0.66% (verified on-chain 2026-09-18), CLP/EUR corridor added as real)*
+*Document: corredor-mechanics.md (formerly GREYVALLEY_ODL_MECHANICS.md) | 2026-06-28 · Updated: 2026-10-12 (§3: on-chain verifiable transparency) · 2026-09-04 (renamed, "ODL" references removed, real fee 0.66% (verified on-chain 2026-09-18), CLP/EUR corridor added as real)*
 *Related: GREYVALLEY_APR_MODEL.md, TOKENOMICS.md §10, GREYVALLEY_ICP_TECH.md (Principal/HTTPS Outcalls/tECDSA mechanics)*
