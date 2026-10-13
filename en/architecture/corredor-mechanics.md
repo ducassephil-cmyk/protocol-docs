@@ -473,6 +473,10 @@ This is viable because Pegasus SpA **is already a real Chilean entity** —
 Fintoc only operates over Chilean and Mexican banks, so the missing piece
 for CLP is regulatory (CMF), not banking or code.
 
+> ⚠️ Correction (2026-10-13): Pegasus SpA exists, but it is an SpA with no commercial activity, registered only with the
+> SII (code 643000), with no authorization or registration with the CMF or the UAF. Beyond the CMF authorization, an
+> active company bank account for custody would also be needed.
+
 **Real gap found 2026-08-24 — off-ramp (withdrawal) with no real payout:**
 `sclp_treasury.requestRedeem()` burns the user's sCLP and logs the
 request, but never triggers the wire transfer (TEF) back to the bank — the code

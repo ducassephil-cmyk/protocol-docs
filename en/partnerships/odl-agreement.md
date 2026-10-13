@@ -9,6 +9,8 @@
 GreyValley SpA (a Chilean simplified stock corporation, "SpA," in the process of being formed), RUT (Chilean taxpayer ID / *Rol Único Tributario*) pending, represented by Philippe Ducasse La Rivera, RUT XX.XXX.XXX-X, email [official contact pending confirmation].
 
 > ⚠️ **Real correction 2026-09-29 (docs audit) — "in the process of being formed" is not confirmed as accurate today.** On 2026-08-24 the founder confirmed that the real Chilean entity behind the protocol (Pegasus SpA) **is already incorporated**, as a *financiera* (a regulated Chilean financial-services company) — it is not a new SpA pending formation. It remains an open, unresolved question (as of 2026-08-30) whether it makes sense to create a separate, purely tech-purpose SpA to sign agreements of this kind without exposing Pegasus SpA (the *financiera*) to the custody risk of an ODL partner. **Do not sign this agreement under the name/RUT of any entity until the founder's lawyer confirms which real entity signs** — this PARTIES block is a placeholder pending that decision, not verified data.
+>
+> ⚠️ **Correction (2026-10-13, confirmed by the founder).** Pegasus SpA is an SpA **with no commercial activity**, incorporated through *Empresa en un Día*, with SII activity code 643000 and **registered only with the SII**: it has **no authorization or registration with the CMF, the UAF or any other supervisor**. "Financiera" referred only to its declared business purpose (*giro*), not to a regulated status. The future GreyValley SpA (software *giro*, no custody of client funds) **is not yet incorporated**.
 
 **The Client:**
 [Company name], RUT [XX.XXX.XXX-X], represented by [Name], RUT [XX.XXX.XXX-X], email [email].

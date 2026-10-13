@@ -203,7 +203,7 @@ El Art. 90 y ss. de la Ley 21.521 permite a la CMF autorizar la operación tempo
 
 | Requisito | Estado GreyValley | Acción |
 |-----------|--------------|--------|
-| Constitución como entidad legal en Chile | ⚠️ Parcial (2026-10-05) | Ya existe una entidad constituida como financiera (Pegasus SpA). Sigue abierta, con el abogado del founder, la decisión de si conviene una SpA separada de giro tecnológico para el protocolo y sus acuerdos (ver `partnerships/odl-agreement.md`) |
+| Constitución como entidad legal en Chile | ⚠️ Parcial (2026-10-05) | Ya existe una entidad constituida como financiera (Pegasus SpA). Sigue abierta, con el abogado del founder, la decisión de si conviene una SpA separada de giro tecnológico para el protocolo y sus acuerdos (ver `partnerships/odl-agreement.md`) ⚠️ Corrección (2026-10-13): Pegasus SpA es una SpA sin actividad, giro SII 643000, registrada solo ante el SII; sin autorización ni registro ante la CMF ni la UAF ("financiera" era solo su giro). GreyValley SpA aún no está constituida. |
 | Descripción técnica del modelo de negocio | ✅ corredor-mechanics.md | Adaptar a formato CMF |
 | Plan AML/CFT | ⚠️ Delegado a Koywe | Documentar el modelo de delegación |
 | Capital mínimo operacional | ❓ Verificar | Determinar monto requerido para el sandbox |
@@ -551,7 +551,7 @@ Timeline mínimo antes de ir a producción con fondos de terceros:
 
 > ⚠️ **CORREGIDO 2026-10-05 (estado verificado en cadena).** Lo que sigue describe el estado del 2026-09-29 y ya no es completo. Desde el 2026-09-30 el canister `governance` tiene en el código y desplegado un motor de propuestas con `propose`, `vote`, `finalize` y `execute`, con quórum, umbral de aprobación y timelock por categoría. **Todavía no gobierna nada real:** su estado es `Sandbox`, no existen propuestas, los canisters que custodian fondos de usuarios tienen un único controller (el principal del founder) y el canister `multisig` está desplegado con un solo firmante y umbral 1, sin activar. En consecuencia, **el control unilateral del founder sobre las actualizaciones de código y los movimientos de fondos sigue vigente hoy**; lo que cambió es que ahora existe el mecanismo para quitarlo. Activarlo (transferir el control de los canisters al governance o al multisig con más de un firmante) sigue pendiente. El texto original se conserva debajo como registro histórico.
 >
-> ⚠️ **Corrección real (2026-10-08, verificado con `dfx canister info`).** La frase de arriba "un único controller (el principal del founder)" no era exacta: 16 canisters (entre ellos `amm`, `fee_splitter`, `bridge`, `bridge_canister`, `cdp`, `staking-vault`, `liquidity-pool`, `vusd_ledger` y el ledger de PXRM) tenían además como controller la antigua wallet de cycles de dfx (`vdwwt-iaaaa-aaaah-quydq-cai`), también del founder. El 2026-10-08 se quitó de todos: hoy cada canister tiene **un solo controller**, el principal del founder. El riesgo de fondo no cambia: el control unilateral sigue vigente hasta activar el multisig con más de un firmante o la gobernanza.
+> ⚠️ **Corrección real (2026-10-08, verificado con `dfx canister info`).** La frase de arriba "un único controller (el principal del founder)" no era exacta: 16 canisters (entre ellos `amm`, `fee_splitter`, `bridge`, `bridge_canister`, `cdp`, `staking-vault`, `liquidity-pool`, `vusd_ledger` y el ledger de PXRM) tenían además como controller la antigua wallet de cycles de dfx (`vdwwt-iaaaa-aaaah-quydq-cai`), también del founder. El 2026-10-08 se quitó de todos: hoy cada canister tiene **un solo controller**, el principal del founder. Excepción: el ledger viejo de PXRM `5zqoe…`, reemplazado en agosto de 2026, tiene como controller a `y76ov…` (verificado el 2026-10-13). El riesgo de fondo no cambia: el control unilateral sigue vigente hasta activar el multisig con más de un firmante o la gobernanza.
 
 **Lo que dice la spec** (`GREYVALLEY_REGULATORY.md §5`, `INSTRUCCIONES_FOUNDER.md §13.5`):
 > "Propuesta on-chain + quórum de PXRM stakers + timelock 48h"
@@ -752,4 +752,4 @@ La existencia de SFA-Sandbox y el cumplimiento FAPI 2.0 de Koywe **fortalece el 
 
 ---
 
-*GreyValley Regulatory Reference | Actualizado: 2026-10-08 (§11.3: controllers) · 2026-10-05 (§11.3 y entidad) | Próxima revisión: antes de aplicación sandbox CMF*
+*GreyValley Regulatory Reference | Actualizado: 2026-10-13 (entidad Pegasus SpA; §11.3: ledger viejo de PXRM) · 2026-10-08 (§11.3: controllers) · 2026-10-05 (§11.3 y entidad) | Próxima revisión: antes de aplicación sandbox CMF*

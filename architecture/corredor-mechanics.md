@@ -464,6 +464,10 @@ Esto es viable porque Pegasus SpA **ya es una entidad chilena real** — Fintoc 
 opera sobre bancos chilenos y mexicanos, así que la pieza que falta para CLP es
 regulatoria (CMF), no bancaria ni de código.
 
+> ⚠️ Corrección (2026-10-13): Pegasus SpA existe, pero es una SpA sin actividad comercial, registrada solo ante el SII
+> (giro 643000), sin autorización ni registro ante la CMF ni la UAF. Además de la autorización CMF, faltaría operar una
+> cuenta bancaria activa de la empresa para la custodia.
+
 **Hueco real encontrado 2026-08-24 — off-ramp (retiro) sin payout real:**
 `sclp_treasury.requestRedeem()` quema el sCLP del usuario y registra la
 solicitud, pero nunca dispara el TEF de vuelta al banco — el código solo

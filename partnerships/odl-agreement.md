@@ -9,6 +9,8 @@
 GreyValley SpA (en constitución), RUT en trámite, representada por Philippe Ducasse La Rivera, RUT XX.XXX.XXX-X, correo [contacto oficial pendiente de confirmar].
 
 > ⚠️ **Corrección real 2026-09-29 (auditoría de docs) — "en constitución" no está confirmado como cierto hoy.** El founder confirmó el 2026-08-24 que la entidad chilena real detrás del protocolo (Pegasus SpA) **ya está constituida**, como financiera — no es una SpA nueva en trámite. Sigue abierta y sin resolver (al 2026-08-30) la pregunta de si conviene crear una SpA separada de giro puramente tech para firmar este tipo de acuerdos sin exponer a Pegasus SpA (la financiera) al riesgo de custodia de un partner ODL. **No firmar este acuerdo con el nombre/RUT de una entidad sin que el abogado del founder confirme primero cuál entidad real firma** — este bloque de PARTES es un placeholder pendiente de esa decisión, no un dato verificado.
+>
+> ⚠️ **Corrección real (2026-10-13, confirmado por el founder).** Pegasus SpA es una SpA **sin actividad comercial**, constituida por *Empresa en un Día*, con código de actividad del SII 643000 y **registrada solo ante el SII**: **no tiene autorización ni registro ante la CMF, la UAF ni otro organismo**. "Financiera" se refería solo a su giro declarado, no a una condición regulada. La futura GreyValley SpA (giro de software, sin custodia de fondos de clientes) **aún no está constituida**.
 
 **El Cliente:**
 [Nombre empresa], RUT [XX.XXX.XXX-X], representada por [Nombre], RUT [XX.XXX.XXX-X], correo [email].

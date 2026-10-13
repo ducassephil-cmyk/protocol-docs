@@ -4,6 +4,8 @@ Public technical and commercial documentation for the DeFi payment protocol buil
 
 *This is a full English translation of the repo's original documentation. The original working versions (mixed Spanish/English) are available one level up from [the repo root](../README.md).*
 
+**Try it:** the simplified app is live at **https://greyvalley.xyz/app** (Swap, Lend/Borrow, Vaults, Portfolio and Riverside, the business area); the business program (GV District) is at **https://greyvalley.xyz/distrito**. Early-stage public software: no external users yet, use small amounts.
+
 ---
 
 ## What is this?
