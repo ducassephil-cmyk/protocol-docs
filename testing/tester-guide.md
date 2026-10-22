@@ -39,6 +39,12 @@ probar con plata real.
   direcciones) los protege.
 - **CDP** — mintear vUSD real contra ICP, ckBTC, ckETH o PXRM como
   colateral (mint habilitado globalmente).
+  ⚠️ Corrección (2026-10-22, verificado en cadena): el mint de vUSD está
+  **apagado** (`vusdMint = false`); hoy no se puede mintear vUSD nuevo.
+- **App simplificada** (`/app`, agregado 2026-10-22) — Swap y Convertir (con
+  una comisión de 0,22 % cuando la ruta pasa por ICPSwap), Prestar y Pedir
+  (pool de crédito en ckUSDC contra ckBTC o ckETH), órdenes Límite y
+  Automático, y bóvedas. Detalle en `product/overview.md`.
 
 **Apagado o bloqueado hoy (a propósito, no por bug):**
 - **Corredor fiat CLP↔USD / CLP↔EUR** — el código real ya existe y está
@@ -162,7 +168,7 @@ conocidas, incompletas, y no aportan señal nueva:
 
 ---
 
-*Última actualización: 2026-09-04. Este documento se actualiza a medida que
+*Última actualización: 2026-09-04 (§1.1 corregida el 2026-10-22: vUSD y app simplificada). Este documento se actualiza a medida que
 se confirman o descartan los hallazgos de arriba — no es un documento
 final.*
 
@@ -207,6 +213,12 @@ test with real money.
   guard (~11%, fixed this week in both directions) protects them.
 - **CDP** — mint real vUSD against ICP, ckBTC, ckETH, or PXRM as
   collateral (minting enabled globally).
+  ⚠️ Correction (2026-10-22, verified on-chain): vUSD minting is
+  **switched off** (`vusdMint = false`); new vUSD cannot be minted today.
+- **Simplified app** (`/app`, added 2026-10-22) — Swap and Convert (with a
+  0.22% fee when the route goes through ICPSwap), Lend and Borrow (a ckUSDC
+  credit pool against ckBTC or ckETH), Limit and Auto orders, and vaults.
+  Details in `product/overview.md`.
 
 **Switched off or blocked today (on purpose, not a bug):**
 - **Fiat corridor CLP↔USD / CLP↔EUR** — the real code already exists and
@@ -329,5 +341,5 @@ known, incomplete, and don't add new signal:
 
 ---
 
-*Last updated: 2026-09-04. This document gets updated as the findings above
+*Last updated: 2026-09-04 (§1.1 corrected on 2026-10-22: vUSD and the simplified app). This document gets updated as the findings above
 get confirmed or ruled out — it's not a final document.*

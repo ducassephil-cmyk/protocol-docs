@@ -36,6 +36,12 @@ test with real money.
   guard (~11%, fixed this week in both directions) protects them.
 - **CDP** — mint real vUSD against ICP, ckBTC, ckETH, or PXRM as
   collateral (minting enabled globally).
+  ⚠️ Correction (2026-10-22, verified on-chain): vUSD minting is
+  **switched off** (`vusdMint = false`); new vUSD cannot be minted today.
+- **Simplified app** (`/app`, added 2026-10-22) — Swap and Convert (with a
+  0.22% fee when the route goes through ICPSwap), Lend and Borrow (a ckUSDC
+  credit pool against ckBTC or ckETH), Limit and Auto orders, and vaults.
+  Details in `product/overview.md`.
 
 **Switched off or blocked today (on purpose, not a bug):**
 - **Fiat corridor CLP↔USD / CLP↔EUR** — the real code already exists and
@@ -158,5 +164,5 @@ known, incomplete, and don't add new signal:
 
 ---
 
-*Last updated: 2026-09-04. This document gets updated as the findings above
+*Last updated: 2026-09-04 (§1.1 corrected on 2026-10-22: vUSD and the simplified app). This document gets updated as the findings above
 get confirmed or ruled out — it's not a final document.*

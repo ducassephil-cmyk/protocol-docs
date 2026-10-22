@@ -71,6 +71,17 @@ The protocol is **live on mainnet** with the following components operational:
 
 In development: Koywe on/off-ramp bridge, sCLP corridor (pending CMF approval), governance canister activation.
 
+> ⚠️ **Correction (2026-10-22, verified on-chain).** Two lines above are out of date:
+> - **Oracle:** it no longer refreshes every 300 s. Each asset has its own timestamp (ICP, BTC and ETH from Internet Computer's XRC; LINK from CoinGecko; CLP and EUR from mindicador.cl with a fallback). During testing it refreshes every few hours and on demand: every contract that uses a price rejects one older than 25 minutes and asks the oracle for a new one first.
+> - **CDP:** minting new vUSD is switched off (`vusdMint = false`). The fiat corridor and sCLP are off too (`bridge = false`), with no fiat partner connected; governance is deployed in `Sandbox` status.
+>
+> Also live since the last update, in the simplified app (`/app`):
+> - **Lend / Borrow:** a ckUSDC credit pool against ckBTC or ckETH. It is permissionless and has no legal opinion yet; see `legal/regulatory.md` §13.
+> - **ICPSwap route fee:** GreyValley charges 0.22% when a swap is routed through ICPSwap, half of it for the referring partner (since 2026-10-16).
+> - **Limit and Auto orders:** limit orders and recurring purchases through the `limit_orders` canister.
+>
+> Details: `product/overview.md`.
+
 ---
 
 ## Contact

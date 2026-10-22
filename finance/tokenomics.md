@@ -427,6 +427,28 @@ donde ocurrió (`amm.receiveAllocationForPair`), proporcional a su LP. Los fees 
 (p. ej. interés CDP) se reparten entre todos los pools ponderados por el valor de cada pool
 (antes 1/n por igual, lo que le daba a un pool con $1 lo mismo que a uno con $1M).
 
+### 4.7 — Comisión de la ruta ICPSwap (desplegada 2026-10-16)
+
+Cuando la app simplificada enruta un swap por ICPSwap (un DEX de terceros), GreyValley cobra **0,22 % del monto
+ingresado**, en el token de entrada. No pasa por los buckets de arriba ni usa PXRM:
+
+- La comisión sale con una **transferencia aparte**, antes del swap, a una subcuenta del `fee_splitter`: una por
+  socio (si el usuario llegó con un enlace `?partner=`) o una "sin socio". GreyValley no custodia el swap.
+- Solo se cobra si la comisión es al menos 3 veces el fee de red del token. Tokens admitidos: ICP, ckBTC, ckETH,
+  ckLINK y ckUSDC.
+- **Reparto:** el `partnerFeeBps` del socio (hoy 50 %) queda en `pendingPartnerFee` y el socio lo cobra con
+  `claimPartnerFee`. El resto va a Tesorería, y sin socio va todo a Tesorería. Reparte `settleRouteFee`, que puede
+  llamar cualquier principal no anónimo; además, el tick del backend llama a `settleAllRouteFees` cada 20 min.
+- Público: `getRouteFeeStats(token)` muestra lo cobrado, lo repartido a socios y lo enviado a Tesorería.
+
+### 4.8 — Interés de Lend (2026-10)
+
+El pool de crédito en ckUSDC (`lending`) no usa el `fee_splitter`. Del interés que pagan quienes piden, el
+**85 % es para quienes prestan** y el **15 %** (`treasuryCutBps`) va primero a una reserva de seguro, que cubre
+deuda incobrable, hasta el 5 % del pool. Cuando la reserva está llena, ese 15 % va a la Tesorería. Desde el
+2026-10-18 el resto que no alcanza a una unidad pasa a la actualización siguiente (`cutCarry`) en vez de perderse
+por redondeo. Público: `getPool` y `getRiskParams`.
+
 ## 5b. vUSD Institutional Track (NUEVO — 2026-07-01)
 
 > ⚠️ **Nota de riesgo regulatorio (2026-08-07):** "No requiere CMF" abajo es una
@@ -447,7 +469,7 @@ Track de rendimiento estable para inversores clásicos, empresas y bancos. **No 
 | Fuente suplementaria | Boost adicional en PXRM vía Guild Multiplier (Treasury, §2) — existe como clasificación en `staking-vault` desde 2026-08-13, pero sin wiring a ningún payout real todavía |
 | Colateral | ckUSDC del usuario (CDP interno, ratio 110%) |
 | Al salir | vUSD quemado, ckUSDC devuelto íntegro |
-| Activación | ✅ Mint live desde 2026-08-02 (`ENABLE_VUSD_MINT = true`) — pero vUSD no tiene ningún uso real más allá de cerrar el propio CDP: no es enviable, no es swapeable, el Marketplace es solo UI sin canister (ver `GREYVALLEY_MASTER_STATE.md` §32) |
+| Activación | ✅ Mint live desde 2026-08-02 (`ENABLE_VUSD_MINT = true`) — pero vUSD no tiene ningún uso real más allá de cerrar el propio CDP: no es enviable, no es swapeable, el Marketplace es solo UI sin canister (ver `GREYVALLEY_MASTER_STATE.md` §32). ⚠️ Corrección (2026-10-22, verificado en cadena): el mint está **apagado** (`vusdMint = false`); hoy no se puede mintear vUSD nuevo |
 
 **Acceso por Guild tier — corregido 2026-08-14, permissionless en los tres:**
 
@@ -679,6 +701,19 @@ cualquier posición de vault o CDP:
 - Transform function obligatoria en todas las HTTP outcalls
 - Fix real 2026-09-09: el precio de LINK perdía los decimales al parsear
   (truncaba después del punto) — corregido, ahora preserva 8 decimales.
+
+> ⚠️ **Corrección (2026-10-22, verificado en cadena).** La tabla de arriba omitía que el tick del backend (cada
+> 20 min) llamaba a `forceRefresh` y refrescaba todos los precios en cada llamada; por eso el "cada 8 h" no era la
+> frecuencia real. Hoy:
+> - **Un timestamp por activo** (desde 2026-10-18): `getPriceFor(sym)` y `getHealth` dan la antigüedad de ICP, BTC,
+>   ETH, LINK, CLP y EUR por separado. LINK ya no adelanta el timestamp global. CLP/EUR tienen respaldo en open.er-api.
+> - **Refresco por intervalos y a pedido** (desde 2026-10-19): el tick del backend refresca solo lo que toca. En esta
+>   etapa de pruebas, ICP, BTC, ETH y LINK cada 6 h y CLP/EUR cada 24 h (desde 2026-10-22), para gastar menos cycles;
+>   antes de abrir a usuarios, ICP vuelve a ≈ 1 h.
+> - **Validación por activo:** `cdp`, `amm` y `lending` rechazan un precio de más de 25 min del activo que usan. Si
+>   está viejo, primero le piden uno nuevo al oráculo (`refreshAsset`, con 5 min de espera mínima entre refrescos del
+>   mismo activo). Los estables del AMM no consultan el oráculo, y PXRM se valida con el precio de ICP.
+> - **Refrescar todo** (`forceRefreshAll`) es solo del controller. Nadie puede fijar un precio a mano.
 
 ### Guard de impacto de swap server-side + recalibración de pools (NUEVO 2026-09-09)
 

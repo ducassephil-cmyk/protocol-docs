@@ -10,6 +10,13 @@
 > specialized in Ley 21.521 reviewing it first — the same criterion
 > `INSTRUCCIONES_FOUNDER.md` applies to its own legal points.
 
+> ⚠️ **Status as of 2026-10-22 (verified on-chain).** This document was written for the full app with the fiat
+> corridor, with Koywe as the regulated ramp. That corridor and sCLP are **switched off** (`bridge = false`) and no
+> fiat partner is operating: Koywe, SFA and Fintoc are still pending. What this document says about Koywe (CLP held at
+> Koywe, delegated KYC/AML) describes the design, not what runs today. The current regulatory surface comes from the
+> simplified app (`/app`): **Lend**, live and without KYC; the 0.22% fee for routing to ICPSwap; partner fees; and
+> Limit/Auto orders. See **§13**.
+
 ---
 
 ## 1. Chile's Regulatory Framework — What Applies to GreyValley
@@ -148,7 +155,7 @@ In V1, the Gnosis Safe is the most legally defensible architecture because:
 
 If the GreyValley team can upgrade the `bridge_canister` canister without governance approval, they have de facto unilateral control over the USDC in the EVM wallet. A regulator follows that thread directly.
 
-**The solution:** the `governance` canister (`src/governance/main.mo`, 71 lines, **deployed on mainnet since 2026-08-13** — `ynmo7-taaaa-aaaah-quzjq-cai`, status `Development`) must be **activated** (to `#Live`/`#Restricted`) **before going to production with real funds** and must have control over `bridge_canister` upgrades. The deploy has already happened; what remains pending is the status activation and the controller transfer described in the steps below.
+**The solution:** the `governance` canister (`src/governance/main.mo`, 71 lines, **deployed on mainnet since 2026-08-13** — `ynmo7-taaaa-aaaah-quzjq-cai`, status `Development` — ⚠️ correction 2026-10-22: `Sandbox`, verified on-chain) must be **activated** (to `#Live`/`#Restricted`) **before going to production with real funds** and must have control over `bridge_canister` upgrades. The deploy has already happened; what remains pending is the status activation and the controller transfer described in the steps below.
 
 ### Recommended governance model (founder-led with DAO oversight)
 
@@ -206,10 +213,10 @@ Art. 90 et seq. of Ley 21.521 allows the CMF to authorize the temporary operatio
 |-----------|--------------|--------|
 | Incorporation as a legal entity in Chile | ⚠️ Partial (2026-10-05) | An entity already exists, incorporated as a financial company (Pegasus SpA). Whether to create a separate technology-focused SpA for the protocol and its agreements remains an open decision with the founder's counsel (see `partnerships/odl-agreement.md`) ⚠️ Correction (2026-10-13): Pegasus SpA is an SpA with no activity, SII code 643000, registered only with the SII; no authorization or registration with the CMF or UAF ("financiera" was only its giro). GreyValley SpA is not yet incorporated. |
 | Technical description of the business model | ✅ corredor-mechanics.md | Adapt to CMF format |
-| AML/CFT plan | ⚠️ Delegated to Koywe | Document the delegation model |
+| AML/CFT plan | ⚠️ Delegated to Koywe | Document the delegation model. ⚠️ Correction (2026-10-22): Koywe is not integrated, so nothing is delegated today, and the simplified app does not require KYC (Lend included). The AML/CFT process is still to be defined with the lawyer (§13) |
 | Minimum operational capital | ❓ To verify | Determine the amount required for the sandbox |
 | Complaint handling and SERNAC (Chile's consumer protection agency) | ❌ Does not exist | Design a protocol |
-| Documented governance | ⚠️ Canister deployed (2026-08-13), status `Development` | **Activate governance before applying** |
+| Documented governance | ⚠️ Canister deployed (2026-08-13), status `Development` — ⚠️ correction (2026-10-22, verified on-chain): status `Sandbox`, with the proposal, voting and timelock engine deployed since 2026-09-30 (§11.3) | **Activate governance before applying** |
 | Smart contract audit | ❌ Not started | Hire an external auditor (Certora, OpenZeppelin) |
 
 ### Estimated timeline
@@ -238,7 +245,7 @@ Month 31+: Permanent authorization or regulatory shutdown
 | Incorrect communication framing | 🔴 High | "Public Software" copy guide (see §8) | ❌ Not formalized |
 | No registration as PSAV with CMF | 🟡 Medium | CMF Sandbox application | ❌ Not started |
 | sCLP requires Central Bank authorization | 🔴 High | Feature flag `FEATURE_SCLP_BRIDGE=false` | ✅ Disabled in V1 |
-| AML/CFT with no own process | 🟡 Medium | Delegated to Koywe (KYC/KYB) — document it | ⚠️ Not formally documented |
+| AML/CFT with no own process | 🟡 Medium | Delegated to Koywe (KYC/KYB) — document it | ⚠️ Not formally documented. ⚠️ 2026-10-22: Koywe is not integrated and the simplified app runs without KYC (§13) |
 | vUSD as a "security" | 🟡 Medium | Collateral belongs to the user themselves (no external pooling) | 🔍 Analyze |
 | Contract audit | 🟡 Medium | Hire an auditor before the sandbox | ❌ Not started |
 
@@ -752,4 +759,37 @@ The existence of SFA-Sandbox and Koywe's FAPI 2.0 compliance **strengthens GreyV
 
 ---
 
-*GreyValley Regulatory Reference | Updated: 2026-10-13 (Pegasus SpA entity; §11.3: old PXRM ledger) · 2026-10-08 (§11.3: controllers) · 2026-10-05 (§11.3 and entity) | Next review: before CMF sandbox application*
+## 13. Simplified app (`/app`) and status as of 2026-10-22
+
+> Added 2026-10-22. Draft for the conversation with the lawyer; this is not legal advice. The simplified app removes
+> sCLP, the fiat corridor and the fixed PXRM APR, but adds **Lend**, the product with the heaviest regulatory load: a
+> ckUSDC credit pool funded by lenders.
+
+| Topic | Status (verified on-chain on 2026-10-22 unless noted) |
+|---|---|
+| Entities | Pegasus SpA with no commercial activity (SII activity code 643000, registered only with the SII, no CMF or UAF registration); GreyValley SpA not incorporated (stated by the founder) |
+| Users and third-party funds | None: only team tests with small amounts |
+| Fiat corridor and sCLP | Switched off (`bridge = false`); no fiat partner operating |
+| vUSD | Minting switched off (`vusdMint = false`) |
+| Lend | Live (`paused = false`), permissionless and without KYC; no legal opinion |
+| ICPSwap route | GreyValley fee of 0.22% since 2026-10-16; half goes to the partner who referred the user |
+| Limit/Auto orders | Live; an order's funds stay in the `limit_orders` contract until it executes or its owner cancels it |
+| Control | One controller per canister; `multisig` deployed but not activated; `governance` in `Sandbox` (see §11.3) |
+| External audit | Not started |
+
+**New risks:**
+
+| Risk | Severity | Technical mitigant | Status |
+|---|---|---|---|
+| Lend: credit with third-party funds and without KYC (possible deposit-taking or credit intermediation) | 🔴 High | `setPaused`; debt cap of 10,000 ckUSDC per collateral type; 1 ckUSDC minimum; 200% collateral to borrow and liquidation below 140%; insurance reserve of up to 5% of the pool; keeper | ⚠️ Live without a legal opinion; no third-party funds today |
+| 0.22% fee for routing to a third-party DEX (ICPSwap) | 🟡 Medium | Charged as a separate transfer, visible before signing; GreyValley does not custody the swap | Deployed 2026-10-16 |
+| Partner fees (AMM swaps and the ICPSwap route) | 🟡 Medium | On-chain accounting (`pendingPartnerFee`, `claimPartnerFee`) | Live; tax treatment pending |
+| Limit/Auto orders: temporary custody of an order's funds | 🟡 Medium | Lock against double payment through reentrancy (2026-10-17); cancellation by the owner | Live |
+
+**Questions for the lawyer:** whether Lend qualifies as deposit-taking or credit intermediation and which regime
+applies; whether charging a fee for routing to a third-party DEX requires any registration; how to invoice and tax
+partner fees; and which AML/KYC process applies without a fiat partner doing it.
+
+---
+
+*GreyValley Regulatory Reference | Updated: 2026-10-22 (status at the top, §5, §6, §7 and new §13) · 2026-10-13 (Pegasus SpA entity; §11.3: old PXRM ledger) · 2026-10-08 (§11.3: controllers) · 2026-10-05 (§11.3 and entity) | Next review: before CMF sandbox application*
